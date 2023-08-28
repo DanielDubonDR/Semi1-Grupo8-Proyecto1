@@ -8,9 +8,13 @@
 
 - Loguearse con una cuenta a Postman
 - Ir al apartado de `Environments` y configurar sus variables
-<div align="center"><img src="../Images/enviromentPostman.png" width="700"/></div>
+
+<div align="center"><img src="../Images/enviromentPostman.png" width="900"/></div>
+
 - Seleccionar su `Environment`
-<div align="center"><img src="../Images/selectEnv.png" width="700"/></div>
+
+<div align="center"><img src="../Images/selectEnv.png" width="900"/></div>
+
 - Documentar cada endpoint en su categoria correspondiente y guardar los cambios
 
 ## Base de Datos
