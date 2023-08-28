@@ -10,8 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroicons/react": "^1.0.6",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.10.1",
+    "recoil": "^0.7.7",
+    "tailwind-forms": "^1.0.6",
+    "tailwind-merge": "^1.14.0",
+    "tailwind-scrollbar-hide": "^1.1.7",
+    "tw-elements": "^1.0.0-beta3"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

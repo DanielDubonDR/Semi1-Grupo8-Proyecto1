@@ -8,7 +8,7 @@ export default function Navbar({ fixed }) {
           <div class="grid gap-6 md:grid-cols-3 ">
             <div>
                 <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">
-                  SoundStream
+                  
                 </span>
             </div>
             <div class="relative hidden md:block">

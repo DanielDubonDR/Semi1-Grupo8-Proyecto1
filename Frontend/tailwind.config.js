@@ -13,9 +13,12 @@ export default {
       lightPurple: "#984AF0",
       silver: "#CBCBCB",
       white: "#FFFFFF",
+      strongPurple: '#8312b8',
     }}
   },
 
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar-hide')
+  ],
 }
 
