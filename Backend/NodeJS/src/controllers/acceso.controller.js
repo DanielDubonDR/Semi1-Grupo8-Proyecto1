@@ -1,9 +1,7 @@
 import { pool } from '../db.js'
 import bcrypt from 'bcrypt'
-import { v4 as uuidv4 } from 'uuid';
-import { bucketConfig } from '../config/credentials.js';
-import AWS from 'aws-sdk';
 import multer from 'multer';
+import { saveImage } from '../config/imageHandler.js';
 
 const storage = multer.memoryStorage();
 export const upload = multer({ storage: storage });
@@ -19,8 +17,8 @@ export const registrar = async (req, res) => {
 
     if (!(query[0].length > 0)) {
         const passwordCifrado = await cifrarPassword(password);
-        const { Key, Location } = await almacenarFoto(buffer, fileExtension);
-        await pool.query("INSERT INTO usuario (correo, nombres, apellidos, password, fecha_nac, rol, id_foto, path_foto) VALUES (?,?,?,?,?,?,?,?)", [correo, nombres, apellidos, passwordCifrado, fecha_nac, 0, Key, Location]);
+        const { Key, Location } = await saveImage(buffer, fileExtension);
+        const resultQuery = await pool.query("INSERT INTO usuario (correo, nombres, apellidos, password, fecha_nac, rol, id_foto, path_foto) VALUES (?,?,?,?,?,?,?,?)", [correo, nombres, apellidos, passwordCifrado, fecha_nac, 0, Key, Location]);
         status = true;
     }
 
@@ -57,23 +55,4 @@ const cifrarPassword = async (password) => {
 
 const compararPassword = async (password, passwordCifrado) => {
     return await bcrypt.compare(password, passwordCifrado);
-}
-
-const almacenarFoto = async (foto, extension) => {
-    const s3 = new AWS.S3({
-        accessKeyId: bucketConfig.id,
-        secretAccessKey: bucketConfig.key,
-        region: bucketConfig.region
-    });
-
-    const params = {
-        Bucket: bucketConfig.name,
-        Key: "perfil/"+uuidv4()+"."+extension,
-        Body: foto,
-        ACL: 'public-read'
-    };
-
-    const data = await s3.upload(params).promise();
-    console.log(data);
-    return data;
 }

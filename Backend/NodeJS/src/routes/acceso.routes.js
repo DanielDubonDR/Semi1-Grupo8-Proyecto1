@@ -8,7 +8,7 @@ import {
 
 const router = Router();
 
-router.post("/registrar", upload.single('foto'), registrar);
+router.post("/registrar", upload.single('imagen'), registrar);
 router.post("/login", login);
 
 export default router;
