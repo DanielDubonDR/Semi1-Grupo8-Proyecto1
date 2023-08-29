@@ -1,17 +1,26 @@
 import { pool } from '../db.js'
 import bcrypt from 'bcrypt'
+import { v4 as uuidv4 } from 'uuid';
+import { bucketConfig } from '../config/credentials.js';
+import AWS from 'aws-sdk';
+import multer from 'multer';
+
+const storage = multer.memoryStorage();
+export const upload = multer({ storage: storage });
+
 
 export const registrar = async (req, res) => {
     const { nombres, apellidos, correo, password, fecha_nac } = req.body;
-
-    const query = await pool.query("SELECT * FROM usuario WHERE correo = ?", [correo]);
+    const { buffer, originalname } = req.file;
+    const fileExtension = originalname.split('.').pop();
     let status = false
 
-    if (!(query[0].length > 0)){
+    const query = await pool.query("SELECT * FROM usuario WHERE correo = ?", [correo]);
+
+    if (!(query[0].length > 0)) {
         const passwordCifrado = await cifrarPassword(password);
-        console.log(passwordCifrado);
-        console.log(await compararPassword(password, passwordCifrado));
-        await pool.query("INSERT INTO usuario (correo, nombres, apellidos, password, fecha_nac, rol, id_foto, path_foto) VALUES (?,?,?,?,?,?,?,?)", [correo, nombres, apellidos, passwordCifrado, fecha_nac, 0, "a", "b"]);
+        const { Key, Location } = await almacenarFoto(buffer, fileExtension);
+        await pool.query("INSERT INTO usuario (correo, nombres, apellidos, password, fecha_nac, rol, id_foto, path_foto) VALUES (?,?,?,?,?,?,?,?)", [correo, nombres, apellidos, passwordCifrado, fecha_nac, 0, Key, Location]);
         status = true;
     }
 
@@ -38,7 +47,7 @@ export const login = async (req, res) => {
     return res.send({
         "status": status,
         "rol": rol
-     });
+    });
 }
 
 const cifrarPassword = async (password) => {
@@ -48,4 +57,23 @@ const cifrarPassword = async (password) => {
 
 const compararPassword = async (password, passwordCifrado) => {
     return await bcrypt.compare(password, passwordCifrado);
+}
+
+const almacenarFoto = async (foto, extension) => {
+    const s3 = new AWS.S3({
+        accessKeyId: bucketConfig.id,
+        secretAccessKey: bucketConfig.key,
+        region: bucketConfig.region
+    });
+
+    const params = {
+        Bucket: bucketConfig.name,
+        Key: "perfil/"+uuidv4()+"."+extension,
+        Body: foto,
+        ACL: 'public-read'
+    };
+
+    const data = await s3.upload(params).promise();
+    console.log(data);
+    return data;
 }

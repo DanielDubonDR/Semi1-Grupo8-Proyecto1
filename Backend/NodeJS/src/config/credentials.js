@@ -9,3 +9,10 @@ export const dbConfig = {
     database: process.env.DATABASE,
     port: process.env.DB_PORT
 }
+
+export const bucketConfig = {
+    name: process.env.NAME_BUCKET,
+    region: process.env.REGION_BUCKET,
+    id: process.env.ID_BUCKET,
+    key: process.env.KEY_BUCKET
+}
