@@ -1,7 +1,8 @@
 import { pool } from '../db.js'
 import bcrypt from 'bcrypt'
 import multer from 'multer';
-import { saveImage } from '../config/imageHandler.js';
+import { saveObj } from '../config/objectHandler.js';
+import { tipoObjeto } from '../config/constants.js';
 
 const storage = multer.memoryStorage();
 export const upload = multer({ storage: storage });
@@ -17,7 +18,7 @@ export const registrar = async (req, res) => {
 
     if (!(query[0].length > 0)) {
         const passwordCifrado = await cifrarPassword(password);
-        const { Key, Location } = await saveImage(buffer, fileExtension);
+        const { Key, Location } = await saveObj(buffer, fileExtension, tipoObjeto.IMG);
         const resultQuery = await pool.query("INSERT INTO usuario (correo, nombres, apellidos, password, fecha_nac, rol, id_foto, path_foto) VALUES (?,?,?,?,?,?,?,?)", [correo, nombres, apellidos, passwordCifrado, fecha_nac, 0, Key, Location]);
         status = true;
     }
