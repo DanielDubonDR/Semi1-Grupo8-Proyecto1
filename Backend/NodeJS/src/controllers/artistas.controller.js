@@ -1,6 +1,7 @@
 import { pool } from "../db.js";
 import multer from 'multer';
-import { saveImage } from '../config/imageHandler.js';
+import { saveObj, deleteObj } from '../config/objectHandler.js';
+import { tipoObjeto } from '../config/constants.js';
 
 const storage = multer.memoryStorage();
 export const upload = multer({ storage: storage });
@@ -11,7 +12,7 @@ export const createArtist = async (req, res) => {
     const fileExtension = originalname.split('.').pop();
     let status = false
 
-    const { Key, Location } = await saveImage(buffer, fileExtension);
+    const { Key, Location } = await saveObj(buffer, fileExtension, tipoObjeto.IMG);
     const query = await pool.query("INSERT INTO artista (nombres, apellidos, fecha_nac, path_fotografia, id_fotografia) VALUES (?,?,?,?,?)", [nombres, apellidos, fecha_nac, Location, Key]);
     status = query[0].affectedRows > 0;
 
@@ -30,16 +31,41 @@ export const getArtists = async (req, res) => {
 export const getArtistById = async (req, res) => {
     
     const query = await pool.query("SELECT * FROM artista WHERE id_artista = ?", [req.params.id]);
-    const artist = query[0];
+    const artist = query[0][0];
 
     return res.send(artist);
 }
 
-export const updateArtistById = async (req, res) => {
-    res.send({
-        message: "updateArtistById",
-        id: req.params.id
-    });
+export const updateInfoArtistById = async (req, res) => {
+    
+    const id = req.params.id;
+    const { nombres, apellidos, fecha_nac } = req.body;
+    let status = false;
+
+    const query = await pool.query("UPDATE artista SET nombres = ?, apellidos = ?, fecha_nac = ? WHERE id_artista = ?", [nombres, apellidos, fecha_nac, id]);
+
+    status = query[0].affectedRows > 0;
+
+    return res.send({ "status": status });
+}
+
+export const updateImageArtistById = async (req, res) => {
+    
+    const id = req.params.id;
+    const { buffer, originalname } = req.file;
+    const fileExtension = originalname.split('.').pop();
+    let status = false;
+
+    const query = await pool.query("SELECT id_fotografia FROM artista WHERE id_artista = ?", [id]);
+
+    if(query[0].length > 0){
+        await deleteObj(query[0][0].id_fotografia);
+        const { Key, Location } = await saveObj(buffer, fileExtension, tipoObjeto.IMG);
+        const query2 = await pool.query("UPDATE artista SET path_fotografia = ?, id_fotografia = ? WHERE id_artista = ?", [Location, Key, id]);
+        status = query2[0].affectedRows > 0;
+    }
+
+    return res.send({ "status": status });
 }
 
 export const deleteArtistById = async (req, res) => {

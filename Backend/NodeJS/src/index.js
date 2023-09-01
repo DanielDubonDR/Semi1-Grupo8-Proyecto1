@@ -4,6 +4,8 @@ import cors from "cors";
 import handlerTest from "./routes/test.routes.js";
 import handlerAcceso from "./routes/acceso.routes.js";
 import handlerArtista from "./routes/artista.routes.js";
+import handlerCancion from "./routes/cancion.routes.js";
+import handler404 from "./routes/404.routes.js";
 
 const app = express();
 
@@ -15,6 +17,8 @@ app.use(cors());
 app.use(handlerTest);
 app.use(handlerAcceso);
 app.use(handlerArtista);
+app.use(handlerCancion);
+app.use(handler404);
 
 app.listen(4000);
 console.log(`Server on port 4000`);

@@ -4,7 +4,8 @@ import {
     deleteArtistById, 
     getArtistById, 
     getArtists, 
-    updateArtistById, 
+    updateImageArtistById, 
+    updateInfoArtistById, 
     upload
 } from "../controllers/artistas.controller.js";
 
@@ -13,7 +14,8 @@ const router = Router();
 router.post("/artista/crear", upload.single('imagen'), createArtist);
 router.get("/artista/listar", getArtists);
 router.get("/artista/ver/:id", getArtistById);
-router.put("/artista/modificar/:id", updateArtistById);
+router.patch("/artista/modificar/info/:id", updateInfoArtistById);
+router.patch("/artista/modificar/image/:id", upload.single('imagen'), updateImageArtistById);
 router.delete("/artista/eliminar/:id", deleteArtistById);
 
 
