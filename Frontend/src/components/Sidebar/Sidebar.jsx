@@ -1,23 +1,36 @@
 import { HeartIcon, HomeIcon, LibraryIcon, MusicNoteIcon, PlusCircleIcon, RssIcon, SearchIcon, UserIcon } from '@heroicons/react/outline';
 import React from "react";
+import { Outlet, useNavigate } from 'react-router-dom';
 import './Slidebar.css';
 function Sidebar() {
+
+    const navigate = useNavigate();
+
+    const handlerInicio = () => {
+        navigate('/user/home');
+    }
+    const handlerBuscar = () => {
+        console.log('Buscar')
+    }
+    const handlerPerfil = () => {
+        navigate('/user/profile');
+    }
     return(
-        <div className='text-gray-500 p-5 text-xs lg:text-sm border-r border-gray-900 overflow-y-scroll scrollbar-hide h-screen sm: max-w-[12rem] lg:max-w-[15rem] hidden md:inline-flex'>
+        <div className='flex'>
+        <div className='bg-black text-gray-500 p-5 text-xs lg:text-sm border-r border-gray-900 overflow-y-scroll scrollbar-hide h-screen sm: max-w-[12rem] lg:max-w-[16rem] hidden md:inline-flex'>
             <div className='space-y-4'>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-center space-x-2">
                     <img className='h-20 w-20 align-middle' src="http://imgfz.com/i/pxcvWfe.png" alt="" />
-                    <h3 className='tipo_title'>SoundStream</h3>
                 </div>
-                <button className="flex items-center space-x-2 hover:text-white">
+                <button className="flex items-center space-x-2 hover:text-white" onClick={handlerInicio}>
                     <HomeIcon className="h5 w-5"/>
                     <p>Inicio</p>
                 </button>
-                <button className="flex items-center space-x-2 hover:text-white">
+                <button className="flex items-center space-x-2 hover:text-white" onClick={handlerBuscar}>
                     <SearchIcon className="h5 w-5"/>
                     <p>Buscar</p>
                 </button>
-                <button className="flex items-center space-x-2 hover:text-white">
+                <button className="flex items-center space-x-2 hover:text-white" onClick={handlerPerfil}>
                     <UserIcon className="h5 w-5"/>
                     <p>Perfil</p>
                 </button>
@@ -59,6 +72,8 @@ function Sidebar() {
                 </button>
                 
             </div>
+        </div>
+        <Outlet/>
         </div>
     )
 }

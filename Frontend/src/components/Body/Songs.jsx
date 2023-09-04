@@ -1,4 +1,5 @@
 import React from "react";
+import { canciones_artista } from "../datos_test/canciones_artista";
 import Song from "./Song";
 
 //Se creo una lista de canciones para ejemplo
@@ -20,7 +21,7 @@ function Songs() {
     
     return (
         <div className=" px-8 flex flex-col space-y-1 pb-28 text-white">
-            {canciones_ejemplo.map((cancion, i) => (
+            {canciones_artista.map((cancion, i) => (
                 <Song key={i} order={i} track={cancion}/>
             ))}
         </div>

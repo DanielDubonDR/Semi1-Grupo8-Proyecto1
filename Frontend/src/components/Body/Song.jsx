@@ -5,7 +5,7 @@ function Song({order, track}){
                 <p>{order +1}</p>
                 <img 
                 className="h-10 w-10" 
-                src="https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/22/c8/9f/22c89f2d-9989-1996-c608-36e089a3767d/18UMGIM23645.rgb.jpg/1200x1200bb.jpg" 
+                src={track.img} 
                 alt="" 
                 />
 

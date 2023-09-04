@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+.circle_image{
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+.swal2-popup {
+    background-color: rgb(61, 21, 90); /* Cambia el color de fondo a negro */
+}
+.swal2-input {
+    background-color: #fff;
+}
+
+.custom-title{
+    color: white;
+    font-size: 24px;
+    font-Family: 'Quicksand', sans-serif;
+}
+
+.swal2-confirm {
+    background-color: #4caf50;
+    color: white;
+    font-Family: 'Quicksand', sans-serif;
+}
+.swal2-input {
+    font-Family: 'Quicksand', sans-serif;
+}
+.custom-cancel {
+    color: #984AF0; 
+}

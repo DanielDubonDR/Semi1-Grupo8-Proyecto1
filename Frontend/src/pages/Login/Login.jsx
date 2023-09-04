@@ -1,17 +1,38 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useUserContext } from '../../context/UserContext';
+import './Login.css';
 
 function Login() {
-    
+
+  const {logueado, setLogueado} = useUserContext();
+
+  useEffect(() => {
+    if(logueado){
+      navigate('/user/home');
+    }
+  }, [logueado])
+
+  const style_font = {
+    fontFamily: "'Quicksand', sans-serif",
+  };
+
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    setLogueado(true);
+    navigate('/user/home');
+  }
     return (
-        <div className="min-h-screen bg-lightPurple text-white flex justify-center">
+        <div className="min-h-screen bg-lightPurple text-white flex justify-center fuente" >
       <div className="max-w-screen-xl m-0 sm:m-10 bg-black shadow sm:rounded-lg flex justify-center flex-1">
         <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
           <div>
             <img src="http://imgfz.com/i/6mHNsRq.png"
               className="w-52 mx-auto" alt="Logo" />
           </div>
-          <div className="mt-12 flex flex-col items-center">
-            <h1 className="text-2xl xl:text-3xl font-bold font-sans">
+          <div className="mt-12 flex flex-col items-center" >
+            <h1 className="text-2xl xl:text-3xl font-bold" style={style_font}>
               Inicia Sesión
             </h1>
             <div className="w-full flex-1 mt-8">
@@ -19,21 +40,22 @@ function Login() {
               <div className="mx-auto max-w-xs">
                 <input
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                  type="email" placeholder="Email" />
+                  type="email" placeholder="Email" style={style_font}/>
                 <input
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                  type="password" placeholder="Password" />
+                  type="password" placeholder="Password" style={style_font}/>
                 <button
-                  className="mt-5 tracking-wide font-semibold bg-purple text-gray-100 w-full py-4 rounded-lg hover:bg-purple transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
-                  <span className="ml-3">
+                  className="mt-5 tracking-wide font-semibold bg-purple text-gray-100 w-full py-4 rounded-lg hover:bg-purple transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                  type="button" onClick={handleLogin} >
+                  <span className="ml-3" style={style_font}>
                     Iniciar Sesión
                   </span>
                 </button>
-                <p className="mt-6 text-xs text-white text-center">
+                <p className="mt-6 text-xs text-white text-center"style={style_font}>
                   ¿Acaso no tienes cuenta? , 
-                  <a href="#" className="border-b border-lightPurple border-dotted text-lightPurple">
+                  <Link to="/registro" className="border-b border-lightPurple border-dotted text-lightPurple"style={style_font} >
                     Registrate Aqui
-                  </a>
+                  </Link>
                 </p>
               </div>
             </div>
