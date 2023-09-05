@@ -20,9 +20,11 @@ export const registrar = async (req, res) => {
         const passwordCifrado = await cifrarPassword(password);
         const { Key, Location } = await saveObj(buffer, fileExtension, tipoObjeto.IMG);
         const resultQuery = await pool.query("INSERT INTO usuario (correo, nombres, apellidos, password, fecha_nac, rol, id_foto, path_foto) VALUES (?,?,?,?,?,?,?,?)", [correo, nombres, apellidos, passwordCifrado, fecha_nac, 0, Key, Location]);
-        // const id_usuario = resultQuery[0].insertId;
-        // crear la playlist por defecto, Me gusta
-        // const resultQuery2 = await pool.query("INSERT INTO playlist (nombre, descripcion, id_portada, path_portada) VALUES (?,?,?,?)", ["Me gusta", "Playlist por defecto", Key, Location]);
+        
+        const id_usuario = resultQuery[0].insertId;
+        const resultQuery2 = await pool.query("INSERT INTO playlist (nombre, descripcion) VALUES (?,?)", ["Me gusta", "La musica que te gusta en un solo lugar"]);
+        const id_playlist = resultQuery2[0].insertId;
+        const resultQuery3 = await pool.query("INSERT INTO playlist_usuario (id_playlist, id_usuario) VALUES (?,?)", [id_playlist, id_usuario]);
         status = true;
     }
 

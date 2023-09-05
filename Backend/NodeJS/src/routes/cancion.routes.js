@@ -2,8 +2,10 @@ import { Router } from "express";
 import { 
     createSong, 
     deleteSongById, 
+    getSongAlbumById, 
     getSongById, 
     getSongs, 
+    getSongsWithAlbum, 
     updateSongById, 
     updateSongImageById, 
     updateSongInfoById, 
@@ -19,6 +21,8 @@ router.post("/cancion/subir/cancion", upload.single('cancion'), uploadSong);
 router.post("/cancion/crear", createSong);
 router.get("/cancion/listar", getSongs);
 router.get("/cancion/ver/:id", getSongById);
+router.get("/cancion/album/listar", getSongsWithAlbum);
+router.get("/cancion/album/ver/:id", getSongAlbumById);
 router.patch("/cancion/modificar/info/:id", updateSongInfoById);
 router.patch("/cancion/modificar/image/:id", updateSongImageById);
 router.patch("/cancion/modificar/cancion/:id", updateSongById);

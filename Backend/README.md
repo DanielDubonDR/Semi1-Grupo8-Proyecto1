@@ -22,3 +22,17 @@
 - Fue creado en mysql utilizando workbench
 
 <div align="center"><img src="../Images/model.png"/></div>
+
+## Plantilla archivo .env
+
+```bash
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DATABASE=sound_stream
+DB_PORT=
+NAME_BUCKET=
+REGION_BUCKET=
+ID_BUCKET=
+KEY_BUCKET=
+```

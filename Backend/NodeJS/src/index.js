@@ -7,6 +7,8 @@ import handlerArtista from "./routes/artista.routes.js";
 import handlerCancion from "./routes/cancion.routes.js";
 import handler404 from "./routes/404.routes.js";
 import handlerPlaylist from "./routes/playlist.routes.js";
+import handlerAlbum from "./routes/album.routes.js";
+import handlerUser from "./routes/user.routes.js";
 
 const app = express();
 
@@ -20,6 +22,8 @@ app.use(handlerAcceso);
 app.use(handlerArtista);
 app.use(handlerCancion);
 app.use(handlerPlaylist);
+app.use(handlerAlbum);
+app.use(handlerUser);
 app.use(handler404);
 
 app.listen(4000);
