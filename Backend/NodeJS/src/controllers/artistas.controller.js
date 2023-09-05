@@ -36,6 +36,17 @@ export const getArtistById = async (req, res) => {
     return res.send(artist);
 }
 
+export const getSongsByArtistId = async (req, res) => {
+
+    const id_artista = req.params.id;
+
+    // SELECT cancion.nombre AS songName, cancion.path_imagen, cancion.id_cancion, album.nombre AS albumName, album.id_album FROM cancion INNER JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion INNER JOIN album ON cancion_album.id_album = album.id_album WHERE album.id_artista = 1;
+
+    const query = await pool.query("SELECT cancion.nombre AS songName, cancion.path_imagen, cancion.id_cancion, album.nombre AS albumName, album.id_album FROM cancion INNER JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion INNER JOIN album ON cancion_album.id_album = album.id_album WHERE album.id_artista = ?", [id_artista]);
+
+    res.send(query[0]);
+}
+
 export const updateInfoArtistById = async (req, res) => {
     
     const id = req.params.id;
@@ -69,8 +80,18 @@ export const updateImageArtistById = async (req, res) => {
 }
 
 export const deleteArtistById = async (req, res) => {
-    res.send({
-        message: "deleteArtistById",
-        id: req.params.id
-    });
+    const id = req.params.id;
+    let status = false;
+
+    const query = await pool.query("SELECT id_fotografia FROM artista WHERE id_artista = ?", [id]);
+
+    if(query[0].length > 0){
+        if(query[0][0].id_fotografia){
+            await deleteObj(query[0][0].id_fotografia);
+        }
+        const query2 = await pool.query("DELETE FROM artista WHERE id_artista = ?", [id]);
+        status = query2[0].affectedRows > 0;
+    }
+
+    return res.send({ "status": status });
 }

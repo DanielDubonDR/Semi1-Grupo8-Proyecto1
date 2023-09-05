@@ -28,14 +28,29 @@ export const getPlaylistsByIdUser = async (req, res) => {
 
     const id_usuario = req.params.id;
 
-    const query = await pool.query("SELECT * FROM playlist WHERE id_playlist IN (SELECT id_playlist FROM playlist_usuario WHERE id_usuario = ?)", [id_usuario]);
+    const query = await pool.query("SELECT id_playlist, nombre, descripcion, path_portada FROM playlist WHERE id_playlist IN (SELECT id_playlist FROM playlist_usuario WHERE id_usuario = ?)", [id_usuario]);
 
-    res.status(200).json( { playlists: query[0] } );
+    res.status(200).send(query[0]);
 }
 
-export const getPlaylistByIdUser = async (req, res) => {
+export const getPlaylistSongsById = async (req, res) => {
 
-    res.status(200).json( { msg: "getPlaylistById" } );
+    const id_playlist = req.params.id;
+
+    const query = await pool.query("SELECT cancion.*, canciones_playlist.id_album FROM cancion INNER JOIN canciones_playlist ON cancion.id_cancion = canciones_playlist.id_cancion WHERE canciones_playlist.id_playlist = ?", [id_playlist]);
+
+    res.status(200).send(query[0]);
+}
+
+export const addSongToPlaylist = async (req, res) => {
+
+    const { id_cancion, id_playlist, id_album } = req.body;
+
+    const query = await pool.query("INSERT INTO canciones_playlist (id_cancion, id_playlist, id_album) VALUES (?,?,?)", [id_cancion, id_playlist, id_album]);
+
+    const status = query[0].affectedRows > 0;
+
+    res.status(200).json( { status } );
 }
 
 export const updatePlaylistInfoById = async (req, res) => {
@@ -70,5 +85,18 @@ export const updatePlaylistPortadaById = async (req, res) => {
 
 export const deletePlaylistById = async (req, res) => {
     
-    res.status(200).json( { msg: "deletePlaylistById" } );
+    const id = req.params.id;
+    let status = false;
+
+    const qeury = await pool.query("SELECT id_portada FROM playlist WHERE id_playlist = ?", [id]);
+
+    if(qeury[0].length > 0){
+        if (qeury[0][0].id_portada != null){
+            await deleteObj(qeury[0][0].id_portada);
+        }
+        const query2 = await pool.query("DELETE FROM playlist WHERE id_playlist = ?", [id]);
+        status = query2[0].affectedRows > 0;
+    }
+
+    res.status(200).json( { status } );
 }
