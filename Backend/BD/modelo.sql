@@ -33,7 +33,7 @@ CREATE TABLE `album` (
   `path_imagen` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id_album`),
   KEY `fk_id_artista_idx` (`id_artista`),
-  CONSTRAINT `fk_id_artista` FOREIGN KEY (`id_artista`) REFERENCES `artista` (`id_artista`)
+  CONSTRAINT `fk_id_artista` FOREIGN KEY (`id_artista`) REFERENCES `artista` (`id_artista`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -86,8 +86,8 @@ CREATE TABLE `cancion_album` (
   `id_album` int DEFAULT NULL,
   KEY `fk_id_cancion_idx` (`id_cancion`),
   KEY `fk_id_album_idx` (`id_album`),
-  CONSTRAINT `fk_id_album` FOREIGN KEY (`id_album`) REFERENCES `album` (`id_album`),
-  CONSTRAINT `fk_id_cancion` FOREIGN KEY (`id_cancion`) REFERENCES `cancion` (`id_cancion`)
+  CONSTRAINT `fk_id_album` FOREIGN KEY (`id_album`) REFERENCES `album` (`id_album`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_id_cancion` FOREIGN KEY (`id_cancion`) REFERENCES `cancion` (`id_cancion`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -105,9 +105,9 @@ CREATE TABLE `canciones_playlist` (
   KEY `fk_id_playlist_idx` (`id_playlist`),
   KEY `fk_id_cancion_idx` (`id_cancion`),
   KEY `fk_id_album_idx` (`id_album`),
-  CONSTRAINT `fk_id_album1` FOREIGN KEY (`id_album`) REFERENCES `cancion_album` (`id_album`),
-  CONSTRAINT `fk_id_cancion1` FOREIGN KEY (`id_cancion`) REFERENCES `cancion_album` (`id_cancion`),
-  CONSTRAINT `fk_id_playlist1` FOREIGN KEY (`id_playlist`) REFERENCES `playlist` (`id_playlist`)
+  CONSTRAINT `fk_id_album1` FOREIGN KEY (`id_album`) REFERENCES `cancion_album` (`id_album`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_id_cancion1` FOREIGN KEY (`id_cancion`) REFERENCES `cancion_album` (`id_cancion`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_id_playlist1` FOREIGN KEY (`id_playlist`) REFERENCES `playlist` (`id_playlist`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -122,18 +122,15 @@ CREATE TABLE `historico` (
   `id_historico` int NOT NULL AUTO_INCREMENT,
   `id_cancion` int DEFAULT NULL,
   `id_album` int DEFAULT NULL,
-  `id_playlist` int DEFAULT NULL,
   `id_usuario` int DEFAULT NULL,
-  `fecha` date DEFAULT NULL,
+  `fecha` datetime DEFAULT NULL,
   PRIMARY KEY (`id_historico`),
-  KEY `fk_id_cancion2_idx` (`id_cancion`),
-  KEY `fk_id_album2_idx` (`id_album`),
-  KEY `fk_id_playlist2_idx` (`id_playlist`),
-  KEY `fk_id_usuario2_idx` (`id_usuario`),
-  CONSTRAINT `fk_id_album2` FOREIGN KEY (`id_album`) REFERENCES `canciones_playlist` (`id_album`),
-  CONSTRAINT `fk_id_cancion2` FOREIGN KEY (`id_cancion`) REFERENCES `canciones_playlist` (`id_cancion`),
-  CONSTRAINT `fk_id_playlist2` FOREIGN KEY (`id_playlist`) REFERENCES `canciones_playlist` (`id_playlist`),
-  CONSTRAINT `fk_id_usuario2` FOREIGN KEY (`id_usuario`) REFERENCES `playlist_usuario` (`id_usuario`)
+  KEY `fk4_idx` (`id_usuario`),
+  KEY `fk4_id_album_idx` (`id_album`),
+  KEY `fk4_id_cancion_idx` (`id_cancion`),
+  CONSTRAINT `fk4_id_album` FOREIGN KEY (`id_album`) REFERENCES `cancion_album` (`id_album`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk4_id_cancion` FOREIGN KEY (`id_cancion`) REFERENCES `cancion_album` (`id_cancion`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk4_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -166,8 +163,8 @@ CREATE TABLE `playlist_usuario` (
   `id_usuario` int DEFAULT NULL,
   KEY `id_playlist_idx` (`id_playlist`),
   KEY `fk_id_usuario_idx` (`id_usuario`),
-  CONSTRAINT `fk_id_playlist` FOREIGN KEY (`id_playlist`) REFERENCES `playlist` (`id_playlist`),
-  CONSTRAINT `fk_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+  CONSTRAINT `fk_id_playlist` FOREIGN KEY (`id_playlist`) REFERENCES `playlist` (`id_playlist`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -201,4 +198,4 @@ CREATE TABLE `usuario` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-09-03  1:01:21
+-- Dump completed on 2023-09-05  0:35:51
