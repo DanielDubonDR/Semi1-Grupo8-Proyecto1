@@ -43,7 +43,7 @@ export const updateUserImageById = async (req, res) => {
     const { buffer, originalname } = req.file;
     const fileExtension = originalname.split('.').pop();
 
-    const dataImg = await query("SELECT id_foto FROM usuario WHERE id_usuario = ?", [id]);
+    const dataImg = await pool.query("SELECT id_foto FROM usuario WHERE id_usuario = ?", [id]);
     const id_foto = dataImg[0][0].id_foto;
 
     if(id_foto != null){
@@ -82,4 +82,67 @@ const cifrarPassword = async (password) => {
 
 const compararPassword = async (password, passwordCifrado) => {
     return await bcrypt.compare(password, passwordCifrado);
+}
+
+export const setHistory = async (req, res) => {
+
+    const { id_cancion, id_album, id_usuario } = req.body;
+    let status = false;
+
+    const currentDatetime = new Date();
+    const formattedDatetime = currentDatetime.toISOString().slice(0, 19).replace('T', ' ');
+
+    
+    const query = await pool.query("INSERT INTO historico (id_cancion, id_album, id_usuario, fecha) VALUES (?, ?, ?, ?)", [id_cancion, id_album, id_usuario, formattedDatetime]);
+    status = query[0].affectedRows > 0;
+
+    return res.send({ "status": status });
+}
+
+export const getTop5songs = async (req, res) => {
+
+    const id_usuario = req.params.id;
+    
+    const query = await pool.query("SELECT id_cancion, COUNT(id_cancion) AS 'reproducciones' FROM historico WHERE id_usuario = ? GROUP BY id_cancion ORDER BY reproducciones DESC LIMIT 5", [id_usuario]);
+    const query2 = await pool.query("SELECT id_cancion, nombre, duracion, path_cancion, path_imagen FROM cancion WHERE id_cancion IN (?)", [query[0].map((item) => item.id_cancion)]);
+
+    // unir los dos arrays
+    for(let i = 0; i < query[0].length; i++){
+        query[0][i] = {...query[0][i], ...query2[0][i]};
+    }
+
+    return res.send(query[0]);
+}
+
+export const top3Artistas = async (req, res) => {
+
+    // SELECT a.id_artista, CONCAT(a.nombres, ' ', a.apellidos) AS nombre_artista, COUNT(*) AS reproducciones FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN artista a ON al.id_artista = a.id_artista JOIN usuario u ON h.id_usuario = u.id_usuario WHERE u.id_usuario = 2 GROUP BY a.id_artista, nombre_artista ORDER BY reproducciones DESC LIMIT 3;
+    const id_usuario = req.params.id;
+    const query = await pool.query("SELECT a.id_artista, CONCAT(a.nombres, ' ', a.apellidos) AS nombre_artista, a.path_fotografia , COUNT(*) AS reproducciones FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN artista a ON al.id_artista = a.id_artista JOIN usuario u ON h.id_usuario = u.id_usuario WHERE u.id_usuario = ? GROUP BY a.id_artista, nombre_artista ORDER BY reproducciones DESC LIMIT 3", [id_usuario]);
+
+    return res.send(query[0]);
+}
+
+export const top3Albumes = async (req, res) => {
+    
+        // obtener los 3 albumes con mas reproducciones
+        const query = await pool.query("SELECT id_album, COUNT(id_album) AS 'reproducciones' FROM historico GROUP BY id_album ORDER BY reproducciones DESC LIMIT 3");
+        const query2 = await pool.query("SELECT id_album, nombre, path_imagen FROM album WHERE id_album IN (?)", [query[0].map((item) => item.id_album)]);
+    
+        // unir los dos arrays
+        for(let i = 0; i < query[0].length; i++){
+            query[0][i] = {...query[0][i], ...query2[0][i]};
+        }
+    
+        return res.send(query[0]);
+}
+
+export const getHistory = async (req, res) => {
+
+    // SELECT h.fecha, c.nombre AS nombre_cancion, c.duracion AS duracion_cancion, a.nombres AS nombre_artista, al.nombre AS nombre_album FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN artista a ON al.id_artista = a.id_artista WHERE h.id_usuario = 2 ORDER BY h.fecha DESC;
+    const id_usuario = req.params.id;
+    const query = await pool.query("SELECT h.fecha, c.nombre AS nombre_cancion, c.duracion AS duracion_cancion, a.nombres AS nombre_artista, al.nombre AS nombre_album FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN artista a ON al.id_artista = a.id_artista WHERE h.id_usuario = ? ORDER BY h.fecha DESC", [id_usuario]);
+
+    return res.send(query[0]);
+
 }
