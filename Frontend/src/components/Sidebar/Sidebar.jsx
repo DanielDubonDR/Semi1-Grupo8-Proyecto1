@@ -2,6 +2,7 @@ import { HeartIcon, HomeIcon, LibraryIcon, MusicNoteIcon, PlusCircleIcon, RssIco
 import React from "react";
 import { Outlet, useNavigate } from 'react-router-dom';
 import './Slidebar.css';
+import Reproductor from '../Rep/Reproductor';
 function Sidebar() {
 
     const navigate = useNavigate();
@@ -10,14 +11,17 @@ function Sidebar() {
         navigate('/user/home');
     }
     const handlerBuscar = () => {
-        console.log('Buscar')
+        navigate('/user/search');
     }
     const handlerPerfil = () => {
         navigate('/user/profile');
     }
     return(
+        
         <div className='flex'>
+            
         <div className='bg-black text-gray-500 p-5 text-xs lg:text-sm border-r border-gray-900 overflow-y-scroll scrollbar-hide h-screen sm: max-w-[12rem] lg:max-w-[16rem] hidden md:inline-flex'>
+            
             <div className='space-y-4'>
                 <div className="flex items-center justify-center space-x-2">
                     <img className='h-20 w-20 align-middle' src="http://imgfz.com/i/pxcvWfe.png" alt="" />
@@ -69,11 +73,17 @@ function Sidebar() {
                 <button className="flex items-center space-x-2 hover:text-white">
                     <PlusCircleIcon className="h5 w-5"/>
                     <p>Crea tu Playlist</p>
+                    
                 </button>
                 
             </div>
+            
+        </div>
+        <div className="flex justify-between">
+        <Reproductor/>
         </div>
         <Outlet/>
+        
         </div>
     )
 }

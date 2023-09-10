@@ -1,14 +1,12 @@
 import React from 'react'
 import 'react-toastify/dist/ReactToastify.css'
+import Reproductor from './components/Rep/Reproductor'
 
 function App() {
   return (
-
-    
-    <div className='bg-black'>  
     
     
-
+    <div className='bg-black'> 
       {/*<main className='flex'>
 
           <Login />

@@ -7,6 +7,8 @@ import LayoutPrivate from '../layout/LayoutPrivate'
 import Login from '../pages/Login/Login'
 import NotFound from '../pages/NotFound'
 import Registro from '../pages/Registro/Registro'
+import Reproductor from '../components/Rep/Reproductor'
+import SearchBar from '../components/Rep/SearchBar'
 
 
 export const router = createBrowserRouter([
@@ -30,7 +32,8 @@ export const router = createBrowserRouter([
         element: <LayoutPrivate />,
         errorElement: <NotFound />,
         children: [
-            {
+            {   
+
                 element: <Sidebar />,
                 children: [
                     {
@@ -44,6 +47,10 @@ export const router = createBrowserRouter([
                     {
                         path:'edit_profile',
                         element: <Profile_Edit />,
+                    },
+                    {
+                        path: 'search',
+                        element: <SearchBar />,
                     }
                 ]
             },

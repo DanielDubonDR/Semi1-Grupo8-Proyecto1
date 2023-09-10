@@ -3,8 +3,8 @@ import React from "react";
 export default function Navbar({ fixed }) {
   return (
     <>
-      
-        <nav class="sticky top-0 bg-gradient-to-r from-lightPurple via-purple to-lightPurple dark:bg-gray-900 z-30 w-full px-2 py-4 shadow-[0_30px_30px_-15px_rgba(0,0,0,0.8)]">
+      <div className="w-full bg-black2">
+      <nav class="sticky top-0 bg-gradient-to-r from-lightPurple via-purple to-lightPurple dark:bg-gray-900 z-30 w-full px-2 py-4 shadow-[0_30px_30px_-15px_rgba(0,0,0,0.8)]">
           <div class="grid gap-6 md:grid-cols-3 ">
             <div>
                 <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">
@@ -40,6 +40,8 @@ export default function Navbar({ fixed }) {
             <div></div>
           </div>
         </nav>
+      </div>
+        
       
     </>
   );
