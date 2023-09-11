@@ -36,6 +36,3 @@ def prueba():
         conexion.close()
 
     return resultado
-
-
-

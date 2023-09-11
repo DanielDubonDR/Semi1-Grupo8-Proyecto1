@@ -1,14 +1,21 @@
 from flask import Flask, request, jsonify
 import json
 from flask_cors import CORS
-from db import blueprint as dbprueba
+from db import blueprint as dbprueba, obtenerConexion, cerrarConexion
 from controllers.Acceso import BlueprintAcceso
+from controllers.Artistas import BlueprintArtistas
+from controllers.Album import BlueprintAlbum
+
 
 app = Flask(__name__)
 CORS(app)
 
+
+
 app.register_blueprint(dbprueba)
 app.register_blueprint(BlueprintAcceso)
+app.register_blueprint(BlueprintArtistas)
+app.register_blueprint(BlueprintAlbum)
 
 
 @app.route('/', methods=['GET'])

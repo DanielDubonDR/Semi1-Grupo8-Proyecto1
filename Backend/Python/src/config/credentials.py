@@ -7,8 +7,8 @@ load_dotenv()
 dbConfig = {
     'host': os.environ.get('DB_HOST'),
     'user': os.environ.get('DB_USER'),
-    'password': os.environ.get('DB_PASS'),
-    'database': os.environ.get('DB_NAME'),
+    'password': os.environ.get('DB_PASSWORD'),
+    'database': os.environ.get('DATABASE'),
     'port': os.environ.get('DB_PORT')
 }
 
