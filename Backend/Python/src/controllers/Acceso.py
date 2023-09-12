@@ -28,8 +28,6 @@ def login():
             status = compararPassword(password, passwordCifrado)
     return jsonify({'status': status, 'rol': rol})
 
-
-
 @BlueprintAcceso.route('/registrar', methods=['POST'])
 def registrar():
     #variables que se reciben del front en un formulario
@@ -76,9 +74,7 @@ def registrar():
         conexion.close()
         status = True
     return jsonify({'status': status})
-
-
-    
+ 
 def cifrarPassword(password):
     #saltos
     salt = bcrypt.gensalt(4)

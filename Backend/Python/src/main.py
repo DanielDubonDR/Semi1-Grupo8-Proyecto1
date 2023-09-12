@@ -5,6 +5,7 @@ from db import blueprint as dbprueba, obtenerConexion, cerrarConexion
 from controllers.Acceso import BlueprintAcceso
 from controllers.Artistas import BlueprintArtistas
 from controllers.Album import BlueprintAlbum
+from controllers.Cancion import BlueprintCancion
 
 
 app = Flask(__name__)
@@ -16,6 +17,7 @@ app.register_blueprint(dbprueba)
 app.register_blueprint(BlueprintAcceso)
 app.register_blueprint(BlueprintArtistas)
 app.register_blueprint(BlueprintAlbum)
+app.register_blueprint(BlueprintCancion)
 
 
 @app.route('/', methods=['GET'])

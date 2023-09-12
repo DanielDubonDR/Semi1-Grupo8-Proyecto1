@@ -16,7 +16,7 @@ def guardarObjeto(contenido, extension, tipoObjeto):
 
     #Subir el archivo
     try:
-        s3.upload_fileobj(contenido, bucketConfig['name'], key, ExtraArgs={'ACL': 'public-read'})
+        #s3.upload_fileobj(contenido, bucketConfig['name'], key, ExtraArgs={'ACL': 'public-read'})
         return {
             'Key': key,
             'Location': f"https://{bucketConfig['name']}.s3.amazonaws.com/{key}"
@@ -30,7 +30,7 @@ def guardarObjeto(contenido, extension, tipoObjeto):
     
 def eliminarObjeto(key):
     try:
-        s3.delete_object(Bucket=bucketConfig['name'], Key=key)
+        #s3.delete_object(Bucket=bucketConfig['name'], Key=key)
         return True
     except Exception as e:
         print(e)

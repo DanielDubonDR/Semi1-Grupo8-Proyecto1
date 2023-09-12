@@ -157,9 +157,9 @@ def eliminarArtista(id):
         if result[0][0]:
             id_foto = result[0][0]
             eliminarObjeto(id_foto)
-        cursor.execute("DELETE FROM artista WHERE id_artista = %s;", (id,))
-        status = cursor.rowcount > 0
-        conexion.commit()
+    cursor.execute("DELETE FROM artista WHERE id_artista = %s;", (id,))
+    status = cursor.rowcount > 0
+    conexion.commit()
     
     cursor.close()
     conexion.close()
