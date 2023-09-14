@@ -1,1 +1,6 @@
 .env
+
+# Archivos y directorios de caché de Python
+__pycache__/
+*.pyc
+*.pyo

@@ -6,6 +6,8 @@ from controllers.Acceso import BlueprintAcceso
 from controllers.Artistas import BlueprintArtistas
 from controllers.Album import BlueprintAlbum
 from controllers.Cancion import BlueprintCancion
+from controllers.User import BlueprintUser
+from controllers.Playlist import BlueprintPlaylist
 
 
 app = Flask(__name__)
@@ -18,6 +20,8 @@ app.register_blueprint(BlueprintAcceso)
 app.register_blueprint(BlueprintArtistas)
 app.register_blueprint(BlueprintAlbum)
 app.register_blueprint(BlueprintCancion)
+app.register_blueprint(BlueprintUser)
+app.register_blueprint(BlueprintPlaylist)
 
 
 @app.route('/', methods=['GET'])

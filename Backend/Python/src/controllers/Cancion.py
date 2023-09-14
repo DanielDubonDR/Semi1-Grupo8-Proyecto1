@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from config.imageHandler import guardarObjeto, eliminarObjeto
 from db import  obtenerConexion
+from io import BytesIO
 
 BlueprintCancion = Blueprint('cancion', __name__)
 
@@ -9,10 +10,15 @@ def subirImagen():
     imagen = request.files['imagen']
     #Extension de la imagen
     extension = imagen.filename.split('.')[-1]
-    contenido = imagen.read()
+    if imagen.filename != '':
+        data = imagen.read()
     #Guardar la imagen
-    nombre_imagen = guardarObjeto(contenido, extension,"Imagenes/")
-
+    nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
+    #Pasar a un json
+    nombre_imagen = {
+        'id_imagen': nombre_imagen['Key'],
+        'path_imagen': nombre_imagen['Location']
+    }
     return jsonify(nombre_imagen)
 
 @BlueprintCancion.route('/cancion/subir/cancion', methods=['POST'])
@@ -20,9 +26,15 @@ def subirCancion():
     cancion = request.files['cancion']
     #Extension de la imagen
     extension = cancion.filename.split('.')[-1]
-    contenido = cancion.read()
+    if cancion.filename != '':
+        data = cancion.read()
     #Guardar la imagen
-    nombre_cancion = guardarObjeto(contenido, extension,"Canciones/")
+    nombre_cancion = guardarObjeto(BytesIO(data), extension,"Canciones/")
+    #Pasar a un json
+    nombre_cancion = {
+        'id_cancion': nombre_cancion['Key'],
+        'path_cancion': nombre_cancion['Location']
+    }
 
     return jsonify(nombre_cancion)
 
@@ -57,8 +69,19 @@ def crearCancion():
 def listarCancion():
     conexion = obtenerConexion()
     cursor = conexion.cursor()
-    cursor.execute("SELECT * FROM cancion;")
+    cursor.execute("SELECT * FROM cancion;") # id_cancion, nombre, duracion, id_imagen, path_imagen, path_cancion, id_obj_cancion
     cancion = cursor.fetchall()
+    #Pasar a un json
+    for i in range(len(cancion)):
+        cancion[i] = {
+            'id_cancion': cancion[i][0],
+            'nombre': cancion[i][1],
+            'duracion': cancion[i][2],
+            'id_imagen': cancion[i][3],
+            'path_imagen': cancion[i][4],
+            'path_cancion': cancion[i][5],
+            'id_obj_cancion': cancion[i][6]
+        }
     cursor.close()
     conexion.close()
     return jsonify(cancion)
@@ -69,6 +92,18 @@ def listarCancionAlbum():
     cursor = conexion.cursor()
     cursor.execute("SELECT cancion.*, cancion_album.id_album FROM cancion LEFT JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion;")
     cancion = cursor.fetchall()
+    #Pasar a un json
+    for i in range(len(cancion)):
+        cancion[i] = {
+            'id_cancion': cancion[i][0],
+            'nombre': cancion[i][1],
+            'duracion': cancion[i][2],
+            'id_imagen': cancion[i][3],
+            'path_imagen': cancion[i][4],
+            'path_cancion': cancion[i][5],
+            'id_obj_cancion': cancion[i][6],
+            'id_album': cancion[i][7]
+        }
     cursor.close()
     conexion.close()
     return jsonify(cancion)
@@ -79,16 +114,38 @@ def verCancionId(id_cancion):
     cursor = conexion.cursor()
     cursor.execute("SELECT * FROM cancion WHERE id_cancion = %s;", (id_cancion,))
     cancion = cursor.fetchone()
+    #Pasar a un json
+    cancion = {
+        'id_cancion': cancion[0],
+        'nombre': cancion[1],
+        'duracion': cancion[2],
+        'id_imagen': cancion[3],
+        'path_imagen': cancion[4],
+        'path_cancion': cancion[5],
+        'id_obj_cancion': cancion[6]
+    }
     cursor.close()
     conexion.close()
     return jsonify(cancion)
 
-@BlueprintCancion.route('/cancion/albun/ver/<id_album>', methods=['GET'])
+@BlueprintCancion.route('/cancion/album/ver/<id_album>', methods=['GET'])
 def verCancionAlbum(id_album):
     conexion = obtenerConexion()
     cursor = conexion.cursor()
     cursor.execute("SELECT cancion.*, cancion_album.id_album FROM cancion LEFT JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion WHERE cancion.id_cancion = %s;", (id_album,))
     cancion = cursor.fetchall()
+    #Pasar a un json
+    for i in range(len(cancion)):
+        cancion[i] = {
+            'id_cancion': cancion[i][0],
+            'nombre': cancion[i][1],
+            'duracion': cancion[i][2],
+            'id_imagen': cancion[i][3],
+            'path_imagen': cancion[i][4],
+            'path_cancion': cancion[i][5],
+            'id_obj_cancion': cancion[i][6],
+            'id_album': cancion[i][7]
+        }
     cursor.close()
     conexion.close()
     return jsonify(cancion)
@@ -171,7 +228,6 @@ def eliminarCancion(id_cancion):
 
     result = cursor.fetchall()
 
-    print(result)
 
     if len(result) > 0:
         if result[0][0]:
@@ -180,7 +236,7 @@ def eliminarCancion(id_cancion):
         if result[0][1]:
             id_cancion_obj = result[0][1]
             eliminarObjeto(id_cancion_obj)
-    cursor.execute("DELETE FROM cancion WHERE id_cancion = %s;", (id_cancion,))
+        cursor.execute("DELETE FROM cancion WHERE id_cancion = %s;", (id_cancion,))
     status = cursor.rowcount > 0
     conexion.commit()
 
