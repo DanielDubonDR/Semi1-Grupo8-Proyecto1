@@ -49,7 +49,7 @@ def modificarInfoUsuario(id_usuario):
     cursor.execute("SELECT * FROM usuario WHERE correo = %s;", (correo,))
     query2 = cursor.fetchone()
 
-    if query2 is None or len(query) == 0:
+    if (query2 is None or len(query) == 0) or query[1] == correo:
         passwordCifrado = query[0]
         status = compararPassword(password, passwordCifrado)
         if status:
