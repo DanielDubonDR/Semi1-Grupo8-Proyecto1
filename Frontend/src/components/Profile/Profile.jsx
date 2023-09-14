@@ -13,11 +13,13 @@ function Profile(){
       navigate('/user/edit_profile');
     }
 
+    const usuario = JSON.parse(sessionStorage.getItem('data_user'));
+
     return(
         <div className="flex flex-col flex-grow items-center justify-center p-12 h-screen overflow-y-scroll scrollbar-hide bg-gradient-to-b from-purple to-black" style={style_font}>
     <h1 className="text-4xl font-bold text-white my-4 mx-auto">Mi Perfil</h1>
             <img className="rounded-full w-40 h-40 mx-auto block border-8 border-lightPurple" 
-                    src="https://img.freepik.com/vector-gratis/astronauta-dabbing-cartoon-vector-icon-illustration-concepto-icono-tecnologia-ciencia-aislado-vector-premium-estilo-dibujos-animados-plana_138676-3360.jpg" 
+                    src={usuario.path_foto} 
                     alt="" 
                     />
   <div className="mx-auto w-full max-w-[550px]">
@@ -30,7 +32,7 @@ function Profile(){
         >
           Nombres
         </label>
-        <h2 className="text-white text-2xl">name</h2>
+        <h2 className="text-white text-2xl">{usuario.nombres}</h2>
       </div>
       <div className="mb-5">
         <label
@@ -39,7 +41,7 @@ function Profile(){
         >
           Apellidos
         </label>
-        <h2 className="text-white text-2xl">last-name</h2>
+        <h2 className="text-white text-2xl">{usuario.apellidos}</h2>
       </div>
       <div className="mb-5">
         <label
@@ -48,7 +50,7 @@ function Profile(){
         >
           Correo Electrónico
         </label>
-        <h2 className="text-white text-2xl">correo@dominio.com</h2>
+        <h2 className="text-white text-2xl">{usuario.correo}</h2>
       </div>
       <div>
         <button

@@ -1,14 +1,13 @@
-import React, { useEffect } from "react";
-import { useState, useRef } from "react";
-import "./Reproductor.css";
+import React, { useEffect, useRef, useState } from "react";
 import { canciones } from "../datos_test/canciones";
 import Barra from "./Barra";
+import "./Reproductor.css";
 import Vol from "./Volumen";
 
 const Reproductor = () => {
   const [canc, setCanc] = useState(canciones);
 
-  const [reproduciendose, setReproduciendose] = useState(canciones);
+  const [reproduciendose, setReproduciendose] = useState(false);
   const [cancionActual, setCancionActual] = useState(canciones[0]);
 
   const audioElem = useRef();

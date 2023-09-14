@@ -1,8 +1,9 @@
 import { HeartIcon, HomeIcon, LibraryIcon, MusicNoteIcon, PlusCircleIcon, RssIcon, SearchIcon, UserIcon } from '@heroicons/react/outline';
 import React from "react";
 import { Outlet, useNavigate } from 'react-router-dom';
-import './Slidebar.css';
+import Header_name from '../Body/Header_name';
 import Reproductor from '../Rep/Reproductor';
+import './Slidebar.css';
 function Sidebar() {
 
     const navigate = useNavigate();
@@ -16,10 +17,14 @@ function Sidebar() {
     const handlerPerfil = () => {
         navigate('/user/profile');
     }
+
+    const handlerFavoritos = () => {
+        navigate('/user/favoritos');
+    }
     return(
         
         <div className='flex'>
-            
+            <Header_name/>
         <div className='bg-black text-gray-500 p-5 text-xs lg:text-sm border-r border-gray-900 overflow-y-scroll scrollbar-hide h-screen sm: max-w-[12rem] lg:max-w-[16rem] hidden md:inline-flex'>
             
             <div className='space-y-4'>
@@ -66,7 +71,7 @@ function Sidebar() {
                     <LibraryIcon className="h5 w-5"/>
                     <p>Tus Playlists</p>
                 </button>
-                <button className="flex items-center space-x-2 hover:text-white">
+                <button className="flex items-center space-x-2 hover:text-white" onClick={handlerFavoritos}>
                     <HeartIcon className="h5 w-5"/>
                     <p>Favoritos</p>
                 </button>
