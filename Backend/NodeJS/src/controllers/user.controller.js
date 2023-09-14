@@ -104,6 +104,11 @@ export const getTop5songs = async (req, res) => {
     const id_usuario = req.params.id;
     
     const query = await pool.query("SELECT id_cancion, COUNT(id_cancion) AS 'reproducciones' FROM historico WHERE id_usuario = ? GROUP BY id_cancion ORDER BY reproducciones DESC LIMIT 5", [id_usuario]);
+
+    if (query[0].length == 0) {
+        return res.send([]);
+    }
+
     const query2 = await pool.query("SELECT id_cancion, nombre, duracion, path_cancion, path_imagen FROM cancion WHERE id_cancion IN (?)", [query[0].map((item) => item.id_cancion)]);
 
     // unir los dos arrays
@@ -123,17 +128,15 @@ export const top3Artistas = async (req, res) => {
     return res.send(query[0]);
 }
 
-export const top3Albumes = async (req, res) => {
+export const top5Albumes = async (req, res) => {
     
-        // obtener los 3 albumes con mas reproducciones
-        const query = await pool.query("SELECT id_album, COUNT(id_album) AS 'reproducciones' FROM historico GROUP BY id_album ORDER BY reproducciones DESC LIMIT 3");
-        const query2 = await pool.query("SELECT id_album, nombre, path_imagen FROM album WHERE id_album IN (?)", [query[0].map((item) => item.id_album)]);
-    
-        // unir los dos arrays
-        for(let i = 0; i < query[0].length; i++){
-            query[0][i] = {...query[0][i], ...query2[0][i]};
-        }
-    
+        // obtener los 3 albumes con mas reproducciones por usuario
+        
+        // SELECT al.id_album, al.nombre, COUNT(*) AS reproducciones FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN usuario u ON h.id_usuario = u.id_usuario WHERE u.id_usuario = 2 GROUP BY al.id_album, al.nombre ORDER BY reproducciones DESC LIMIT 5;
+
+        const id_usuario = req.params.id;
+        const query = await pool.query("SELECT al.id_album, al.nombre, al.path_imagen, COUNT(*) AS reproducciones FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN usuario u ON h.id_usuario = u.id_usuario WHERE u.id_usuario = ? GROUP BY al.id_album, al.nombre ORDER BY reproducciones DESC LIMIT 5", [id_usuario]);
+
         return res.send(query[0]);
 }
 

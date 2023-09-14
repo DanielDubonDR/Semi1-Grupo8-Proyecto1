@@ -48,10 +48,11 @@ export const login = async (req, res) => {
         }
     }
 
-    return res.send({
-        "status": status,
-        "rol": rol
-    });
+    const datosUusario = status ? query[0][0] : null;
+
+    delete datosUusario.password;
+
+    return res.status(200).json({ status, rol, datosUusario })
 }
 
 const cifrarPassword = async (password) => {

@@ -100,3 +100,16 @@ export const deletePlaylistById = async (req, res) => {
 
     res.status(200).json( { status } );
 }
+
+export const deleteSongFromPlaylist = async (req, res) => {
+        
+        const { idc:id_cancion, idp:id_playlist } = req.params;
+
+        console.log(id_cancion, id_playlist);
+    
+        const query = await pool.query("DELETE FROM canciones_playlist WHERE id_cancion = ? AND id_playlist = ?", [id_cancion, id_playlist]);
+    
+        const status = query[0].affectedRows > 0;
+    
+        res.status(200).json( { status } );
+}
