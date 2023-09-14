@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from config.imageHandler import guardarObjeto
 from db import  obtenerConexion
 import bcrypt
+import base64
+from io import BytesIO
 
 
 BlueprintAcceso = Blueprint('acceso', __name__)
@@ -15,18 +17,36 @@ def login():
     #se hace la consulta a la base de datos
     conexion = obtenerConexion()
     cursor = conexion.cursor()
-    cursor.execute("SELECT correo,password,rol FROM usuario WHERE correo = %s;", (correo,))
+    cursor.execute("SELECT * FROM usuario WHERE correo = %s;", (correo,)) # id_usuario, correo, nombres, apellidos, fecha_nac, rol, id_foto, path_foto
     query = cursor.fetchall()
-    estado = False
+    status = False
     rol = 0
+    usuario = {}
     if (len(query) > 0):
-        correoConsulta = query[0][0]
+        correoConsulta = query[0][1]
 
         if (correoConsulta == correo):
-            passwordCifrado = query[0][1]
-            rol = query[0][2]
+            passwordCifrado = query[0][4]
+            rol = query[0][6]
             status = compararPassword(password, passwordCifrado)
-    return jsonify({'status': status, 'rol': rol})
+        usuario = {
+        'id_usuario': query[0][0],
+        'correo': query[0][1],
+        'nombres': query[0][2],
+        'apellidos': query[0][3],
+        'fecha_nac': query[0][5].strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+        'rol': query[0][6],
+        'id_foto': query[0][7],
+        'path_foto': query[0][8]
+        }
+
+ 
+    
+
+
+    cursor.close()
+    conexion.close()
+    return jsonify({'status': status, 'rol': rol, 'datosUusario': usuario})
 
 @BlueprintAcceso.route('/registrar', methods=['POST'])
 def registrar():
@@ -40,7 +60,9 @@ def registrar():
 
     #Extension de la imagen
     extension = imagen.filename.split('.')[-1]
-    contenido = imagen.read()
+
+    if imagen.filename != '':
+        data = imagen.read()
 
 
     status = False
@@ -53,7 +75,7 @@ def registrar():
     if query is None or len(query) == 0:
         passwordCifrado = cifrarPassword(password)
          #Guardar la imagen
-        nombre_imagen = guardarObjeto(contenido, extension,"Imagenes/")
+        nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
         id_foto = nombre_imagen['Key']
         path_foto = nombre_imagen['Location']
         cursor.execute("INSERT INTO usuario (correo, nombres, apellidos, password, fecha_nac, rol, id_foto, path_foto) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);", (correo, nombres, apellidos, passwordCifrado, fecha_nac, 0, id_foto, path_foto))

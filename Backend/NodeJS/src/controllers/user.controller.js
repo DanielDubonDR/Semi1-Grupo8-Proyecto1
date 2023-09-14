@@ -20,17 +20,26 @@ export const getUserById = async (req, res) => {
 export const updateUserInfoById = async (req, res) => {
 
     const id = req.params.id;
-    const { nombres, apellidos, fecha_nac, password } = req.body;
+    const { nombres, apellidos, correo, password } = req.body;
     let status = false;
 
-    const query = await pool.query("SELECT password FROM usuario WHERE id_usuario = ?", [id]);
+    const query = await pool.query("SELECT password, correo FROM usuario WHERE id_usuario = ?", [id]);
     const passwordCifrado = query[0][0].password;
+    const correoActual = query[0][0].correo;
 
     status = await compararPassword(password, passwordCifrado);
 
     if(status){
-        const query = await pool.query("UPDATE usuario SET nombres = ?, apellidos = ?, fecha_nac = ? WHERE id_usuario = ?", [nombres, apellidos, fecha_nac, id]);
-        status = query[0].affectedRows > 0;
+
+        if(correoActual != correo){
+            const query2 = await pool.query("SELECT COUNT(*) AS 'count' FROM usuario WHERE correo = ?", [correo]);
+            status = query2[0][0].count == 0;
+        }
+
+        if(status){
+            const query3 = await pool.query("UPDATE usuario SET nombres = ?, apellidos = ?, correo = ? WHERE id_usuario = ?", [nombres, apellidos, correo, id]);
+            status = query3[0].affectedRows > 0;
+        }
     }
 
     return res.send({ "status": status });
@@ -130,12 +139,19 @@ export const top3Artistas = async (req, res) => {
 
 export const top5Albumes = async (req, res) => {
     
-        // obtener los 3 albumes con mas reproducciones por usuario
-        
-        // SELECT al.id_album, al.nombre, COUNT(*) AS reproducciones FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN usuario u ON h.id_usuario = u.id_usuario WHERE u.id_usuario = 2 GROUP BY al.id_album, al.nombre ORDER BY reproducciones DESC LIMIT 5;
-
         const id_usuario = req.params.id;
-        const query = await pool.query("SELECT al.id_album, al.nombre, al.path_imagen, COUNT(*) AS reproducciones FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN usuario u ON h.id_usuario = u.id_usuario WHERE u.id_usuario = ? GROUP BY al.id_album, al.nombre ORDER BY reproducciones DESC LIMIT 5", [id_usuario]);
+        const query = await pool.query("SELECT id_album, COUNT(id_album) AS reproducciones FROM historico WHERE id_usuario = ? GROUP BY id_album ORDER BY reproducciones DESC LIMIT 5", [id_usuario]);
+
+        if (query[0].length == 0) {
+            return res.send([]);
+        }
+
+        const query2 = await pool.query("SELECT id_album, nombre, path_imagen FROM album WHERE id_album IN (?)", [query[0].map((item) => item.id_album)]);
+
+        // unir los dos arrays
+        for(let i = 0; i < query[0].length; i++){
+            query[0][i] = {...query[0][i], ...query2[0][i]};
+        }
 
         return res.send(query[0]);
 }

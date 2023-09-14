@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from config.imageHandler import guardarObjeto, eliminarObjeto
 from db import  obtenerConexion
+from io import BytesIO
 
 BlueprintArtistas = Blueprint('artistas', __name__)
 
@@ -14,7 +15,8 @@ def crearArtista():
 
     #Extension de la imagen
     extension = imagen.filename.split('.')[-1]
-    contenido = imagen.read()
+    if imagen.filename != '':
+        data = imagen.read()
 
     status = False
 
@@ -22,7 +24,7 @@ def crearArtista():
     conexion = obtenerConexion()
     cursor = conexion.cursor()
     #Guardar la imagen
-    nombre_imagen = guardarObjeto(contenido, extension,"Imagenes/")
+    nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
     id_foto = nombre_imagen['Key']
     path_foto = nombre_imagen['Location']
     cursor.execute("INSERT INTO artista (nombres, apellidos, fecha_nac, path_fotografia, id_fotografia) VALUES (%s, %s, %s, %s, %s);", (nombres, apellidos, fecha_nac, path_foto, id_foto))
@@ -38,8 +40,19 @@ def crearArtista():
 def listarArtistas():
     conexion = obtenerConexion()
     cursor = conexion.cursor()
-    cursor.execute("SELECT * FROM artista;")
+    cursor.execute("SELECT * FROM artista;") #id_artista, nombres, apellidos, fecha_nac, path_fotografia, id_fotografia
     data = cursor.fetchall()
+    #Pasar a un json
+    for i in range(len(data)):
+        fecha_iso = data[i][3].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        data[i] = {
+            'id_artista': data[i][0],
+            'nombres': data[i][1],
+            'apellidos': data[i][2],
+            'fecha_nac': fecha_iso,
+            'path_fotografia': data[i][4],
+            'id_fotografia': data[i][5]
+        }
     cursor.close()
     conexion.close()
     return jsonify(data)
@@ -50,9 +63,20 @@ def verArtista(id):
     cursor = conexion.cursor()
     cursor.execute("SELECT * FROM artista WHERE id_artista = %s;", (id,))
     data = cursor.fetchone()
+    #Pasar a un json
+    data = {
+        'id_artista': data[0],
+        'nombres': data[1],
+        'apellidos': data[2],
+        'fecha_nac': data[3].strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+        'path_fotografia': data[4],
+        'id_fotografia': data[5]
+    }
+    lista = []
+    lista.append(data)
     cursor.close()
     conexion.close()
-    return jsonify(data)
+    return jsonify(lista)
 
 #Falta probar hasta que se creen canciones
 @BlueprintArtistas.route('/artista/ver/canciones/<id>', methods=['GET'])
@@ -81,6 +105,15 @@ def verCancionesArtista(id):
     '''
     cursor.execute(query, (id,))
     data = cursor.fetchall()
+    #Pasar a un json
+    for i in range(len(data)):
+        data[i] = {
+            'songName': data[i][0],
+            'path_imagen': data[i][1],
+            'id_cancion': data[i][2],
+            'albumName': data[i][3],
+            'id_album': data[i][4]
+        }
     cursor.close()
     conexion.close()
     return jsonify(data)
@@ -116,7 +149,8 @@ def modificarImagenArtista(id):
 
     #Extension de la imagen
     extension = imagen.filename.split('.')[-1]
-    contenido = imagen.read()
+    if imagen.filename != '':
+        data = imagen.read()
 
     status = False
 
@@ -131,7 +165,7 @@ def modificarImagenArtista(id):
     if len(result) > 0:
         id_foto = result[0][0]
         eliminarObjeto(id_foto)
-        nombre_imagen = guardarObjeto(contenido, extension,"Imagenes/")
+        nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
         id_foto = nombre_imagen['Key']
         path_foto = nombre_imagen['Location']
         cursor.execute("UPDATE artista SET path_fotografia = %s, id_fotografia = %s WHERE id_artista = %s;", (path_foto, id_foto, id))
@@ -157,7 +191,7 @@ def eliminarArtista(id):
         if result[0][0]:
             id_foto = result[0][0]
             eliminarObjeto(id_foto)
-    cursor.execute("DELETE FROM artista WHERE id_artista = %s;", (id,))
+        cursor.execute("DELETE FROM artista WHERE id_artista = %s;", (id,))
     status = cursor.rowcount > 0
     conexion.commit()
     

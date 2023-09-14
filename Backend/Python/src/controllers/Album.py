@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from config.imageHandler import guardarObjeto, eliminarObjeto
 from db import  obtenerConexion
+from io import BytesIO
 
 BlueprintAlbum = Blueprint('album', __name__)
 
@@ -14,7 +15,8 @@ def crearAlbum():
 
     #Extension de la imagen
     extension = imagen.filename.split('.')[-1]
-    contenido = imagen.read()
+    if imagen.filename != '':
+        data = imagen.read()
 
     status = False
 
@@ -23,7 +25,7 @@ def crearAlbum():
     cursor = conexion.cursor()
 
     #Guardar la imagen
-    nombre_imagen = guardarObjeto(contenido, extension,"Imagenes/")
+    nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
     id_foto = nombre_imagen['Key']
     path_foto = nombre_imagen['Location']
     cursor.execute("INSERT INTO album (nombre, descripcion, id_artista, id_imagen, path_imagen) VALUES (%s, %s, %s, %s, %s);", (nombre, descripcion, id_artista, id_foto, path_foto))
@@ -40,8 +42,18 @@ def crearAlbum():
 def listarAlbum():
     conexion = obtenerConexion()
     cursor = conexion.cursor()
-    cursor.execute("SELECT * FROM album;")
+    cursor.execute("SELECT * FROM album;") #id_album, id_artista, nombre, descripcion, id_imagen, path_imagen
     album = cursor.fetchall()
+    #Pasar a un json
+    for i in range(len(album)):
+        album[i] = {
+            'id_album': album[i][0],
+            'id_artista': album[i][1],
+            'nombre': album[i][2],
+            'descripcion': album[i][3],
+            'id_imagen': album[i][4],
+            'path_imagen': album[i][5]
+        }
     cursor.close()
     conexion.close()
     return jsonify(album)
@@ -52,6 +64,15 @@ def verAlbumId(id_album):
     cursor = conexion.cursor()
     cursor.execute("SELECT * FROM album WHERE id_album = %s;", (id_album,))
     album = cursor.fetchone()
+    #Pasar a un json
+    album = {
+        'id_album': album[0],
+        'id_artista': album[1],
+        'nombre': album[2],
+        'descripcion': album[3],
+        'id_imagen': album[4],
+        'path_imagen': album[5]
+    }
     cursor.close()
     conexion.close()
     return jsonify(album)
@@ -64,6 +85,16 @@ def verAlbum(id_artista):
     album = cursor.fetchall()
     cursor.close()
     conexion.close()
+    #Pasar a un json
+    for i in range(len(album)):
+        album[i] = {
+            'id_album': album[i][0],
+            'id_artista': album[i][1],
+            'nombre': album[i][2],
+            'descripcion': album[i][3],
+            'id_imagen': album[i][4],
+            'path_imagen': album[i][5]
+        }
     return jsonify(album)
 
 @BlueprintAlbum.route('/album/ver/canciones/<id_album>', methods=['GET'])
@@ -72,6 +103,18 @@ def verCancionesAlbum(id_album):
     cursor = conexion.cursor()
     cursor.execute("SELECT cancion.*, id_album FROM cancion INNER JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion WHERE cancion_album.id_album = %s;", (id_album,))
     album = cursor.fetchall()
+    #Pasar a un json
+    for i in range(len(album)):
+        album[i] = {
+            'id_cancion': album[i][0],
+            'nombre': album[i][1],
+            'duracion': album[i][2],
+            'id_imagen': album[i][3],
+            'path_imagen': album[i][4],
+            'path_cancion': album[i][5],
+            'id_obj_cancion': album[i][6],
+            'id_album': album[i][7]
+        }
     cursor.close()
     conexion.close()
     return jsonify(album)
@@ -102,7 +145,8 @@ def modificarImagenAlbum(id_album):
 
     #Extension de la imagen
     extension = imagen.filename.split('.')[-1]
-    contenido = imagen.read()
+    if imagen.filename != '':
+        data = imagen.read()
 
     status = False
 
@@ -117,7 +161,7 @@ def modificarImagenAlbum(id_album):
     if len(result) > 0:
         id_foto = result[0][0]
         eliminarObjeto(id_foto)
-        nombre_imagen = guardarObjeto(contenido, extension,"Imagenes/")
+        nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
         id_foto = nombre_imagen['Key']
         path_foto = nombre_imagen['Location']
         cursor.execute("UPDATE album SET path_imagen = %s, id_imagen = %s WHERE id_album = %s;", (path_foto, id_foto, id_album))
