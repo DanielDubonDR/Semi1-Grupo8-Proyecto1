@@ -9,7 +9,11 @@ import LayoutPrivate from '../layout/LayoutPrivate'
 import Login from '../pages/Login/Login'
 import NotFound from '../pages/NotFound'
 import Registro from '../pages/Registro/Registro'
-
+import Top5_Canciones from '../components/TOP5_canciones/Top5_canciones'
+import Top5_Albumes from '../components/TOP5_Albumes/Top5_albumes'
+import Top3_Artistas from '../components/TOP3/Top3_artistas'
+import Reproductor from '../components/Rep/Reproductor'
+import SearchBar from '../components/Rep/SearchBar'
 
 export const router = createBrowserRouter([
     {
@@ -56,8 +60,21 @@ export const router = createBrowserRouter([
                         path:'favoritos',
                         element: <Favoritos />,
                     }
+                    },
+                    {
+                        path: 'top5_canciones',
+                        element: <Top5_Canciones />
+                    },
+                    {
+                        path: 'top5_albumes',
+                        element: <Top5_Albumes />
+                    },
+                    {
+                        path: 'top3_artistas',
+                        element: <Top3_Artistas />
+                    },
                 ]
             },
         ]
-    }
+    },
 ])

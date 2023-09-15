@@ -3,6 +3,7 @@ import { canciones } from "../datos_test/canciones";
 import Barra from "./Barra";
 import "./Reproductor.css";
 import Vol from "./Volumen";
+import { postReproduccion } from "../routes/routes";
 
 const Reproductor = () => {
   const [canc, setCanc] = useState(canciones);
@@ -29,8 +30,27 @@ const Reproductor = () => {
       length: duration,
     });
   };
+  const fetchData = async () => {
+    try {
+      
+      let values = {
+        id_cancion: 1,
+        id_album: 1,
+        id_usuario: 1
+      }
+      let res = await postReproduccion(values);
+      console.log(res.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   const pausar = () => {
+   if (!reproduciendose) {
+      fetchData();
+    }
+
+
     setReproduciendose(!reproduciendose);
   };
 

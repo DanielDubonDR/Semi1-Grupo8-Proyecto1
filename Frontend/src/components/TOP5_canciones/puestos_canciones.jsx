@@ -6,7 +6,7 @@ export default function Puestos({ canciones }) {
 function Item(data) {
   return (
     <>
-      <div class="flex h-screen">
+      <div class="flex h-screen-full w-screen-full bg-black">
         <div class="m-auto content-center">
           <h1 class="mb-6 text-3xl font-extrabold dark:text-white md:text-5xl lg:text-6xl">
             <span class="animate-gradient text-transparent bg-300% bg-clip-text bg-gradient-to-r to-silver via-purple from-lightPurple">
@@ -46,18 +46,18 @@ function Item(data) {
                     {" "}
                     <img
                       class="w-24 h-24 rounded-md"
-                      src={value.img}
+                      src={value.path_imagen}
                       alt="artista"
                     ></img>
                   </td>
                   <td class="px-10 py-6 text-center">
                     <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                      {value.name}
+                      {value.nombre}
                     </p>
                   </td>
                   <td class="text-right px-10 py-6 ">
                     <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                      {value.reps}
+                      {value.reproducciones}
                     </p>
                   </td>
                 </tr>

@@ -1,5 +1,8 @@
 export const canciones = [
     {
+        id_cancion: 1,
+        id_album: 1,
+        id_usuario: 1,
         name: "No Pero No",
         artist: "Miranda",
         reps : 1063,
@@ -8,6 +11,9 @@ export const canciones = [
         img: "https://is1-ssl.mzstatic.com/image/thumb/Music49/v4/1b/77/1f/1b771f10-8e47-c313-91a9-2187b574ec93/190374235365.jpg/1200x1200bf-60.jpg",
     },
     {
+        id_cancion: 1,
+        id_album: 1,
+        id_usuario: 1,
         name: "Welcome to the Black Parade",
         artist: "My Chemical Romance",
         reps : 1080,
@@ -16,6 +22,9 @@ export const canciones = [
         img: "https://upload.wikimedia.org/wikipedia/en/e/ea/Blackparadecover.jpg",
     },
     {
+        id_cancion: 1,
+        id_album: 1,
+        id_usuario: 1,
         name: "Summertime",
         artist: "My Chemical Romance",
         reps : 900,
@@ -24,6 +33,9 @@ export const canciones = [
         img: "https://upload.wikimedia.org/wikipedia/en/5/51/Danger_Days-album-2010.jpg",
     },
     {
+        id_cancion: 1,
+        id_album: 1,
+        id_usuario: 1,
         name: "august",
         artist: "Taylor Swift",
         reps : 200,
@@ -32,6 +44,9 @@ export const canciones = [
         img: "https://upload.wikimedia.org/wikipedia/en/f/f8/Taylor_Swift_-_Folklore.png"
     },
     {
+        id_cancion: 1,
+        id_album: 1,
+        id_usuario: 1,
         name: "Helena",
         artist: "My Chemical Romance",
         reps : 780,

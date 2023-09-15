@@ -18,6 +18,20 @@ function Sidebar() {
         navigate('/user/profile');
     }
 
+    const handlerTop5 = () => {
+        navigate('/user/top5_canciones');
+    }
+
+    const handlerTop5A = () => {
+    }
+        navigate('/user/top5_albumes');
+
+    const handlerTop3 = () => {
+        navigate('/user/top3_artistas');
+    }
+
+
+
     const handlerFavoritos = () => {
         navigate('/user/favoritos');
     }
@@ -49,15 +63,15 @@ function Sidebar() {
                 </button>
                 <hr className="border-t-[0.1px] border-gray-900"/>
                 <p>Histórico</p>
-                <button className="flex items-center space-x-2 hover:text-white">
+                <button className="flex items-center space-x-2 hover:text-white " onClick={handlerTop5}>
                     <MusicNoteIcon className="h5 w-5"/>
                     <p>Canciones más reproducidas</p>
                 </button>
-                <button className="flex items-center space-x-2 hover:text-white">
+                <button className="flex items-center space-x-2 hover:text-white" onClick={handlerTop3}>
                     <MusicNoteIcon className="h5 w-5"/>
                     <p>Artistas más reproducidos</p>
                 </button>
-                <button className="flex items-center space-x-2 hover:text-white">
+                <button className="flex items-center space-x-2 hover:text-white"onClick={handlerTop5A}>
                     <MusicNoteIcon className="h5 w-5"/>
                     <p>Álbumes más reproducidos</p>
                 </button>

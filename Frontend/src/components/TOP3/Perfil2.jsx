@@ -7,7 +7,7 @@ export default function Perfil({ profiles }) {
 function Item(data) {
   return (
     <>
-      <div class="flex h-screen">
+      <div class="flex w-full h-screen bg-black">
         <div class="m-auto content-center">
           <h1 class="mb-6 text-3xl font-extrabold dark:text-white md:text-5xl lg:text-6xl">
             <span class="animate-gradient text-transparent bg-300% bg-clip-text bg-gradient-to-r to-purple via-lightPurple from-black">
@@ -47,18 +47,18 @@ function Item(data) {
                     {" "}
                     <img
                       class="w-24 h-24 rounded-full"
-                      src={value.img}
+                      src={value.path_fotografia}
                       alt="artista"
                     ></img>
                   </td>
                   <td class="px-10 py-6 text-center">
                     <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                      {value.name}
+                      {value.nombre_artista}
                     </p>
                   </td>
                   <td class="text-right px-10 py-6 ">
                     <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                      {value.reps}
+                      {value.reproducciones}
                     </p>
                   </td>
                 </tr>
