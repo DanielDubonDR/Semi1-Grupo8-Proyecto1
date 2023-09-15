@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Service from '../../Service/Service';
 import { useUserContext } from '../../context/UserContext';
@@ -13,8 +13,6 @@ function Registro(){
 		console.log(logueado)
 		if(logueado){
 		  navigate('/user/home');
-		}else{
-		  navigate('/registro');
 		}
 	}, [logueado])
 

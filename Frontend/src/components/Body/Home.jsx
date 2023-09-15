@@ -10,10 +10,8 @@ function Home(){
     const {logueado, setLogueado} = useUserContext();
     const navigate = useNavigate();
     useEffect(() => {
-        if(logueado){
-            navigate('/user/home');
-        }else{
-          navigate('/login');
+        if(!logueado){
+            navigate('/login');
         }
     }, [logueado])
 

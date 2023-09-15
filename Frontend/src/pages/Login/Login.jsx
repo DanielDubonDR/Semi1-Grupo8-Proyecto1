@@ -15,8 +15,6 @@ function Login() {
     console.log(logueado)
     if(logueado){
       navigate('/user/home');
-    }else{
-      navigate('/login');
     }
   }, [logueado])
 
