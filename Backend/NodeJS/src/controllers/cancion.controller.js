@@ -2,6 +2,7 @@ import { pool } from "../db.js";
 import multer from 'multer';
 import { saveObj, deleteObj } from '../config/objectHandler.js';
 import { tipoObjeto } from '../config/constants.js';
+import { comparePassword } from "../config/objectHandler.js";
 
 const storage = multer.memoryStorage();
 export const upload = multer({ storage: storage });
@@ -115,19 +116,57 @@ export const updateSongById = async (req, res) => {
 
 export const deleteSongById = async (req, res) => {
 
-    const id = req.params.id;
-    let status
-    
-    const query = await pool.query("SELECT * FROM cancion WHERE id_cancion = ?", [id]);
+    const { idUser, idSong, password } = req.body;
 
-    if(qeury[0].length > 0){
-        const { id_imagen, id_obj_cancion } = query[0][0];
-        await deleteObj(id_imagen);
-        await deleteObj(id_obj_cancion);
-        
-        const delete4 = await pool.query("DELETE FROM cancion WHERE id_cancion = ?", [id]);
-        status = delete4[0].affectedRows > 0;
+    const query = await pool.query("SELECT * FROM usuario WHERE id_usuario = ?", [idUser]);
+
+    if(query[0].length > 0)
+    {
+
+        if(query[0][0].rol != 1)
+        {
+            console.log(query[0].rol);
+            return res.status(200).json( { status: false } );
+        }
+
+        const { password: passwordCifrado } = query[0][0];
+        const isPasswordCorrect = await comparePassword(password, passwordCifrado);
+
+        if(isPasswordCorrect)
+        {
+            const query2 = await pool.query("SELECT * FROM cancion WHERE id_cancion = ?", [idSong]);
+
+            if(query2[0].length > 0)
+            {
+                const { id_imagen, id_obj_cancion } = query2[0][0];
+                await deleteObj(id_imagen);
+                await deleteObj(id_obj_cancion);
+                const delete4 = await pool.query("DELETE FROM cancion WHERE id_cancion = ?", [idSong]);
+                const status = delete4[0].affectedRows > 0;
+                res.status(200).json( { status } );
+            }
+            else
+            {
+                res.status(200).json( { status: false } );
+            }
+        }
+        else{
+            res.status(200).json( { status: false } );
+        }
     }
+    else{
+        res.status(200).json( { status: false } );
+    }
+}
 
-    res.status(200).json( { status } );
+export const getSongsWithArtist = async (req, res) => {
+    
+    // SELECT c.*, ca.id_album, a.id_artista, CONCAT(a.nombres, ' ', COALESCE(a.apellidos, '')) AS nombre_artista FROM cancion AS c JOIN cancion_album AS ca ON c.id_cancion = ca.id_cancion JOIN album AS al ON ca.id_album = al.id_album JOIN artista AS a ON al.id_artista = a.id_artista;
+
+    const query = await pool.query("SELECT c.*, ca.id_album, a.id_artista, CONCAT(a.nombres, ' ', COALESCE(a.apellidos, '')) AS nombre_artista FROM cancion AS c JOIN cancion_album AS ca ON c.id_cancion = ca.id_cancion JOIN album AS al ON ca.id_album = al.id_album JOIN artista AS a ON al.id_artista = a.id_artista");
+
+    const songs = query[0];
+
+    res.status(200).send(songs);
+
 }

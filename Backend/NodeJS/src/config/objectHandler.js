@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { bucketConfig } from './credentials.js';
 import AWS from 'aws-sdk';
+import bcrypt from 'bcrypt';
 
 const s3 = new AWS.S3({
     accessKeyId: bucketConfig.id,
@@ -29,4 +30,8 @@ export const deleteObj = async (key) => {
 
     const data = await s3.deleteObject(params).promise();
     return data;
+}
+
+export const comparePassword = async (password, passwordCifrado) => {
+    return await bcrypt.compare(password, passwordCifrado);
 }

@@ -50,7 +50,7 @@ export const login = async (req, res) => {
 
     const datosUusario = status ? query[0][0] : null;
 
-    delete datosUusario.password;
+    if (datosUusario) delete datosUusario.password;
 
     return res.status(200).json({ status, rol, datosUusario })
 }

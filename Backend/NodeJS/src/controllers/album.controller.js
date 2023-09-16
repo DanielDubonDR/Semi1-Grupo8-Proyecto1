@@ -2,6 +2,7 @@ import { pool } from "../db.js";
 import multer from 'multer';
 import { saveObj, deleteObj } from '../config/objectHandler.js';
 import { tipoObjeto } from '../config/constants.js';
+import { comparePassword } from "../config/objectHandler.js";
 
 const storage = multer.memoryStorage();
 export const upload = multer({ storage: storage });
@@ -94,18 +95,52 @@ export const addSongToAlbum = async (req, res) => {
 
 export const deleteAlbumById = async (req, res) => {
     
-    const id = req.params.id;
-    let status = false;
+    const { idUser, idAlbum, password } = req.body;
 
-    const query = await pool.query("SELECT id_imagen FROM album WHERE id_album = ?", [id]);
+    const query = await pool.query("SELECT password FROM usuario WHERE id_usuario = ?", [idUser]);
 
-    if(query[0].length > 0){
-        if(query[0][0].id_imagen != null){
-            await deleteObj(query[0][0].id_imagen);
+    if(query[0].length > 0)
+    {
+
+        if(query[0][0].rol != 1)
+        {
+            return res.status(200).json( { status: false } );
         }
-        const query2 = await pool.query("DELETE FROM album WHERE id_album = ?", [id]);
-        status = query2[0].affectedRows > 0;
-    }
 
-    res.status(200).json( { status } );
+        const { password: passwordCifrado } = query[0][0];
+        const isPasswordCorrect = await comparePassword(password, passwordCifrado);
+
+        if(isPasswordCorrect)
+        {
+            const query2 = await pool.query("SELECT id_imagen FROM album WHERE id_album = ?", [idAlbum]);
+
+            if(query2[0].length > 0){
+                if(query2[0][0].id_imagen != null){
+                    await deleteObj(query2[0][0].id_imagen);
+                }
+                const query3 = await pool.query("DELETE FROM album WHERE id_album = ?", [idAlbum]);
+                
+                const status = query3[0].affectedRows > 0;
+
+                if(status)
+                {
+                    // const query = await pool.query("SELECT cancion.*, id_album FROM cancion INNER JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion WHERE cancion_album.id_album = ?", [req.params.id]);
+
+                    const query4 = await pool.query("SELECT cancion.*, id_album FROM cancion INNER JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion WHERE cancion_album.id_album = ?", [idAlbum]);
+
+                    // eliminar canciones junto a sus datos como imagen y audio
+                    for(let i = 0; i < query4[0].length; i++)
+                    {
+                        const { id_imagen, id_obj_cancion, id_cancion } = query4[0][i];
+                        await deleteObj(id_imagen);
+                        await deleteObj(id_obj_cancion);
+
+                        const query5 = await pool.query("DELETE FROM cancion WHERE id_cancion = ?", [id_cancion]);
+                    }
+
+                    res.status(200).json( { status } );
+                }
+            }
+        }
+    }
 }

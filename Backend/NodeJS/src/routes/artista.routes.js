@@ -18,6 +18,6 @@ router.get("/artista/ver/:id", getArtistById);
 router.get("/artista/ver/canciones/:id", getSongsByArtistId)
 router.patch("/artista/modificar/info/:id", updateInfoArtistById);
 router.patch("/artista/modificar/image/:id", upload.single('imagen'), updateImageArtistById);
-router.delete("/artista/eliminar/:id", deleteArtistById);
+router.delete("/artista/eliminar", deleteArtistById);
 
 export default router;
