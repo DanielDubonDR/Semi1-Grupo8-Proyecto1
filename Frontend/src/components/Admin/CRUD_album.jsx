@@ -6,7 +6,7 @@ export default function CRUD_album() {
   const [data, setData] = useState({});
 
   return (
-    <div id="profile" class="overflow-y-auto bg-gradient-to-t from-darkPurple">
+    <div id="profile" class="h-screen w-screen overflow-y-auto bg-gradient-to-t from-darkPurple">
       {Item_CRUD_album(albumes)}
     </div>
   );

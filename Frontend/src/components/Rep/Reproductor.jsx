@@ -3,14 +3,16 @@ import { canciones } from "../datos_test/canciones";
 import Barra from "./Barra";
 import "./Reproductor.css";
 import Vol from "./Volumen";
-import { postReproduccion } from "../routes/routes";
+import Service from "../../Service/Service";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from '../../context/UserContext';
 
 const Reproductor = () => {
   const [canc, setCanc] = useState(canciones);
 
   const [reproduciendose, setReproduciendose] = useState(false);
   const [cancionActual, setCancionActual] = useState(canciones[0]);
-
+  const usuario = JSON.parse(sessionStorage.getItem('data_user'));
   const audioElem = useRef();
 
   useEffect(() => {
@@ -20,6 +22,14 @@ const Reproductor = () => {
       audioElem.current.pause();
     }
   }, [reproduciendose]);
+  
+  const {logueado, setLogueado} = useUserContext();
+    const navigate = useNavigate();
+      useEffect(() => {
+          if(!logueado){
+              navigate('/login');
+          }
+      }, [logueado])
 
   const onPlaying = () => {
     const duration = audioElem.current.duration;
@@ -36,9 +46,9 @@ const Reproductor = () => {
       let values = {
         id_cancion: 1,
         id_album: 1,
-        id_usuario: 1
+        id_usuario: usuario.id_usuario
       }
-      let res = await postReproduccion(values);
+      let res = Service.postReproduccion(values);
       console.log(res.data);
     } catch (error) {
       console.error("Error fetching data:", error);

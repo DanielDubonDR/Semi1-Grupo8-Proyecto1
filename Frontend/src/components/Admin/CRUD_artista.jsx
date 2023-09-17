@@ -6,7 +6,7 @@ export default function CRUD_artistas() {
   const [data, setData] = useState({});
 
   return (
-    <div id="profile" class="overflow-y-auto bg-gradient-to-t from-lightPurple/50">
+    <div id="profile" class="h-screen w-screen overflow-y-auto bg-gradient-to-t from-lightPurple/50">
       {Item_CRUD_artistas(profiles)}
     </div>
   );
@@ -113,7 +113,7 @@ function Item_CRUD_artistas(data) {
       <div>
         <ToastContainer />
       </div>
-      <div class="flex h-screen">
+      <div class="flex h-full w-screen">
         <div class="m-auto content-center">
           <section className="flex items-end h-50 text-white p-8 ">
             <div class="md:flex md:items-center place-content-between ltr:ml-3 rtl:mr-3">

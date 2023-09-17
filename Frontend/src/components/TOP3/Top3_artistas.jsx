@@ -1,15 +1,18 @@
 import Perfil from "./Perfil2";
 import React, {useState, useEffect} from "react";
 import "./style_top3.css";
-import { getTop3_Artistas } from "../routes/routes";
+import Service from "../../Service/Service";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from '../../context/UserContext';
+
 
 export default function Top3_artistas() {
   const [profiles, setProfiles] = useState();
-
+  const usuario = JSON.parse(sessionStorage.getItem('data_user'));
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let res = await getTop3_Artistas();
+        let res = await Service.getTop3_Artistas(usuario.id_usuario);
         if (res.status === 200) {
           setProfiles(res.data);
         }
@@ -20,6 +23,14 @@ export default function Top3_artistas() {
 
     fetchData();
   }, []);
+
+  const {logueado, setLogueado} = useUserContext();
+    const navigate = useNavigate();
+      useEffect(() => {
+          if(!logueado){
+              navigate('/login');
+          }
+      }, [logueado])
 
   return (
     <>

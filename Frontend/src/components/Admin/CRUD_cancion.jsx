@@ -1,37 +1,70 @@
 import React, { useEffect, useState } from "react";
 import { canciones } from "../datos_test/canciones";
 import { ToastContainer, toast } from "react-toastify";
+import Service from "../../Service/Service";
+import { useUserContext } from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
+import { set } from "lodash";
 
 export default function CRUD_cancion() {
   const [data, setData] = useState({});
+  const usuario = JSON.parse(sessionStorage.getItem("data_user"));
+  const [artista, setArtista] = useState([]);
+  const [canciones, setCanciones] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let res = await Service.listarCanciones();
+        //console.log("este es el res:", res.data);
+        if (res.status === 200) {
+          //console.log("este es el res:", res);
+          setCanciones(res.data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+
+      try {
+        let res = await Service.listarArtistas();
+        console.log("este es el res de los artistas:", res.data);
+        
+        if (res.status === 200) {
+            setArtista(res.data);
+        }
+      } catch
+      (error) {
+        console.error("Error fetching data:", error);
+      }
+
+    };
+
+    fetchData();
+  }, []);
+
+  const { logueado, setLogueado } = useUserContext();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!logueado) {
+      navigate("/login");
+    }
+  }, [logueado]);
 
   return (
-    <div id="profile" class="overflow-y-auto bg-gradient-to-t from-silver/40">
-      {Item_CRUD_cancion(canciones)}
+    <div
+      id="profile"
+      class="h-screen w-screen overflow-y-auto bg-gradient-to-t from-silver/40"
+    >
+      {Item_CRUD_cancion(canciones, artista)}
     </div>
   );
 }
 
-function Item_CRUD_cancion(data) {
-  const showToastMessageError = () => {
-    toast.error("Ha ocurrido un error - la canción no ha sido eliminada.", {
-      position: toast.POSITION.TOP_RIGHT,
-    });
-  };
-
-  const showToastMessageSuccess = () => {
-    toast.success("La canción ha sido eliminada correctamente.", {
-      position: toast.POSITION.TOP_RIGHT,
-    });
-  };
-
+function Item_CRUD_cancion(data, data2) {
   const [showModal, setShowModal] = useState(false);
   const [showSongs, setShowSongs] = useState(false);
   const [addSong, setAddSong] = useState(false);
   const [deleteAlbum, setDeleteAlbum] = useState(false);
   const [addAlbum, setAddAlbum] = useState(false);
-
-  const URL = "http://localhost:3001/cambiarEstexd"; //ESTE SE TIENE QUE CAMBIAR, QUE NO SE ME OLVIDE
 
   const [album, setAlbum] = useState([]);
   //atributos:
@@ -39,30 +72,36 @@ function Item_CRUD_cancion(data) {
   const [artist, setArtist] = useState("");
   const [img, setImg] = useState("");
   const [description, setDescription] = useState("");
-  const [songs, setSongs] = useState([]);
+  const [idCancionG, setIdCancionG] = useState(-1);
+  const [id_song, setID] = useState(-1);
+  const [songs, setSongs] = useState(-1);
+  const [artista, setArtista] = useState([]);
+  const [PathImg, setPathImg] = useState("");
+  const [PathSong, setPathSong] = useState("");
 
   const [title, setTitle] = useState("");
-
-  useEffect(() => {
-    obtDatos();
-  }, []);
-
-  const obtDatos = async () => {
-    setAlbum(data);
-
-    /*const respose = await fetch(URL);
-    setAlbum(await respose.data);*/
-  };
   const getRowValue = (e) => {
     console.log("HOLIWIS KIWIIIIIIIIS", e);
   };
 
-  const openModal = (op, name, artist, img, description, songs) => {
+  const [sSong, setSSong] = useState({
+    id_cancion: -1,
+    nombre: "",
+    duracion: "",
+    id_imagen: "",
+    path_imagen: "",
+    path_cancion: "",
+    id_obj_cancion: "",
+  });
+
+  const openModal = (op, name, artist, img, description, songs, id_song) => {
     setName("");
     setArtist("");
     setImg("");
     setDescription("");
-    setSongs([]);
+    setSongs("");
+    setID(-1);
+    setIdCancionG(-1);
 
     if (op === 1) {
       //actualizar
@@ -73,6 +112,8 @@ function Item_CRUD_cancion(data) {
       setImg(img);
       setDescription(description);
       setSongs(songs);
+      setIdCancionG(id_song);
+      setID(id_song);
     } else if (op === 2) {
       // agregar cancion al álbum
       setAddSong(true);
@@ -81,6 +122,7 @@ function Item_CRUD_cancion(data) {
       setArtist(artist);
       setImg(img);
       setDescription(description);
+      setIdCancionG(id_song);
       setSongs(songs);
     } else if (op === 3) {
       //detalle
@@ -101,6 +143,7 @@ function Item_CRUD_cancion(data) {
       setImg(img);
       setDescription(description);
       setSongs(songs);
+      setID(id_song);
     } else {
       //agregar
       setAddAlbum(true);
@@ -108,12 +151,219 @@ function Item_CRUD_cancion(data) {
     }
   };
 
+  const DeleteSong = async () => {
+    console.log("id de la cancion: ", id);
+    try {
+      let res = await Service.eliminarCancion(id);
+
+      if (res.status === 200 || res.status === 204) {
+        toast.success("Canción eliminada con éxito");
+        setDeleteAlbum(false);
+        Window.location.reload();
+      } else {
+        toast.error("Error al eliminar la canción");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      const formData = new FormData();
+      formData.append("imagen", file);
+
+      let res = await Service.subirFotoCancion(formData);
+      console.log("res de la imagen: ", res.data);
+      if (res.status === 200) {
+        toast.success("Imagen subida con éxito");
+        setImg(res.data.id_imagen);
+        setPathImg(res.data.path_imagen);
+      } else {
+        toast.error("Error al subir la imagen");
+      }
+    }
+  };
+
+  const handleSongChange = async (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      const formData = new FormData();
+      formData.append("cancion", file);
+
+      let res = await Service.subirCancion(formData);
+      console.log("res de la cancion: ", res.data);
+      if (res.status === 200) {
+        toast.success("Canción subida con éxito");
+        setSongs(res.data.id_cancion);
+        setPathSong(res.data.path_cancion);
+      } else {
+        toast.error("Error al subir la canción");
+      }
+    }
+  };
+
+  const handleActualizacion = async (e) => {
+    let nombre = "";
+    let duracion = "";
+
+    nombre = name;
+    duracion = description;
+  
+    let datos_Enviar = {
+      nombre: nombre,
+      duracion: duracion
+    };
+
+    console.log("datos a enviar: ", datos_Enviar);
+
+    let res2 = await Service.updateCancionInfo(datos_Enviar, id_song);
+    if (res2.status === 200) {
+      toast.success("Canción actualizada con éxito");
+    } else {
+      toast.error("Error al actualizar la canción");
+    }
+
+   
+    setShowModal(false)
+    setShowSongs(false);
+  };
+
+  const handleSongUpdate = async (e) => {
+    
+    const file = e.target.files[0];
+    let idActualizada = "";
+    let PathActualizado = "";
+
+    if (file) {
+      const formData = new FormData();
+      formData.append("cancion", file);
+
+      let res = await Service.subirCancion(formData);
+
+      if (res.status === 200) {
+        toast.success("Canción subida con éxito");
+        idActualizada = res.data.id_cancion;
+        PathActualizado = res.data.path_cancion;
+      } else {
+        toast.error("Error al subir la canción");
+      }
+    }
+
+    let datos_Enviar = {
+      id_cancion: idActualizada,
+      path_cancion: PathActualizado,
+    };
+
+    let res2 = await Service.updateCancionCancion(datos_Enviar, id_song);
+    if (res2.status === 200) {
+      toast.success("Canción actualizada con éxito");
+    } else {
+      toast.error("Error al actualizar la canción");
+    }
+  };
+
+  const handleImageUpdate = async (e) => {
+    const file = e.target.files[0];
+    let idActualizada = "";
+    let PathActualizado = "";
+    if (file) {
+      const formData = new FormData();
+      formData.append("imagen", file);
+
+      let res = await Service.subirFotoCancion(formData);
+      if (res.status === 200) {
+        idActualizada = res.data.id_imagen;
+        PathActualizado = res.data.path_imagen;
+      } else {
+        toast.error("Error al actualizar la imagen");
+      }
+    }
+
+    let datos_Enviar = {
+      id_imagen: idActualizada,
+      path_imagen: PathActualizado,
+    };
+
+    let res2 = await Service.updateCancionImagen(datos_Enviar, id_song);
+
+    if (res2.status === 200) {
+      toast.success("Imagen actualizada con éxito");
+    } else {
+      toast.error("Error al actualizar la imagen");
+    }
+    
+  };
+
+  const [fData, setFData] = useState({
+    nombre: "",
+    //artista: "",
+    duracion: "",
+    path_imagen: "",
+    id_imagen: "",
+    id_cancion: "",
+    path_cancion: "",
+  });
+
+  const handleInputChange = async (event) => {
+    setFData({
+      ...fData,
+      [event.target.name]: event.target.value,
+    });
+
+    console.log("fData: ", fData);
+  };
+
+  const handleNameChange = async (event) => {
+    setName(event.target.value);
+  };
+
+  const handleArtistChange = async (event) => {
+    setArtist(event.target.value);
+  };
+
+  const handleDuracionChange = async (event) => {
+    setDuracion(event.target.value);
+  };
+
+
+  const handleAdd = async (e) => {
+    let cancionID = songs;
+    let ImgID = img;
+
+    fData.id_imagen = ImgID;
+    fData.id_cancion = cancionID;
+    fData.path_imagen = PathImg;
+    fData.path_cancion = PathSong;
+
+    console.log("fData: ", fData);
+
+    setImg("");
+    setSongs("");
+
+    setPathImg("");
+    setPathSong("");
+
+    let res = await Service.crearCancion(fData);
+    console.log("res de la creación: ", res.data);
+    if (res.status === 200) {
+      toast.success("Canción creada con éxito");
+    } else {
+      toast.error("Error al crear la canción");
+    }
+
+    setAddAlbum(false);
+  };
+
   return (
     <>
       <div>
         <ToastContainer />
       </div>
-      <div class="flex h-screen">
+      <div class="flex h-full w-screen ">
         <div class="m-auto content-center">
           <section className="flex items-end h-50 text-white p-8 ">
             <div class="md:flex md:items-center place-content-between ltr:ml-3 rtl:mr-3">
@@ -153,7 +403,7 @@ function Item_CRUD_cancion(data) {
                       type="text"
                       id="simple-search"
                       class="bg-black2 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-black3 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Buscar Album"
+                      placeholder="Buscar Cancion"
                       required=""
                     ></input>
                   </div>
@@ -215,24 +465,25 @@ function Item_CRUD_cancion(data) {
                     >
                       <img
                         class="w-24 h-24 rounded-r-lg"
-                        src={value.img}
+                        src={value.path_imagen}
                         alt="artista"
                       ></img>
                     </th>
 
-                    <td class="px-6 py-4">{value.name}</td>
-                    <td class="px-6 py-4">{value.artist}</td>
+                    <td class="px-6 py-4">{value.nombre}</td>
+                    <td class="px-6 py-4">{value.artista}</td>
                     <td class=" text-center">
                       <button
                         class="bg-yellow-400 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded "
                         onClick={() =>
                           openModal(
                             1,
-                            value.name,
-                            value.artist,
-                            value.img,
-                            value.desc,
-                            value.songs
+                            value.nombre,
+                            value.artista,
+                            value.path_imagen,
+                            value.duracion,
+                            value.path_cancion,
+                            value.id_cancion
                           )
                         }
                       >
@@ -259,11 +510,12 @@ function Item_CRUD_cancion(data) {
                         onClick={() =>
                           openModal(
                             4,
-                            value.name,
-                            value.artist,
-                            value.img,
-                            value.desc,
-                            value.songs
+                            value.nombre,
+                            value.artista,
+                            value.path_imagen,
+                            value.duracion,
+                            value.path_cancion,
+                            value.id_cancion
                           )
                         }
                       >
@@ -290,11 +542,12 @@ function Item_CRUD_cancion(data) {
                         onClick={() =>
                           openModal(
                             3,
-                            value.name,
-                            value.artist,
-                            value.img,
-                            value.desc,
-                            value.songs
+                            value.nombre,
+                            value.artista,
+                            value.path_imagen,
+                            value.duracion,
+                            value.path_cancion,
+                            value.id_cancion
                           )
                         }
                       >
@@ -363,9 +616,30 @@ function Item_CRUD_cancion(data) {
 
                       {!showSongs ? (
                         <div className="flex flex-col items-center justify-center">
-                          <button className="bg-lightPurple hover:bg-purple text-white font-bold my-2 py-2 px-4 rounded">
-                            Editar
-                          </button>
+                          <input
+                            className="mt-6 text-white rounded-lg bg-purple"
+                            type="file"
+                            accept="image/*" // Accept only image files
+                            onChange={handleImageUpdate}
+                            required
+                          />
+
+                          <div class=" w-full col-span-2">
+                            <div class=" space-y-2">
+                              <div class="flex items-center justify-center w-full">
+                                <label class="text-sm font-bold text-gray-500 tracking-wide">
+                                  Agrega una canción
+                                </label>
+                                <input
+                                  className="mt-6 ml-4 text-white rounded-lg bg-lightPurple"
+                                  type="file"
+                                  accept=".mp3" // Accept specific audio file formats
+                                  onChange={handleSongUpdate}
+                                  required
+                                />
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       ) : null}
                     </div>
@@ -373,7 +647,7 @@ function Item_CRUD_cancion(data) {
                     {!showSongs ? (
                       <div className="relative p-6 flex-auto">
                         <div class="w-full ">
-                          <form class="w-full ">
+                          <form class="w-full " onSubmit={handleActualizacion}>
                             <div class="grid grid-cols-2 gap-2">
                               <div class="md:flex md:items-center mb-6">
                                 <div class="">
@@ -389,7 +663,10 @@ function Item_CRUD_cancion(data) {
                                     class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                     id="inline-full-name"
                                     type="text"
+                                    name="nombre"
                                     defaultValue={name}
+                                    onChange={handleNameChange}
+
                                   ></input>
                                 </div>
                               </div>
@@ -404,12 +681,15 @@ function Item_CRUD_cancion(data) {
                                   </label>
                                 </div>
                                 <div class="w-full mr-4">
-                                  <input
-                                    class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                                    id="inline-full-name"
-                                    type="text"
-                                    defaultValue={artist}
-                                  ></input>
+                                <select class="bg-gray-200 border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500">
+                                {data2.map((value, index) => (
+                                <option 
+                                /*defaultValue={fData.artista}*/
+                                >
+                                  {value.nombres + " " + value.apellidos}
+                                </option>
+                                ))}
+                              </select>
                                 </div>
                               </div>
 
@@ -427,58 +707,34 @@ function Item_CRUD_cancion(data) {
                                     class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                     id="inline-full-name"
                                     type="text"
-                                    defaultValue={artist}
+                                    name="duracion"
+                                    defaultValue={description}
+                                    onChange={handleDuracionChange}
                                   ></input>
                                 </div>
                               </div>
+                            </div>
 
-                              <div class="md:items-center mb-6">
-                                <label
-                                  class="block text-white font-bold md:text-left mb-1 md:mb-2 pr-4"
-                                  for="inline-full-name"
-                                >
-                                  Descripción
-                                </label>
-                                <div class=""></div>
-                                <div class="w-full ">
-                                  <textarea
-                                    class="bg-gray-200 appearance-none h-20 overflow-y-auto border-2 border-gray-200 rounded w-full py- px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                                    id="inline-full-name"
-                                    type="text"
-                                    defaultValue={description}
-                                  ></textarea>
-                                </div>
-                              </div>
-                            </div>
-                            <div class=" w-full col-span-2">
-                              <div class=" space-y-2">
-                                <label class="text-sm font-bold text-gray-500 tracking-wide">
-                                  Agrega una canción
-                                </label>
-                                <div class="flex items-center justify-center w-full">
-                                  <label class="flex flex-col rounded-lg border-4 border-dashed w-full h-20 p-10 group text-center">
-                                    <div class="h-full w-full text-center flex flex-col items-center justify-center items-center  ">
-                                      <p class="pointer-none text-gray-500 ">
-                                        <span class="text-sm">Arrastra</span> tu
-                                        cancion aquí <br /> o{" "}
-                                        <a
-                                          href=""
-                                          id=""
-                                          class="text-blue-600 hover:underline"
-                                        >
-                                          selecciona una
-                                        </a>{" "}
-                                        desde tu computadora
-                                      </p>
-                                    </div>
-                                    <input type="file" class="hidden"></input>
-                                  </label>
-                                </div>
-                              </div>
-                              <p class="text-sm text-gray-300">
-                                <span>Tipo: .mp3</span>
-                              </p>
-                            </div>
+                            <button
+                              type="submit"
+                              class="text-white bg-gradient-to-br from-purple to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-6 h-6"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M4.5 12.75l6 6 9-13.5"
+                                />
+                              </svg>
+                              Guardar
+                            </button>
                           </form>
                         </div>
                       </div>
@@ -541,37 +797,20 @@ function Item_CRUD_cancion(data) {
                                     class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                     id="inline-full-name"
                                     type="text"
-                                    defaultValue="3:00"
+                                    defaultValue={description}
                                     readOnly={true}
                                   ></input>
                                 </div>
                               </div>
-
-                              <div class="">
-                                <label
-                                  class="block text-white font-bold md:text-left mb-1 md:mb-2 pr-4"
-                                  for="inline-full-name"
-                                >
-                                  Descripción
-                                </label>
-                                <div class="md:flex md:items-center mb-6">
-                                  <div class=""></div>
-                                  <div class="w-full ">
-                                    <textarea
-                                      class="bg-gray-200 appearance-none h-24 overflow-y-auto border-2 border-gray-200 rounded w-full px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                                      id="inline-full-name"
-                                      type="text"
-                                      defaultValue={description}
-                                      readOnly={true}
-                                    ></textarea>
-                                  </div>
-                                </div>
-                              </div>
                             </div>
 
-                            <h1 class="text-white font-bold text-3xl">
-                              REPRODUCTOR MINI ACÁ
+                            <h1 className="text-white font-bold text-3xl ml-4">
+                              Escuchar
                             </h1>
+                            <audio controls className="ml-6">
+                              <source src={songs} type="audio/mpeg" />
+                            </audio>
+
                             {/*Termina detalle */}
                           </form>
                         </div>
@@ -588,29 +827,6 @@ function Item_CRUD_cancion(data) {
                         }}
                       >
                         Cancelar
-                      </button>
-                      <button
-                        type="button"
-                        class="text-white bg-gradient-to-br from-purple to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
-                        onClick={() => {
-                          setShowModal(false), setShowSongs(false);
-                        }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M4.5 12.75l6 6 9-13.5"
-                          />
-                        </svg>
-                        Guardar
                       </button>
                     </div>
                   </div>
@@ -672,7 +888,7 @@ function Item_CRUD_cancion(data) {
                         </span>
                         ?
                       </h1>{" "}
-                      <div class="md:flex md:items-center mb-6">
+                      <div class=" md:items-center mb-2">
                         <div class="">
                           <label
                             class="block text-white font-bold md:text-left mb-1 md:mb-0 pr-4"
@@ -681,7 +897,10 @@ function Item_CRUD_cancion(data) {
                             Confirme su contraseña:
                           </label>
                         </div>
-                        <form className="justify-center">
+                        <form
+                          className="justify-center"
+                          onSubmit={DeleteSong(id_song)}
+                        >
                           <div class="w-full ">
                             <input
                               class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
@@ -689,6 +908,15 @@ function Item_CRUD_cancion(data) {
                               type="password"
                               autoComplete="on"
                             ></input>
+                          </div>
+
+                          <div class="">
+                            <button
+                              type="submit"
+                              class="text-white mt-4 bg-gradient-to-br from-red-900 to-red-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
+                            >
+                              Eliminar
+                            </button>
                           </div>
                         </form>
                       </div>
@@ -705,18 +933,6 @@ function Item_CRUD_cancion(data) {
                         }}
                       >
                         Cancelar
-                      </button>
-
-                      <button
-                        type="button"
-                        class="text-white bg-gradient-to-br from-red-900 to-red-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
-                        onClick={() => {
-                          {
-                            setDeleteAlbum(false);
-                          }
-                        }}
-                      >
-                        Eliminar
                       </button>
                     </div>
                   </div>
@@ -760,44 +976,42 @@ function Item_CRUD_cancion(data) {
                       </button>
                     </div>
                     {/*body*/}
-
-                    <div className="w-full bg-black2 items-center justify-center">
-                      <div class=" w-full p-5 rounded-xl z-10">
-                        <form class="mt-2" method="POST">
+                    <form onSubmit={handleAdd}>
+                      <div className="w-full bg-black2 items-center justify-center">
+                        <div class=" w-full p-5 rounded-xl z-10">
                           <div class="grid grid-cols-1 space-y-2">
                             <label class="text-sm font-bold text-gray-500 tracking-wide">
                               Agrega una imagen
                             </label>
-                            <div class="flex items-center justify-center w-full">
-                              <label class="flex flex-col rounded-lg border-4 border-dashed w-full h-20 p-10 group text-center">
-                                <div class="h-full w-full text-center flex flex-col items-center justify-center items-center  ">
-                                  <p class="pointer-none text-gray-500 ">
-                                    <span class="text-sm">Arrastra</span> tu
-                                    imagen aquí <br /> o{" "}
-                                    <a
-                                      href=""
-                                      id=""
-                                      class="text-blue-600 hover:underline"
-                                    >
-                                      selecciona una
-                                    </a>{" "}
-                                    desde tu computadora
-                                  </p>
-                                </div>
-                                <input type="file" class="hidden"></input>
+                            <input
+                              className="mt-6 text-white rounded-lg bg-purple"
+                              type="file"
+                              accept="image/*" // Accept only image files
+                              onChange={handleImageChange}
+                              required
+                            />
+                          </div>
+                          <p class="text-sm text-gray-300"></p>
+
+                          <div class=" w-full col-span-2">
+                            <div class=" ">
+                              <label class="text-sm font-bold text-gray-500 tracking-wide">
+                                Agrega una canción
                               </label>
+                              <input
+                                className="mt-6 ml-4 text-white rounded-lg bg-purple"
+                                type="file"
+                                accept=".mp3" // Accept specific audio file formats
+                                onChange={handleSongChange}
+                                required
+                              />
                             </div>
                           </div>
-                          <p class="text-sm text-gray-300">
-                            <span>Tipo: PNG o JPEG</span>
-                          </p>
-                        </form>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="relative p-6 flex-auto">
-                      <div class="w-full ">
-                        <form class="w-full ">
+                      <div className="relative p-6 flex-auto">
+                        <div class="w-full ">
                           <div class="md:flex md:items-center mb-6">
                             <div class="">
                               <label
@@ -812,7 +1026,9 @@ function Item_CRUD_cancion(data) {
                                 class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                 id="inline-full-name"
                                 type="text"
-                                defaultValue={name}
+                                name="nombre"
+                                defaultValue={fData.nombre}
+                                onChange={handleInputChange}
                               ></input>
                             </div>
                           </div>
@@ -827,68 +1043,61 @@ function Item_CRUD_cancion(data) {
                               </label>
                             </div>
                             <div class="w-full mr-[250px]">
-                              <input
-                                class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                                id="inline-full-name"
-                                type="text"
-                                defaultValue={artist}
-                              ></input>
+                              <select class="bg-gray-200 border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500">
+                                {data2.map((value, index) => (
+                                <option 
+                                //{/*defaultValue={fData.id_artista}*/}
+                                >
+                                  {value.nombres + " " + value.apellidos}
+                                </option>
+                                ))}
+                              </select>
+                              
                             </div>
                           </div>
                           <label
                             class="block text-white font-bold md:text-left mb-1 md:mb-2 pr-4"
                             for="inline-full-name"
                           >
-                            Descripción
+                            Duración de la canción
                           </label>
                           <div class="md:flex md:items-center mb-6">
                             <div class=""></div>
                             <div class="w-full ">
                               <textarea
-                                class="bg-gray-200 appearance-none h-20 overflow-y-auto border-2 border-gray-200 rounded w-full py- px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                                class="bg-gray-200 appearance-none h-8 overflow-y-auto border-2 border-gray-200 rounded w-full py- px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                 id="inline-full-name"
                                 type="text"
-                                defaultValue={description}
+                                name="duracion"
+                                defaultValue={fData.duracion}
+                                onChange={handleInputChange}
                               ></textarea>
                             </div>
                           </div>
-
-                          <div class="md:flex md:items-center">
-                            <div class="md:w-1/3"></div>
-                          </div>
-                          <div class=" w-full col-span-2">
-                              <div class=" ">
-                                <label class="text-sm font-bold text-gray-500 tracking-wide">
-                                  Agrega una canción
-                                </label>
-                                <div class="flex items-center justify-center w-full">
-                                  <label class="flex flex-col rounded-lg border-4 border-dashed w-full h-8 p-10 group text-center">
-                                    <div class="h-full w-full text-center flex flex-col items-center justify-center items-center  ">
-                                      <p class="pointer-none text-gray-500 ">
-                                        <span class="text-sm">Arrastra</span> tu
-                                        cancion aquí <br /> o{" "}
-                                        <a
-                                          href=""
-                                          id=""
-                                          class="text-blue-600 hover:underline"
-                                        >
-                                          selecciona una
-                                        </a>{" "}
-                                        desde tu computadora
-                                      </p>
-                                    </div>
-                                    <input type="file" class="hidden"></input>
-                                  </label>
-                                </div>
-                              </div>
-                              <p class="text-sm text-gray-300">
-                                <span>Tipo: .mp3</span>
-                              </p>
-                            </div>
-                        </form>
+                        </div>
+                        <button
+                          type="submit"
+                          class="text-white bg-gradient-to-br from-purple to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M4.5 12.75l6 6 9-13.5"
+                            />
+                          </svg>
+                          Guardar
+                        </button>
                       </div>
-                    </div>
-                        
+                    </form>
+
                     {/*footer*/}
                     <div className="flex items-center justify-end p-1 border-t border-solid border-slate-200 rounded-b">
                       <button
@@ -900,29 +1109,6 @@ function Item_CRUD_cancion(data) {
                       >
                         Cancelar
                       </button>
-                      <button
-                        type="button"
-                        class="text-white bg-gradient-to-br from-purple to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
-                        onClick={() => {
-                          setAddAlbum(false);
-                        }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M4.5 12.75l6 6 9-13.5"
-                          />
-                        </svg>
-                        Guardar
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -930,6 +1116,8 @@ function Item_CRUD_cancion(data) {
               <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
             </>
           ) : null}
+
+          {/* MODAL ACTUALIZAR */}
         </div>
       </div>
     </>

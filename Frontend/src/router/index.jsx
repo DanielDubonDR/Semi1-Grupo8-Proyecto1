@@ -12,6 +12,11 @@ import LayoutPrivate from '../layout/LayoutPrivate'
 import Login from '../pages/Login/Login'
 import NotFound from '../pages/NotFound'
 import Registro from '../pages/Registro/Registro'
+import CRUD_cancion from '../components/Admin/CRUD_cancion'
+import CRUD_album from '../components/Admin/CRUD_album'
+import CRUD_artista from '../components/Admin/CRUD_artista'
+
+import Reproductor from '../components/Rep/Reproductor'
 
 export const router = createBrowserRouter([
     {
@@ -60,16 +65,19 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: 'top5_canciones',
-                        element: <Top5_Canciones />
+                        element: <CRUD_cancion />
+                       // element: <Top5_Canciones />
                     },
                     {
                         path: 'top5_albumes',
-                        element: <Top5_Albumes />
+                        //element: <Top5_Albumes />
+                        element: <CRUD_album />
                     },
                     {
                         path: 'top3_artistas',
-                        element: <Top3_Artistas />
-                    },
+                        //element: <Top3_Artistas />
+                        element: <CRUD_artista />
+                    }
                 ]
             },
         ]

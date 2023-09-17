@@ -1,12 +1,15 @@
 import { HeartIcon, HomeIcon, LibraryIcon, MusicNoteIcon, PlusCircleIcon, RssIcon, SearchIcon, UserIcon } from '@heroicons/react/outline';
-import React from "react";
+import React, {useEffect} from "react";
 import { Outlet, useNavigate } from 'react-router-dom';
 import Header_name from '../Body/Header_name';
 import Reproductor from '../Rep/Reproductor';
 import './Slidebar.css';
 function Sidebar() {
-
     const navigate = useNavigate();
+    useEffect(() => {
+        
+    }, [])
+    //const navigate = useNavigate();
 
     const handlerInicio = () => {
         navigate('/user/home');
@@ -23,18 +26,30 @@ function Sidebar() {
     }
 
     const handlerTop5A = () => {
-    }
         navigate('/user/top5_albumes');
+    }
 
     const handlerTop3 = () => {
         navigate('/user/top3_artistas');
     }
 
-
-
     const handlerFavoritos = () => {
         navigate('/user/favoritos');
     }
+
+    const handlerCRUDArtista = () => {
+        navigate('/user/crud_artista');
+    }
+
+    const handlerCRUDAlbum = () => {
+        navigate('/user/crud_album');
+    }
+
+    const handlerCRUDCancion = () => {
+        navigate('/user/crud_cancion');
+    }
+    
+
     return(
         
         <div className='flex'>

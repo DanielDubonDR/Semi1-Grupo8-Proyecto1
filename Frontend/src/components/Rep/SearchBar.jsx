@@ -1,7 +1,18 @@
-import React from "react";
-
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from '../../context/UserContext';
 export default function Navbar({ fixed }) {
+  const {logueado, setLogueado} = useUserContext();
+    
+  const navigate = useNavigate();
+    useEffect(() => {
+        if(!logueado){
+            navigate('/login');
+        }
+    }, [logueado])
+
   return (
+    
     <>
       <div className="w-full bg-black2">
       <nav class="sticky top-0 bg-gradient-to-r from-lightPurple via-purple to-lightPurple dark:bg-gray-900 z-30 w-full px-2 py-4 shadow-[0_30px_30px_-15px_rgba(0,0,0,0.8)]">
