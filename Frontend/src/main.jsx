@@ -8,7 +8,7 @@ import { router } from './router'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <UserProvider>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} className="scrollbar-hide"/>
     </UserProvider>
   </React.StrictMode>,
 )

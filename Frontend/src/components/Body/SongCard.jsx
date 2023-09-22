@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { AiFillHeart, AiOutlineHeart, AiOutlinePlus } from 'react-icons/ai';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import { BsPlusCircle } from "react-icons/bs";
 import PlayPause from "./PlayPause";
 
 
@@ -56,28 +57,28 @@ const SongCard = ({song, isPlaying, activeSong, i}) => {
                 <img src={song?.img} alt="song_img" />
             </div>
             <div className="mt-4 flex flex-col">
-                <p className="font-semibold text-lg txt-white truncate">
+                <p className="font-semibold text-lg text-white truncate">
                     {song?.name}
                 </p>
                 <p className="text-sm truncate text-gray-300 mt-1">
                     {song?.artist}
                 </p>
                 <div className="flex mt-2">
-                <button
-                className="w-10 h-10 rounded-full bg-gradient-to-b from-purple to-lightPurple hover:bg-purple text-white flex items-center justify-center border-2 border-white mt-2 mr-3"
-                onClick={toggleLike}
-                onMouseEnter={handleMouseEnterFavorite}
-                onMouseLeave={handleMouseLeaveFavorite}
+                <div
+                    className="w-10 h-10 rounded-full text-white hover:text-white flex items-center justify-center mt-2 mr-3"
+                    onClick={toggleLike}
+                    onMouseEnter={handleMouseEnterFavorite}
+                    onMouseLeave={handleMouseLeaveFavorite}
                 >
-                {isLiked ? <AiFillHeart className="text-xl" /> : <AiOutlineHeart className="text-xl" />}
-                </button>
-                <button
-                className="w-10 h-10 rounded-full bg-gradient-to-b from-purple to-lightPurple hover:bg-purple text-white flex items-center justify-center mt-2 border-2 border-white"
+                    {isLiked ? <AiFillHeart className="text-xl" /> : <AiOutlineHeart className="text-xl" />}
+                </div>
+                <div
+                className="w-10 h-10 rounded-full text-white hover:text-white flex items-center justify-center mt-2 mr-3"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 >
-                <AiOutlinePlus className="text-xl"/>
-                </button>
+                <BsPlusCircle className="text-xl"/>
+                </div>
                 {/* Mensaje temporal */}
                 {showMessage && (
                     <div className="bg-gray-900 text-white py-1 px-2 rounded-md absolute top-30 left-0 mt-12 ml-2">

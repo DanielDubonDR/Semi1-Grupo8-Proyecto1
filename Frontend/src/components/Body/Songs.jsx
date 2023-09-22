@@ -20,7 +20,7 @@ const canciones_ejemplo = [
 function Songs() {
     
     return (
-        <div className=" px-8 flex flex-col space-y-1 pb-28 text-white">
+        <div className=" px-8 flex flex-col space-y-1 pb-36 text-white">
             {canciones_artista.map((cancion, i) => (
                 <Song key={i} order={i} track={cancion}/>
             ))}

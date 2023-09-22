@@ -16,6 +16,12 @@ export const profiles = [
         fecha_nacimiento: "01-01-2000",
         reps : 900,
         img: "https://w7.pngwing.com/pngs/283/648/png-transparent-the-killers-logo-battle-born-music-spiderman-miscellaneous-text-logo-thumbnail.png",
+    },
+    {
+        name: "Eminem",
+        fecha_nacimiento: "17-10-1972",
+        reps : 1000,
+        img : "https://phantom-marca.unidadeditorial.es/8ba8e88f28354c7d6fea00517edacedd/resize/828/f/jpg/assets/multimedia/imagenes/2022/10/19/16661328920205.jpg"
     }
 
 ]

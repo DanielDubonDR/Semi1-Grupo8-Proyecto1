@@ -1,5 +1,6 @@
 import { shuffle } from 'lodash';
 import React, { useEffect } from "react";
+import { BsPlayFill } from "react-icons/bs";
 import Header_name from "./Header_name";
 import Songs from "./Songs";
 
@@ -36,6 +37,9 @@ function Playlist() {
                     <h1 className="text-2xl md:text-3xl xl:text-5xl font-bold">Cumbiones para programar mientras lloras</h1>
                     <p>username</p>
                 </div>
+                <button className="bg-purple hover:bg-purple-700 text-white rounded-full p-3 absolute top-1/2 right-4 transform -translate-y-1/2 shadow-lg">
+                    <BsPlayFill className="h-12 w-12" />
+                </button>
             </section>
 
             <div>

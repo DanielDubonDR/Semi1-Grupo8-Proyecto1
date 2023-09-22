@@ -4,6 +4,7 @@ const instance = axios.create({
     baseURL: 'http://localhost:4000/'
 });
 
+// Registro de usuario
 export const registro = async (formData) => {
     console.log([...formData.entries()]);
     const response = await instance.post('/registrar', formData,{
@@ -14,6 +15,7 @@ export const registro = async (formData) => {
     return response;
 }
 
+// Login de usuario
 export const login = async (data) => {
     const response = await instance.post('/login', data,{
         headers: {
@@ -23,12 +25,29 @@ export const login = async (data) => {
     return response;
 }
 
+// Actualizar datos de usuario
 export const updateDataUser = async (data, id) => {
     const response = await instance.patch(`/usuario/modificar/info/${id}`, data,{
         headers: {
             'Content-Type': 'application/json'
         }
     })
+    return response;
+}
+
+//Actualizar la imagen del usuario
+export const updateImageUser = async (data, id) => {
+    const response = await instance.patch(`/usuario/modificar/image/${id}`, data,{
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    return response;
+}
+
+// Obtener datos de usuario
+export const getDataUser = async (id) => {
+    const response = await instance.get(`/usuario/ver/${id}`);
     return response;
 }
 

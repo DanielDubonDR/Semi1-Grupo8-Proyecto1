@@ -1,10 +1,11 @@
-import { HeartIcon, HomeIcon, LibraryIcon, MusicNoteIcon, PlusCircleIcon, RssIcon, SearchIcon, UserIcon } from '@heroicons/react/outline';
+import { CollectionIcon, HeartIcon, HomeIcon, LibraryIcon, MusicNoteIcon, PlusCircleIcon, RssIcon, SearchIcon, UserIcon, UsersIcon } from '@heroicons/react/outline';
 import React from "react";
+import { AiOutlineHighlight } from "react-icons/ai";
 import { Outlet, useNavigate } from 'react-router-dom';
 import Header_name from '../Body/Header_name';
 import Reproductor from '../Rep/Reproductor';
 import './Slidebar.css';
-function Sidebar() {
+function Sidebar_admin() {
     const navigate = useNavigate();
     //const navigate = useNavigate();
 
@@ -34,6 +35,18 @@ function Sidebar() {
         navigate('/user/favoritos');
     }
 
+    const handlerCRUDArtista = () => {
+        navigate('/user/crud_artista');
+    }
+
+    const handlerCRUDAlbum = () => {
+        navigate('/user/crud_album');
+    }
+
+    const handlerCRUDCancion = () => {
+        navigate('/user/crud_cancion');
+    }
+    
     const handlerMyPlaylists = () => {
         navigate('/user/misplaylists');
     }
@@ -46,7 +59,6 @@ function Sidebar() {
         <div className='flex'>
             <Header_name/>
         <div className='bg-black text-gray-500 p-5 text-xs lg:text-sm border-r border-gray-900 overflow-y-scroll scrollbar-hide h-screen sm: max-w-[12rem] lg:max-w-[16rem] hidden md:inline-flex'>
-            
             <div className='space-y-4'>
                 <div className="flex items-center justify-center space-x-2">
                     <img className='h-20 w-20 align-middle' src="http://imgfz.com/i/pxcvWfe.png" alt="" />
@@ -86,6 +98,20 @@ function Sidebar() {
                     <p>Mi historial</p>
                 </button>
                 <hr className="border-t-[0.1px] border-gray-900"/>
+                <p>Funcionalidades CRUD</p>
+                <button className="flex items-center space-x-2 hover:text-white " onClick={handlerCRUDArtista}>
+                    <UsersIcon className="h5 w-5"/>
+                    <p>CRUD Artista</p>
+                </button>
+                <button className="flex items-center space-x-2 hover:text-white" onClick={handlerCRUDAlbum}>
+                    <CollectionIcon className="h5 w-5"/>
+                    <p>CRUD Album</p>
+                </button>
+                <button className="flex items-center space-x-2 hover:text-white"onClick={handlerCRUDCancion}>
+                    <MusicNoteIcon className="h5 w-5"/>
+                    <p>CRUD Canción</p>
+                </button>
+                <hr className="border-t-[0.1px] border-gray-900"/>
                 <p>Playlist</p>
                 <button className="flex items-center space-x-2 hover:text-white" onClick={handlerMyPlaylists}>
                     <LibraryIcon className="h5 w-5"/>
@@ -98,11 +124,12 @@ function Sidebar() {
                 <button className="flex items-center space-x-2 hover:text-white">
                     <PlusCircleIcon className="h5 w-5"/>
                     <p>Crea tu Playlist</p>
-                    
                 </button>
-                
+                <button className="flex items-center space-x-2 hover:text-white">
+                    <AiOutlineHighlight className="h5 w-5"/>
+                    <p>Edita tu Playlist</p>
+                </button>
             </div>
-            
         </div>
         <div className="flex justify-between">
         <Reproductor/>
@@ -113,4 +140,4 @@ function Sidebar() {
     )
 }
 
-export default Sidebar;
+export default Sidebar_admin;

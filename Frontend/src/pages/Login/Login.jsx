@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 import Service from '../../Service/Service';
 import { useUserContext } from '../../context/UserContext';
 import './Login.css';
@@ -45,7 +46,24 @@ function Login() {
       Service.login(data)
       .then(response => {
         console.log(response.data)
-        sessionStorage.setItem('data_user', JSON.stringify(response.data.datosUusario));
+        if(!response.data.status){
+          toast.error('Ocurrió un Error!,No se pudo iniciar sesión', {
+            position: "bottom-right",
+            autoClose: 4000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+          return;
+        }
+        const data_a_guardar = {
+          id: response.data.datosUusario.id_usuario,
+          rol: response.data.datosUusario.rol
+        }
+        sessionStorage.setItem('data_user', JSON.stringify(data_a_guardar));
         setLogueado(true);
         navigate('/user/home');
       })
@@ -109,6 +127,9 @@ function Login() {
             </div>
         </div>
 
+      </div>
+      <div>
+        <ToastContainer />
       </div>
     </div>
     );

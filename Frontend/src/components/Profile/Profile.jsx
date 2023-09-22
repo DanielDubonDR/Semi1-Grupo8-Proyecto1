@@ -1,25 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
+import Service from "../../Service/Service";
+import { useUserContext } from "../../context/UserContext";
 import "./Profile.css";
 function Profile(){
     const style_font = {
         fontFamily: "'Quicksand', sans-serif",
     };
 
-    const navigate = useNavigate();
-
     const handlerEdit = () => {
       navigate('/user/edit_profile');
     }
+    const {logueado, setLogueado} = useUserContext();
+    const navigate = useNavigate();
+    const [image_user, setImage_user] = useState('');
+    const [name_user, setName_user] = useState('');
+    const [apellido_user, setApellido_user] = useState('');
+    const [correo_user, setCorreo_user] = useState('');
 
-    const usuario = JSON.parse(sessionStorage.getItem('data_user'));
+    useEffect(() => {
+      if(!logueado){
+          navigate('/login');
+      }
+      const user_data = JSON.parse(sessionStorage.getItem('data_user'));
+      console.log(user_data.id)
+      Service.getDataUser(user_data.id)
+      .then(response => {
+          console.log(response)
+          setImage_user(response.data.path_foto)
+          setName_user(response.data.nombres)
+          setApellido_user(response.data.apellidos)
+          setCorreo_user(response.data.correo)
+          console.log(image_user)
+          console.log(name_user)
+      })
+    }, [logueado])
 
     return(
         <div className="flex flex-col flex-grow items-center justify-center p-12 h-screen overflow-y-scroll scrollbar-hide bg-gradient-to-b from-purple to-black" style={style_font}>
     <h1 className="text-4xl font-bold text-white my-4 mx-auto">Mi Perfil</h1>
             <img className="rounded-full w-40 h-40 mx-auto block border-8 border-lightPurple" 
-                    src={usuario.path_foto} 
+                    src={image_user} 
                     alt="" 
                     />
   <div className="mx-auto w-full max-w-[550px]">
@@ -32,7 +54,7 @@ function Profile(){
         >
           Nombres
         </label>
-        <h2 className="text-white text-2xl">{usuario.nombres}</h2>
+        <h2 className="text-white text-2xl">{name_user}</h2>
       </div>
       <div className="mb-5">
         <label
@@ -41,7 +63,7 @@ function Profile(){
         >
           Apellidos
         </label>
-        <h2 className="text-white text-2xl">{usuario.apellidos}</h2>
+        <h2 className="text-white text-2xl">{apellido_user}</h2>
       </div>
       <div className="mb-5">
         <label
@@ -50,7 +72,7 @@ function Profile(){
         >
           Correo Electrónico
         </label>
-        <h2 className="text-white text-2xl">{usuario.correo}</h2>
+        <h2 className="text-white text-2xl">{correo_user}</h2>
       </div>
       <div>
         <button

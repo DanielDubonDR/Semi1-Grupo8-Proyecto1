@@ -1,17 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from 'react-router-dom';
 import { album_artista } from "../datos_test/album_artista";
+import { profiles } from "../datos_test/artistas";
 import AlbumCard from "./AlbumCard";
 import DetailsHeader from "./DetailsHeader";
+import Header_name from "./Header_name";
 import Songs from "./Songs";
 const ArtistDetails = () => {
-    const artist = {
-        name : "Eminem",
-        img : "https://phantom-marca.unidadeditorial.es/8ba8e88f28354c7d6fea00517edacedd/resize/828/f/jpg/assets/multimedia/imagenes/2022/10/19/16661328920205.jpg"
-    }
     const isPlaying = false;
+    const { id } = useParams();
+    const [artist, setArtist] = useState({});
+    useEffect(() => {
+        setArtist(profiles[id])
+    })
     const activeSong = {};
     return (
         <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide ">
+            <Header_name/>
             <div className="flex flex-col">
                 <DetailsHeader 
                 artistData={artist}

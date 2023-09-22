@@ -1,7 +1,9 @@
 import { LogoutIcon } from "@heroicons/react/outline";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Service from "../../Service/Service";
 import { useUserContext } from "../../context/UserContext";
+
 
 
 function Header_name() {
@@ -12,8 +14,23 @@ function Header_name() {
         setLogueado(false);
         navigate('/login');
     }
-    const image_user = JSON.parse(sessionStorage.getItem('data_user')).path_foto;
-    const name_user = JSON.parse(sessionStorage.getItem('data_user')).nombres;
+    const [image_user, setImage_user] = useState('');
+    const [name_user, setName_user] = useState('');
+
+    useEffect(() => {
+        const user_data = JSON.parse(sessionStorage.getItem('data_user'));
+        console.log(user_data.id)
+        Service.getDataUser(user_data.id)
+        .then(response => {
+            console.log(response)
+            setImage_user(response.data.path_foto)
+            setName_user(response.data.nombres)
+            console.log(image_user)
+            console.log(name_user)
+        })
+    }, [logueado])
+    console.log(image_user)
+    console.log(name_user)
     return (
         <div>
             <header className="absolute top-5 right-8">

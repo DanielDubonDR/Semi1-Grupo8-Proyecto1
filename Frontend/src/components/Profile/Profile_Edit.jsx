@@ -1,24 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
 import Service from "../../Service/Service";
+import { useUserContext } from "../../context/UserContext";
 import "./Profile_Edit.css";
 function Profile_Edit(){
 
-  const usuario = JSON.parse(sessionStorage.getItem('data_user'));
+  const {logueado, setLogueado} = useUserContext();
   const [image, setImage] = useState(null);
-  const [nombres, setNombres] = useState(usuario.nombres);
-  const [apellidos, setApellidos] = useState(usuario.apellidos);
-  const [correo, setCorreo] = useState(usuario.correo);
-  const [password, setPassword] = useState(usuario.password);
+  const [path_image, setPath_image] = useState('');
+  const [nombres, setNombres] = useState('');
+  const [namephoto, setNamephoto] = useState('Click para cargar la foto o arrastra la imagen acá');
+  const [apellidos, setApellidos] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [password, setPassword] = useState('');
+  const [id, setId] = useState(0);
     const style_font = {
         fontFamily: "'Quicksand', sans-serif",
     };
 
+    useEffect(() => {
+      if(!logueado){
+          navigate('/login');
+      }
+      const user_data = JSON.parse(sessionStorage.getItem('data_user'));
+      setId(user_data.id)
+      Service.getDataUser(user_data.id)
+      .then(response => {
+          console.log(response)
+          setPath_image(response.data.path_foto)
+          setNombres(response.data.nombres)
+          setApellidos(response.data.apellidos)
+          setCorreo(response.data.correo)
+      })
+    }, [logueado])
     const handleSubmit = (e) =>{
       e.preventDefault();
+    }
+
+    const onChangeFoto = (e) =>{
+      const selectedFile = e.target.files[0];
+      console.log(selectedFile)
+      setNamephoto(selectedFile.name);
+      setImage(selectedFile);
     }
 
     const handleNombre = (e) =>{
@@ -34,6 +60,19 @@ function Profile_Edit(){
     }
     const navigate = useNavigate();
     const verificarPasswd_changephoto = () => {
+      if(image === null){
+        toast.error('No agregó ninguna imagen', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          });
+          return;
+      }
       Swal.fire({
         title: 'Confirma tu contraseña',
         input: 'password',
@@ -51,17 +90,37 @@ function Profile_Edit(){
         cancelButtonColor: '#F87171',
     }).then((result) => {
         if (result.isConfirmed) {
-            toast.success('Cambios aplicados a tu perfil con éxito!', {
+          const pw = result.value;
+          const formData = new FormData();
+          formData.append('imagen', image);
+          formData.append('password', pw);
+          Service.updateImageUser(formData, id)
+          .then(response => {
+            if(response.status){
+              toast.success('Cambios aplicados a tu perfil con éxito!', {
+                  position: "top-center",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: false,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "dark",
+              });
+              navigate('/user/profile')
+            }else{
+              toast.error('Hubo un error', {
                 position: "top-center",
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
-                pauseOnHover: false,
+                pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
                 theme: "dark",
-            });
-            navigate('/user/profile')
+                });
+            }
+          })
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           toast.error('Hubo un error', {
             position: "top-center",
@@ -96,16 +155,31 @@ function Profile_Edit(){
         cancelButtonColor: '#F87171',
     }).then((result) => {
         if (result.isConfirmed) {
-            setPassword(result.value);
+          const pw = result.value;
+            if(nombres === '' || apellidos === '' || correo === ''){
+              toast.error('Todos los campos son obligatorios', {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+                });
+                return;
+            }
+            console.log(password)
             const data = {
               nombres: nombres,
               apellidos: apellidos,
               correo: correo,
-              password: password
+              password: pw
             }
-            Service.updateDataUser(data, usuario.id_usuario)
+            Service.updateDataUser(data, id)
             .then(response => {
-              if(response.status){
+              console.log(response)
+              if(response.data.status){
                   toast.success('Cambios aplicados a tu perfil con éxito!', {
                       position: "top-center",
                       autoClose: 5000,
@@ -116,6 +190,7 @@ function Profile_Edit(){
                       progress: undefined,
                       theme: "dark",
                   });
+                  navigate('/user/profile')
                 }else{
                   toast.error('Hubo un error', {
                     position: "top-center",
@@ -146,7 +221,7 @@ function Profile_Edit(){
     }
 
     return(
-        <div className="flex flex-col flex-grow items-center justify-center p-12 h-screen overflow-y-scroll scrollbar-hide bg-gradient-to-b from-purple to-black" style={style_font}>
+      <div className="flex flex-col flex-grow items-center justify-center mb-20 p-12 h-screen overflow-y-scroll scrollbar-hide bg-gradient-to-b from-purple to-black" style={style_font}>
           <ToastContainer
           position="top-center"
           autoClose={5000}
@@ -161,16 +236,16 @@ function Profile_Edit(){
           />
     <h1 className="text-4xl font-bold text-white my-4 mx-auto">Editar Perfil</h1>
             <img className="rounded-full w-40 h-40 mx-auto block border-8 border-lightPurple" 
-                    src={usuario.path_foto} 
+                    src={path_image} 
                     alt="" 
                     />
                     <br />
                     <div className="flex items-center justify-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 h-24 bg-lightPurple dark:bg-gray-700 hover:bg-lightPurple dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                       <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-full border-2 border-lightPurple border-dashed cursor-pointer">
                         <div className="flex flex-col items-center justify-center h-full">
-                          <p className="mt-1 mb-1 text-xs text-gray-500 dark:text-gray-400">Click para cargar la foto o arrastra la imagen acá</p>
+                          <p className="mt-1 mb-1 text-xs text-gray-500 dark:text-gray-400">{namephoto}</p>
                         </div>
-                        <input id="dropzone-file" type="file" className="hidden" accept="image/*"/>
+                        <input id="dropzone-file" type="file" className="hidden" accept="image/*" onChange={onChangeFoto}/>
                       </label>
                     </div>
                     <br />
