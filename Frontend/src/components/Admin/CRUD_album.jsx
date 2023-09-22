@@ -1,10 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { albumes } from "../datos_test/albumes";
 import { ToastContainer, toast } from "react-toastify";
-
+import Service from "../../Service/Service";
 export default function CRUD_album() {
   const [data, setData] = useState({});
+  const usuario = JSON.parse(sessionStorage.getItem("data_user"));
+  const [albumes, setAlbumes] = useState([]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let res = await Service.listarAlbumes();
+        //console.log("este es el res:", res.data);
+        if (res.status === 200) {
+          //console.log("este es el res:", res);
+          setAlbumes(res.data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+
+    };
+
+    fetchData();
+  }, []);
   return (
     <div id="profile" class="h-screen w-screen overflow-y-auto bg-gradient-to-t from-darkPurple">
       {Item_CRUD_album(albumes)}
@@ -13,6 +32,7 @@ export default function CRUD_album() {
 }
 
 function Item_CRUD_album(data) {
+  const usuario = JSON.parse(sessionStorage.getItem("data_user"));
   const showToastMessageError = () => {
     toast.error("Ha ocurrido un error - el álbum no ha sido eliminado.", {
       position: toast.POSITION.TOP_RIGHT,
@@ -218,24 +238,24 @@ function Item_CRUD_album(data) {
                     >
                       <img
                         class="w-24 h-24 rounded-r-lg"
-                        src={value.img}
+                        src={value.path_imagen}
                         alt="artista"
                       ></img>
                     </th>
 
-                    <td class="px-6 py-4">{value.name}</td>
-                    <td class="px-6 py-4">{value.artist}</td>
+                    <td class="px-6 py-4">{value.nombre}</td>
+                    <td class="px-6 py-4">{value.id_artista}</td>
                     <td class=" text-center">
                       <button
                         class="bg-yellow-400 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded "
                         onClick={() =>
                           openModal(
                             1,
-                            value.name,
-                            value.artist,
-                            value.img,
-                            value.desc,
-                            value.songs
+                            value.nombre,
+                            value.id_artista,
+                            value.path_imagen,
+                            value.descripcion,
+                            value.id_album
                           )
                         }
                       >
@@ -262,11 +282,11 @@ function Item_CRUD_album(data) {
                         onClick={() =>
                           openModal(
                             2,
-                            value.name,
-                            value.artist,
-                            value.img,
-                            value.desc,
-                            value.songs
+                            value.nombre,
+                            value.id_artista,
+                            value.path_imagen,
+                            value.descripcion,
+                            value.id_album
                           )
                         }
                       >
@@ -324,11 +344,11 @@ function Item_CRUD_album(data) {
                         onClick={() =>
                           openModal(
                             3,
-                            value.name,
-                            value.artist,
-                            value.img,
-                            value.desc,
-                            value.songs
+                            value.nombre,
+                            value.id_artista,
+                            value.path_imagen,
+                            value.descripcion,
+                            value.id_album
                           )
                         }
                       >
