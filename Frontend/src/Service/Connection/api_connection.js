@@ -73,9 +73,13 @@ export const listarArtistas = async () => {
 }
 
 // DELETE CANCIONES, ALBUMES Y ARTISTAS
-export const eliminarCancion = async (id) => {
-    console.log(id);
-    const res = await instance.delete(`/cancion/eliminar/${id}`);
+export const eliminarCancion = async (data) => {
+    const res = await instance.delete(`/cancion/eliminar`, data,{
+        headers: {
+            'Content-Type': 'application/json'
+        }
+        });
+
     return res;
 }
 
@@ -145,4 +149,44 @@ export const updateCancionInfo = async (data, id) => {
         }
     })
     return response;
+}
+// CREAR ARTISTA:
+export const crearArtista = async (data) => {
+    const response = await instance.post('/artista/crear', data,{
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+    return response;
+}
+
+//Actualizar Imagen Artista
+export const actualizarArtistaImagen = async (data, id) => {
+    const response = await instance.patch(`/artista/modificar/image/${id}`, data,{
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    return response;
+}
+
+//actualizar datos artista
+export const actualizarArtista = async (data, id) => {
+    const response = await instance.patch(`/artista/modificar/info/${id}`, data,{
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    return response;
+}
+
+// eliminar artista
+export const eliminarArtista = async (data) => {
+    const res = await instance.delete(`/artista/eliminar`, data,{
+        headers: {
+            'Content-Type': 'application/json'
+        }
+        });
+
+    return res;
 }

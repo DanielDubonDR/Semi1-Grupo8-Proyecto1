@@ -1,18 +1,85 @@
 import React, { useEffect, useState } from "react";
 import { profiles } from "../datos_test/artistas";
 import { ToastContainer, toast } from "react-toastify";
+import Service from "../../Service/Service";
+import { useUserContext } from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
+import { set } from "lodash";
 
 export default function CRUD_artistas() {
   const [data, setData] = useState({});
+  const usuario = JSON.parse(sessionStorage.getItem("data_user"));
+
+  const [artistas, setArtistas] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let res = await Service.listarArtistas();
+
+        if (res.status == 200) {
+          setArtistas(res.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const { logueado, setLogueado } = useUserContext();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!logueado) {
+      navigate("/login");
+    }
+  }, [logueado]);
 
   return (
-    <div id="profile" class="h-screen w-screen overflow-y-auto bg-gradient-to-t from-lightPurple/50">
-      {Item_CRUD_artistas(profiles)}
+    <div
+      id="profile"
+      class="h-screen w-screen overflow-y-auto bg-gradient-to-t from-lightPurple/50"
+    >
+      {Item_CRUD_artistas(artistas)}
     </div>
   );
 }
 
+
+
 function Item_CRUD_artistas(data) {
+  const usuario = JSON.parse(sessionStorage.getItem("data_user"));
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    console.log("file: ", file);
+    setSelectedImage(file);
+  };
+
+  const handleImageUpdate = async (e) => {
+    const file = e.target.files[0];
+    
+    const formData = new FormData();
+    formData.append("imagen", file);
+
+    try {
+      const res = await Service.actualizarArtistaImagen(formData, id_artist);
+      if (res.status == 200) {
+        toast.success("La imagen ha sido actualizada correctamente.", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      } else {
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Ha ocurrido un error - la imagen no ha sido actualizada.", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    
+    
+  }
+
+
   const showToastMessageError = () => {
     toast.error("Ha ocurrido un error - la canción no ha sido eliminada.", {
       position: toast.POSITION.TOP_RIGHT,
@@ -31,8 +98,6 @@ function Item_CRUD_artistas(data) {
   const [deleteAlbum, setDeleteAlbum] = useState(false);
   const [addAlbum, setAddAlbum] = useState(false);
 
-  const URL = "http://localhost:3001/cambiarEstexd"; //ESTE SE TIENE QUE CAMBIAR, QUE NO SE ME OLVIDE
-
   const [album, setAlbum] = useState([]);
   //atributos:
   const [name, setName] = useState("");
@@ -40,12 +105,86 @@ function Item_CRUD_artistas(data) {
   const [img, setImg] = useState("");
   const [description, setDescription] = useState("");
   const [songs, setSongs] = useState([]);
-
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedPathImg, setSelectedPathImg] = useState(null);
   const [title, setTitle] = useState("");
+  const [id_artist, setId_artist] = useState(-1);
+  const [passw, setPassw] = useState("");
 
   useEffect(() => {
     obtDatos();
   }, []);
+
+  const handleNameChange = async (event) => {
+    setName(event.target.value);
+  };
+
+  const handlePasswChange = async (event) => {
+    setPassw(event.target.value);
+  };
+
+  const handleArtistChange = async (event) => {
+    setArtist(event.target.value);
+  };
+
+  const handleDescriptionChange = async (event) => {
+    setDescription(event.target.value);
+  };
+
+
+  const DeleteArtist = async (id) => {
+    try {
+      let datos = {
+        idArtist : id,
+        idUser : usuario.id_usuario,
+        password : passw
+      }
+
+      
+      const res = await Service.eliminarArtista(datos);
+
+      if (res.status == 200) {
+        toast.success("El artista ha sido eliminado correctamente.", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      } else {
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Ha ocurrido un error - el artista no ha sido eliminado.", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    Window.location.reload();
+  };
+
+  const handleActualizacion = async () => { 
+
+    let datos_Enviar = {
+      nombres: name,
+      apellidos: description,
+      fecha_nac: artist,
+    };
+
+    try {
+      const res = await Service.actualizarArtista(datos_Enviar, id_artist);
+      if (res.status == 200) {
+        toast.success("El artista ha sido actualizado correctamente.", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+
+        Window.location.reload();
+      } else {
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Ha ocurrido un error - el artista no ha sido actualizado.", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  };
+
+
 
   const obtDatos = async () => {
     setAlbum(data);
@@ -57,12 +196,64 @@ function Item_CRUD_artistas(data) {
     console.log("HOLIWIS KIWIIIIIIIIS", e);
   };
 
+  const [fData, setFData] = useState({
+    nombres: "",
+    apellidos: "",
+    path_imagen: "",
+    fecha_nac: "",
+  });
+
+  const handleInputChange = async (event) => {
+    console.log("event.target.name: ", event.target.name);
+    setFData({
+      ...fData,
+
+      [event.target.name]: event.target.value,
+    });
+
+    console.log("fData: ", fData);
+  };
+
+  const handleAdd = async (e) => {
+    const formData = new FormData();
+    formData.append("nombres", fData.nombres);
+    formData.append("apellidos", fData.apellidos);
+    formData.append("imagen", selectedImage);
+    formData.append("fecha_nac", fData.fecha_nac);
+
+    try {
+      const res = await Service.crearArtista(formData);
+      if (res.status == 200) {
+        toast.success("El artista ha sido creado correctamente.", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      } else {
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Ha ocurrido un error - el artista no ha sido creado.", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+
+    setFData({
+      nombres: "",
+      apellidos: "",
+      path_imagen: "",
+      id_imagen: "",
+      fecha_nac: "",
+    });
+    Window.location.reload();
+
+    setAddAlbum(false);
+  };
+
   const openModal = (op, name, artist, img, description, songs) => {
     setName("");
     setArtist("");
     setImg("");
     setDescription("");
-    setSongs([]);
+    setId_artist(-1);
 
     if (op === 1) {
       //actualizar
@@ -72,7 +263,7 @@ function Item_CRUD_artistas(data) {
       setArtist(artist);
       setImg(img);
       setDescription(description);
-      setSongs(songs);
+      setId_artist(songs);
     } else if (op === 2) {
       // agregar cancion al álbum
       setAddSong(true);
@@ -81,7 +272,7 @@ function Item_CRUD_artistas(data) {
       setArtist(artist);
       setImg(img);
       setDescription(description);
-      setSongs(songs);
+      setId_artist(songs);
     } else if (op === 3) {
       //detalle
       setShowModal(true);
@@ -91,7 +282,7 @@ function Item_CRUD_artistas(data) {
       setArtist(artist);
       setImg(img);
       setDescription(description);
-      setSongs(songs);
+      setId_artist(songs);
     } else if (op === 4) {
       //eliminar
       setDeleteAlbum(true);
@@ -100,11 +291,11 @@ function Item_CRUD_artistas(data) {
       setArtist(artist);
       setImg(img);
       setDescription(description);
-      setSongs(songs);
+      setId_artist(songs);
     } else {
       //agregar
       setAddAlbum(true);
-      setTitle("Agregar Canción");
+      setTitle("Agregar Artista");
     }
   };
 
@@ -153,7 +344,7 @@ function Item_CRUD_artistas(data) {
                       type="text"
                       id="simple-search"
                       class="bg-black2 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-black3 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Buscar Album"
+                      placeholder="Buscar Artista"
                       required=""
                     ></input>
                   </div>
@@ -176,7 +367,7 @@ function Item_CRUD_artistas(data) {
                           d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
                         />
                       </svg>
-                      Agregar Cancion
+                      Agregar Artista
                     </button>
                   </div>
                 </form>
@@ -215,24 +406,26 @@ function Item_CRUD_artistas(data) {
                     >
                       <img
                         class="w-24 h-24 rounded-full"
-                        src={value.img}
+                        src={value.path_fotografia}
                         alt="artista"
                       ></img>
                     </th>
 
-                    <td class="px-6 py-4">{value.name}</td>
-                    <td class="px-6 py-4">{value.fecha_nacimiento}</td>
+                    <td class="px-6 py-4">
+                      {value.nombres + " " + value.apellidos}
+                    </td>
+                    <td class="px-6 py-4">{value.fecha_nac}</td>
                     <td class=" text-center">
                       <button
                         class="bg-yellow-400 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded "
                         onClick={() =>
                           openModal(
                             1,
-                            value.name,
-                            value.fecha_nacimiento,
-                            value.img,
-                            value.desc,
-                            value.songs
+                            value.nombres,
+                            value.fecha_nac,
+                            value.path_fotografia,
+                            value.apellidos,
+                            value.id_artista
                           )
                         }
                       >
@@ -259,11 +452,11 @@ function Item_CRUD_artistas(data) {
                         onClick={() =>
                           openModal(
                             4,
-                            value.name,
-                            value.artist,
-                            value.img,
-                            value.desc,
-                            value.songs
+                            value.nombres,
+                            value.fecha_nac,
+                            value.path_fotografia,
+                            value.apellidos,
+                            value.id_artista
                           )
                         }
                       >
@@ -290,11 +483,11 @@ function Item_CRUD_artistas(data) {
                         onClick={() =>
                           openModal(
                             3,
-                            value.name,
-                            value.artist,
-                            value.img,
-                            value.desc,
-                            value.songs
+                            value.nombres,
+                            value.fecha_nac,
+                            value.path_fotografia,
+                            value.apellidos,
+                            value.id_artista
                           )
                         }
                       >
@@ -361,19 +554,23 @@ function Item_CRUD_artistas(data) {
                         alt=""
                       />
 
-                      
+                      {!showSongs ? (
                         <div className="flex flex-col items-center justify-center">
-                          <button className="bg-lightPurple hover:bg-purple text-white font-bold my-2 py-2 px-4 rounded">
-                            Editar
-                          </button>
+                          <input
+                            className="mt-6 text-white rounded-lg bg-purple"
+                            type="file"
+                            accept="image/*" // Accept only image files
+                            required
+                            onChange={handleImageUpdate}
+                          />
                         </div>
-                      
+                      ) : null}
                     </div>
 
                     {!showSongs ? (
                       <div className="relative p-6 flex-auto">
                         <div class="w-full ">
-                          <form class="w-full ">
+                          <form class="w-full " onSubmit={() => handleActualizacion()}>
                             <div class="grid grid-cols-2 gap-2">
                               <div class="md:flex md:items-center mb-6">
                                 <div class="">
@@ -381,7 +578,7 @@ function Item_CRUD_artistas(data) {
                                     class="block text-white font-bold md:text-left mb-1 md:mb-0 pr-4"
                                     for="inline-full-name"
                                   >
-                                    Nombre
+                                    Nombres:
                                   </label>
                                 </div>
                                 <div class="w-full mr-4">
@@ -390,6 +587,27 @@ function Item_CRUD_artistas(data) {
                                     id="inline-full-name"
                                     type="text"
                                     defaultValue={name}
+                                    onChange={handleNameChange}
+                                  ></input>
+                                </div>
+                              </div>
+
+                              <div class="md:flex md:items-center mb-6">
+                                <div class="">
+                                  <label
+                                    class="block text-white font-bold md:text-left mb-1 md:mb-0 pr-4"
+                                    for="inline-full-name"
+                                  >
+                                    Apellidos:
+                                  </label>
+                                </div>
+                                <div class="w-full mr-4">
+                                  <input
+                                    class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                                    id="inline-full-name"
+                                    type="text"
+                                    defaultValue={description}
+                                    onChange={handleDescriptionChange}
                                   ></input>
                                 </div>
                               </div>
@@ -409,16 +627,31 @@ function Item_CRUD_artistas(data) {
                                     id="inline-full-name"
                                     type="date"
                                     defaultValue={artist}
+                                    onChange={handleArtistChange}
                                   ></input>
                                 </div>
                               </div>
-
-                              
-
-                              
-                              
                             </div>
-                           
+                            <button
+                              type="submit"
+                              class="text-white bg-gradient-to-br from-purple to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-6 h-6"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M4.5 12.75l6 6 9-13.5"
+                                />
+                              </svg>
+                              Guardar
+                            </button>
                           </form>
                         </div>
                       </div>
@@ -441,7 +674,7 @@ function Item_CRUD_artistas(data) {
                                     class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                     id="inline-full-name"
                                     type="text"
-                                    defaultValue={name}
+                                    defaultValue={name + " " + description}
                                     readOnly={true}
                                   ></input>
                                 </div>
@@ -460,7 +693,7 @@ function Item_CRUD_artistas(data) {
                                   <input
                                     class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                     id="inline-full-name"
-                                    type="date"
+                                    type="text"
                                     defaultValue={artist}
                                     readOnly={true}
                                   ></input>
@@ -483,29 +716,6 @@ function Item_CRUD_artistas(data) {
                         }}
                       >
                         Cancelar
-                      </button>
-                      <button
-                        type="button"
-                        class="text-white bg-gradient-to-br from-purple to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
-                        onClick={() => {
-                          setShowModal(false), setShowSongs(false);
-                        }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M4.5 12.75l6 6 9-13.5"
-                          />
-                        </svg>
-                        Guardar
                       </button>
                     </div>
                   </div>
@@ -560,12 +770,12 @@ function Item_CRUD_artistas(data) {
 
                     <div className="relative p-6 flex-auto text-center">
                       <h1 class="inline-block text-xl md:w-flex text-white py-5">
-                        ¿Está seguro de querer eliminar al artista {" "}
+                        ¿Está seguro de querer eliminar al artista{" "}
                         <span class="inline-block text-xl text-red-500 font-bold">
                           {" "}
                           {name}
-                        </span>
-                        {" "}junto con todos los datos relacionados a este?
+                        </span>{" "}
+                        junto con todos los datos relacionados a este?
                       </h1>{" "}
                       <div class="md:flex md:items-center mb-6">
                         <div class="">
@@ -576,14 +786,26 @@ function Item_CRUD_artistas(data) {
                             Confirme su contraseña:
                           </label>
                         </div>
-                        <form className="justify-center">
-                          <div class="w-full ">
+                        <form className="justify-center flex" onSubmit={() => DeleteArtist(id_artist)}>
+                          <div class="w-full flex">
                             <input
                               class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                               id="inline-full-name"
                               type="password"
+                              onChange={handlePasswChange}
                               autoComplete="on"
                             ></input>
+
+                            
+                          </div>
+                          
+                          <div class="flex">
+                            <button
+                              type="submit"
+                              class="text-white mt-4 bg-gradient-to-br from-red-900 to-red-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
+                            >
+                              Eliminar
+                            </button>
                           </div>
                         </form>
                       </div>
@@ -600,18 +822,6 @@ function Item_CRUD_artistas(data) {
                         }}
                       >
                         Cancelar
-                      </button>
-
-                      <button
-                        type="button"
-                        class="text-white bg-gradient-to-br from-red-900 to-red-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
-                        onClick={() => {
-                          {
-                            setDeleteAlbum(false);
-                          }
-                        }}
-                      >
-                        Eliminar
                       </button>
                     </div>
                   </div>
@@ -655,51 +865,33 @@ function Item_CRUD_artistas(data) {
                       </button>
                     </div>
                     {/*body*/}
-
-                    <div className="w-full bg-black2 items-center justify-center">
-                      <div class=" w-full p-5 rounded-xl z-10">
-                        <form class="mt-2" method="POST">
+                    <form onSubmit={() => handleAdd()}>
+                      <div className="w-full bg-black2 items-center justify-center">
+                        <div class=" w-full p-5 rounded-xl z-10">
                           <div class="grid grid-cols-1 space-y-2">
                             <label class="text-sm font-bold text-gray-500 tracking-wide">
                               Agrega una imagen
                             </label>
-                            <div class="flex items-center justify-center w-full">
-                              <label class="flex flex-col rounded-lg border-4 border-dashed w-full h-20 p-10 group text-center">
-                                <div class="h-full w-full text-center flex flex-col items-center justify-center items-center  ">
-                                  <p class="pointer-none text-gray-500 ">
-                                    <span class="text-sm">Arrastra</span> tu
-                                    imagen aquí <br /> o{" "}
-                                    <a
-                                      href=""
-                                      id=""
-                                      class="text-blue-600 hover:underline"
-                                    >
-                                      selecciona una
-                                    </a>{" "}
-                                    desde tu computadora
-                                  </p>
-                                </div>
-                                <input type="file" class="hidden"></input>
-                              </label>
-                            </div>
+                            <input
+                              className="mt-6 text-white rounded-lg bg-purple"
+                              type="file"
+                              accept="image/*" // Accept only image files
+                              onChange={handleImageChange}
+                              required
+                            />
                           </div>
-                          <p class="text-sm text-gray-300">
-                            <span>Tipo: PNG o JPEG</span>
-                          </p>
-                        </form>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="relative p-6 flex-auto">
-                      <div class="w-full ">
-                        <form class="w-full ">
+                      <div className="relative p-6 flex-auto">
+                        <div class="w-full ">
                           <div class="md:flex md:items-center mb-6">
                             <div class="">
                               <label
                                 class="block text-white font-bold md:text-left mb-1 md:mb-0 pr-4"
                                 for="inline-full-name"
                               >
-                                Nombre:
+                                Nombres:
                               </label>
                             </div>
                             <div class="w-full mr-[250px]">
@@ -707,7 +899,10 @@ function Item_CRUD_artistas(data) {
                                 class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                 id="inline-full-name"
                                 type="text"
-                                defaultValue={name}
+                                required
+                                name="nombres"
+                                defaultValue={fData.nombres}
+                                onChange={handleInputChange}
                               ></input>
                             </div>
                           </div>
@@ -718,7 +913,7 @@ function Item_CRUD_artistas(data) {
                                 class="block text-white font-bold md:text-left mb-1 md:mb-0 pr-4"
                                 for="inline-full-name"
                               >
-                                Artista:
+                                Apellidos:
                               </label>
                             </div>
                             <div class="w-full mr-[250px]">
@@ -726,64 +921,57 @@ function Item_CRUD_artistas(data) {
                                 class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                 id="inline-full-name"
                                 type="text"
-                                defaultValue={artist}
+                                name="apellidos"
+                                required
+                                defaultValue={fData.apellidos}
+                                onChange={handleInputChange}
                               ></input>
                             </div>
                           </div>
-                          <label
-                            class="block text-white font-bold md:text-left mb-1 md:mb-2 pr-4"
-                            for="inline-full-name"
+
+                          <div class="md:flex md:items-center mb-6">
+                            <div class="">
+                              <label
+                                class="block text-white font-bold md:text-left mb-1 md:mb-0 pr-4"
+                                for="inline-full-name"
+                              >
+                                Fecha de Nacimiento:
+                              </label>
+                            </div>
+                            <div class="w-full mr-[250px]">
+                              <input
+                                class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                                id="inline-full-name"
+                                type="date"
+                                name="fecha_nac"
+                                defaultValue={fData.fecha_nac}
+                                onChange={handleInputChange}
+                              ></input>
+                            </div>
+                          </div>
+                          <button
+                            type="submit"
+                            class="text-white bg-gradient-to-br from-purple to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
                           >
-                            Descripción
-                          </label>
-                          <div class="md:flex md:items-center mb-6">
-                            <div class=""></div>
-                            <div class="w-full ">
-                              <textarea
-                                class="bg-gray-200 appearance-none h-20 overflow-y-auto border-2 border-gray-200 rounded w-full py- px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                                id="inline-full-name"
-                                type="text"
-                                defaultValue={description}
-                              ></textarea>
-                            </div>
-                          </div>
-
-                          <div class="md:flex md:items-center">
-                            <div class="md:w-1/3"></div>
-                          </div>
-                          <div class=" w-full col-span-2">
-                              <div class=" ">
-                                <label class="text-sm font-bold text-gray-500 tracking-wide">
-                                  Agrega una canción
-                                </label>
-                                <div class="flex items-center justify-center w-full">
-                                  <label class="flex flex-col rounded-lg border-4 border-dashed w-full h-8 p-10 group text-center">
-                                    <div class="h-full w-full text-center flex flex-col items-center justify-center items-center  ">
-                                      <p class="pointer-none text-gray-500 ">
-                                        <span class="text-sm">Arrastra</span> tu
-                                        cancion aquí <br /> o{" "}
-                                        <a
-                                          href=""
-                                          id=""
-                                          class="text-blue-600 hover:underline"
-                                        >
-                                          selecciona una
-                                        </a>{" "}
-                                        desde tu computadora
-                                      </p>
-                                    </div>
-                                    <input type="file" class="hidden"></input>
-                                  </label>
-                                </div>
-                              </div>
-                              <p class="text-sm text-gray-300">
-                                <span>Tipo: .mp3</span>
-                              </p>
-                            </div>
-                        </form>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="w-6 h-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M4.5 12.75l6 6 9-13.5"
+                              />
+                            </svg>
+                            Guardar
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                        
+                    </form>
                     {/*footer*/}
                     <div className="flex items-center justify-end p-1 border-t border-solid border-slate-200 rounded-b">
                       <button
@@ -794,29 +982,6 @@ function Item_CRUD_artistas(data) {
                         }}
                       >
                         Cancelar
-                      </button>
-                      <button
-                        type="button"
-                        class="text-white bg-gradient-to-br from-purple to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
-                        onClick={() => {
-                          setAddAlbum(false);
-                        }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M4.5 12.75l6 6 9-13.5"
-                          />
-                        </svg>
-                        Guardar
                       </button>
                     </div>
                   </div>

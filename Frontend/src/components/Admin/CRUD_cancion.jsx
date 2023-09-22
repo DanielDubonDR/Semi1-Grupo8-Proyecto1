@@ -4,7 +4,6 @@ import { ToastContainer, toast } from "react-toastify";
 import Service from "../../Service/Service";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { set } from "lodash";
 
 export default function CRUD_cancion() {
   const [data, setData] = useState({});
@@ -52,7 +51,7 @@ export default function CRUD_cancion() {
   return (
     <div
       id="profile"
-      class="h-screen w-screen overflow-y-auto bg-gradient-to-t from-silver/40"
+      class="h-screen w-full overflow-y-auto bg-gradient-to-t from-silver/40 mb-[100px] scrollbar-hide"
     >
       {Item_CRUD_cancion(canciones, artista)}
     </div>
@@ -60,13 +59,13 @@ export default function CRUD_cancion() {
 }
 
 function Item_CRUD_cancion(data, data2) {
+  const usuario = JSON.parse(sessionStorage.getItem("data_user"));
+  
   const [showModal, setShowModal] = useState(false);
   const [showSongs, setShowSongs] = useState(false);
   const [addSong, setAddSong] = useState(false);
   const [deleteAlbum, setDeleteAlbum] = useState(false);
   const [addAlbum, setAddAlbum] = useState(false);
-
-  const [album, setAlbum] = useState([]);
   //atributos:
   const [name, setName] = useState("");
   const [artist, setArtist] = useState("");
@@ -78,6 +77,8 @@ function Item_CRUD_cancion(data, data2) {
   const [artista, setArtista] = useState([]);
   const [PathImg, setPathImg] = useState("");
   const [PathSong, setPathSong] = useState("");
+  const [passw, setPassw] = useState("");
+
 
   const [title, setTitle] = useState("");
   const getRowValue = (e) => {
@@ -151,10 +152,16 @@ function Item_CRUD_cancion(data, data2) {
     }
   };
 
-  const DeleteSong = async () => {
-    console.log("id de la cancion: ", id);
+  const DeleteSong = async (id) => {
+    console.log("id de la cancion: ", id, usuario.id_usuario, passw);
+    let data = {
+      idUser: usuario.id_usuario,
+      idSong: id,
+      password: passw,
+    };
+
     try {
-      let res = await Service.eliminarCancion(id);
+      let res = await Service.eliminarCancion(data);
 
       if (res.status === 200 || res.status === 204) {
         toast.success("Canción eliminada con éxito");
@@ -329,6 +336,9 @@ function Item_CRUD_cancion(data, data2) {
     setDuracion(event.target.value);
   };
 
+  const handlePasswChange = async (event) => {
+    setPassw(event.target.value);
+  };
 
   const handleAdd = async (e) => {
     let cancionID = songs;
@@ -434,7 +444,7 @@ function Item_CRUD_cancion(data, data2) {
             </div>
           </div>
           <div class="relative overflow-x-auto overflow-y-auto shadow-md sm:rounded-lg">
-            <table class="w-full text-sm text-left text-white dark:text-gray-400">
+            <table class="w-full text-sm text-left text-white dark:text-gray-400 py-2">
               <thead class="text-xs text-white uppercase bg-gray-50 dark:bg-black3 dark:text-white">
                 <tr>
                   <th scope="col" class="px-6 py-3 "></th>
@@ -647,7 +657,7 @@ function Item_CRUD_cancion(data, data2) {
                     {!showSongs ? (
                       <div className="relative p-6 flex-auto">
                         <div class="w-full ">
-                          <form class="w-full " onSubmit={handleActualizacion}>
+                          <form class="w-full " onSubmit={() => handleActualizacion()}>
                             <div class="grid grid-cols-2 gap-2">
                               <div class="md:flex md:items-center mb-6">
                                 <div class="">
@@ -899,14 +909,15 @@ function Item_CRUD_cancion(data, data2) {
                         </div>
                         <form
                           className="justify-center"
-                          onSubmit={DeleteSong(id_song)}
+                          onSubmit={() => DeleteSong(id_song)}
                         >
                           <div class="w-full ">
                             <input
                               class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                               id="inline-full-name"
                               type="password"
-                              autoComplete="on"
+                              
+                              onChange={handlePasswChange}
                             ></input>
                           </div>
 
@@ -976,7 +987,7 @@ function Item_CRUD_cancion(data, data2) {
                       </button>
                     </div>
                     {/*body*/}
-                    <form onSubmit={handleAdd}>
+                    <form onSubmit={()=> handleAdd()}>
                       <div className="w-full bg-black2 items-center justify-center">
                         <div class=" w-full p-5 rounded-xl z-10">
                           <div class="grid grid-cols-1 space-y-2">
