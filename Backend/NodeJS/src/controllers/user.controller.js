@@ -46,22 +46,30 @@ export const updateUserInfoById = async (req, res) => {
 }
 
 export const updateUserImageById = async (req, res) => {
-    const id = req.params.id;
+    const {idUser:id, password} = req.body;
     let status = false;
 
-    const { buffer, originalname } = req.file;
-    const fileExtension = originalname.split('.').pop();
+    const query = await pool.query("SELECT password, correo FROM usuario WHERE id_usuario = ?", [id]);
+    const passwordCifrado = query[0][0].password;
 
-    const dataImg = await pool.query("SELECT id_foto FROM usuario WHERE id_usuario = ?", [id]);
-    const id_foto = dataImg[0][0].id_foto;
+    status = await compararPassword(password, passwordCifrado);
 
-    if(id_foto != null){
-        await deleteObj(id_foto);
+    if(status){
+        const { buffer, originalname } = req.file;
+        const fileExtension = originalname.split('.').pop();
+    
+        const dataImg = await pool.query("SELECT id_foto FROM usuario WHERE id_usuario = ?", [id]);
+        const id_foto = dataImg[0][0].id_foto;
+    
+        if(id_foto != null){
+            await deleteObj(id_foto);
+        }
+    
+        const { Key: id_imagen, Location: path_imagen } = await saveObj(buffer, fileExtension, tipoObjeto.IMG);
+        const query = await pool.query("UPDATE usuario SET path_foto = ?, id_foto = ? WHERE id_usuario = ?", [path_imagen, id_imagen, id]);
+        status = query[0].affectedRows > 0;
     }
 
-    const { Key: id_imagen, Location: path_imagen } = await saveObj(buffer, fileExtension, tipoObjeto.IMG);
-    const query = await pool.query("UPDATE usuario SET path_foto = ?, id_foto = ? WHERE id_usuario = ?", [path_imagen, id_imagen, id]);
-    status = query[0].affectedRows > 0;
 
     return res.send({ "status": status });
 }

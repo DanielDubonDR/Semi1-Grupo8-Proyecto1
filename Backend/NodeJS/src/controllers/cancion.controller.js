@@ -29,18 +29,24 @@ export const uploadSong = async (req, res) => {
 
 export const createSong = async (req, res) => {
 
-    const { nombre, duracion, id_imagen, path_imagen, id_cancion, path_cancion } = req.body;
+    const { nombre, duracion, id_imagen, path_imagen, id_cancion, path_cancion, id_artista } = req.body;
     let status = false;
 
-    const query = await pool.query("INSERT INTO cancion (nombre, duracion, id_imagen, path_imagen, id_obj_cancion, path_cancion) VALUES (?,?,?,?,?,?)", [nombre, duracion, id_imagen, path_imagen, id_cancion, path_cancion]);
-    status = query[0].affectedRows > 0;
+    try{
+        const query = await pool.query("INSERT INTO cancion (nombre, duracion, id_imagen, path_imagen, id_obj_cancion, path_cancion, id_artista) VALUES (?,?,?,?,?,?,?)", [nombre, duracion, id_imagen, path_imagen, id_cancion, path_cancion, id_artista]);
+        status = query[0].affectedRows > 0;
+    } catch (error) {
+        console.log(error);
+        status = false;
+    }
 
     res.status(200).json( { status } );
 }
 
 export const getSongs = async (req, res) => {
 
-    const query = await pool.query("SELECT * FROM cancion");
+    const query = await pool.query("SELECT c.*, CONCAT(a.nombres, ' ', COALESCE(a.apellidos, '')) AS nombre_artista FROM cancion c, artista a WHERE c.id_artista=a.id_artista");
+
     const songs = query[0];
 
     res.status(200).send(songs);
@@ -50,10 +56,19 @@ export const getSongs = async (req, res) => {
 export const getSongById = async (req, res) => {
         
     const { id } = req.params;
-    const query = await pool.query("SELECT * FROM cancion WHERE id_cancion = ?", [id]);
-    const song = query[0][0];
 
-    res.status(200).send(song);
+    try{
+
+        const query = await pool.query("SELECT c.*, CONCAT(a.nombres, ' ', COALESCE(a.apellidos, '')) AS nombre_artista FROM cancion c, artista a WHERE c.id_artista=a.id_artista AND c.id_cancion=?", [id]);
+
+        const song = query[0][0];
+
+        return res.status(200).json(song);
+    } catch (error) {
+        console.log(error);
+        return res.status(200).json({});
+        
+    }
 }
 
 export const getSongsWithAlbum = async (req, res) => {
@@ -79,13 +94,19 @@ export const updateSongInfoById = async (req, res) => {
         
     const id = req.params.id;
 
-    const { nombre, duracion } = req.body;
+    const { nombre, duracion, id_artista } = req.body;
     let status = false;
+    try {
 
-    const query = await pool.query("UPDATE cancion SET nombre = ?, duracion = ? WHERE id_cancion = ?", [nombre, duracion, id]); 
-    status = query[0].affectedRows > 0;
-
-    res.status(200).json( { status } );
+        const query = await pool.query("UPDATE cancion SET nombre = ?, duracion = ?, id_artista = ? WHERE id_cancion = ?", [nombre, duracion, id_artista, id]); 
+        status = query[0].affectedRows > 0;
+    
+        res.status(200).json( { status } );
+    } catch (error) {
+        console.log(error);
+        status = false;
+        res.status(200).json( { status } );
+    }
 }
 
 export const updateSongImageById = async (req, res) => {
@@ -157,16 +178,4 @@ export const deleteSongById = async (req, res) => {
     else{
         res.status(200).json( { status: false } );
     }
-}
-
-export const getSongsWithArtist = async (req, res) => {
-    
-    // SELECT c.*, ca.id_album, a.id_artista, CONCAT(a.nombres, ' ', COALESCE(a.apellidos, '')) AS nombre_artista FROM cancion AS c JOIN cancion_album AS ca ON c.id_cancion = ca.id_cancion JOIN album AS al ON ca.id_album = al.id_album JOIN artista AS a ON al.id_artista = a.id_artista;
-
-    const query = await pool.query("SELECT c.*, ca.id_album, a.id_artista, CONCAT(a.nombres, ' ', COALESCE(a.apellidos, '')) AS nombre_artista FROM cancion AS c JOIN cancion_album AS ca ON c.id_cancion = ca.id_cancion JOIN album AS al ON ca.id_album = al.id_album JOIN artista AS a ON al.id_artista = a.id_artista");
-
-    const songs = query[0];
-
-    res.status(200).send(songs);
-
 }

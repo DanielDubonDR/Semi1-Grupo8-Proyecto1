@@ -5,8 +5,7 @@ import {
     getSongAlbumById, 
     getSongById, 
     getSongs, 
-    getSongsWithAlbum, 
-    getSongsWithArtist, 
+    getSongsWithAlbum,
     updateSongById, 
     updateSongImageById, 
     updateSongInfoById, 
@@ -28,7 +27,6 @@ router.patch("/cancion/modificar/info/:id", updateSongInfoById);
 router.patch("/cancion/modificar/image/:id", updateSongImageById);
 router.patch("/cancion/modificar/cancion/:id", updateSongById);
 router.delete("/cancion/eliminar", deleteSongById);
-router.get("/cancion/listar/artistas", getSongsWithArtist);
 
 
 export default router;

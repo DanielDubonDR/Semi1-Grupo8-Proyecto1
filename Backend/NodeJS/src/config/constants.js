@@ -1,4 +1,4 @@
 export const tipoObjeto = {
-    IMG: "Imagenes/",
+    IMG: "Fotos/",
     SONG: "Canciones/"
 }
