@@ -21,6 +21,7 @@ import NotFound from '../pages/NotFound'
 import Registro from '../pages/Registro/Registro'
 
 const user = JSON.parse(sessionStorage.getItem('data_user'));
+
 export const router = createBrowserRouter([
     {
         path: '/',
@@ -43,7 +44,7 @@ export const router = createBrowserRouter([
         errorElement: <NotFound />,
         children: [
             {   
-                element: user.rol === 0 ? <Sidebar />: <Sidebar_admin />,
+                element: user !== null ?(user.rol === 0 ? <Sidebar />: <Sidebar_admin />): <Login/>,
                 children: [
                     {
                         path:'home',
