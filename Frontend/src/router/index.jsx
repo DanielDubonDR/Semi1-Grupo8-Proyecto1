@@ -3,10 +3,13 @@ import CRUD_album from '../components/Admin/CRUD_album'
 import CRUD_artista from '../components/Admin/CRUD_artista'
 import CRUD_cancion from '../components/Admin/CRUD_cancion'
 import ArtistDetails from '../components/Body/ArtistDetails'
+import CrearPlaylist from '../components/Body/CrearPlaylist'
+import EditarPlaylist from '../components/Body/EditarPlaylist'
 import Favoritos from '../components/Body/Favoritos'
 import Historial from '../components/Body/Historial'
 import Home from '../components/Body/Home'
 import MyPlaylists from '../components/Body/MyPlaylists'
+import Playlist from '../components/Body/Playlist'
 import Profile from '../components/Profile/Profile'
 import Profile_Edit from '../components/Profile/Profile_Edit'
 import SearchBar from '../components/Rep/SearchBar'
@@ -19,7 +22,6 @@ import LayoutPrivate from '../layout/LayoutPrivate'
 import Login from '../pages/Login/Login'
 import NotFound from '../pages/NotFound'
 import Registro from '../pages/Registro/Registro'
-
 const user = JSON.parse(sessionStorage.getItem('data_user'));
 
 export const router = createBrowserRouter([
@@ -95,12 +97,24 @@ export const router = createBrowserRouter([
                         element: <ArtistDetails />
                     },
                     {
-                        path:'misplaylists',
+                        path:'playlists',
                         element: <MyPlaylists />
                     },
                     {
                         path:'historial',
                         element: <Historial />
+                    },
+                    {
+                        path: 'playlist/:id',
+                        element: <Playlist />
+                    },
+                    {
+                        path: 'playlist/crear',
+                        element: <CrearPlaylist />
+                    },
+                    {
+                        path: 'playlist/editar/:id',
+                        element: <EditarPlaylist/>
                     }
                 ]
             },

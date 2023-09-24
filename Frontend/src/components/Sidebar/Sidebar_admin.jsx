@@ -1,8 +1,7 @@
-import { CollectionIcon, HeartIcon, HomeIcon, LibraryIcon, MusicNoteIcon, PlusCircleIcon, RssIcon, SearchIcon, UserIcon, UsersIcon } from '@heroicons/react/outline';
+import { CollectionIcon, HeartIcon, HomeIcon, MusicNoteIcon, PlusCircleIcon, RssIcon, SearchIcon, UserIcon, UsersIcon } from '@heroicons/react/outline';
 import React from "react";
-import { AiOutlineHighlight } from "react-icons/ai";
+import { BiLibrary } from "react-icons/bi";
 import { Outlet, useNavigate } from 'react-router-dom';
-import Header_name from '../Body/Header_name';
 import Reproductor from '../Rep/Reproductor';
 import './Slidebar.css';
 function Sidebar_admin() {
@@ -48,16 +47,18 @@ function Sidebar_admin() {
     }
     
     const handlerMyPlaylists = () => {
-        navigate('/user/misplaylists');
+        navigate('/user/playlists');
     }
     const handlerHistorial = () => {
         navigate('/user/historial');
+    }
+    const handlerCreatePlaylist = () => {
+        navigate('/user/playlist/crear');
     }
 
     return(
         
         <div className='flex'>
-            <Header_name/>
         <div className='bg-black text-gray-500 p-5 text-xs lg:text-sm border-r border-gray-900 overflow-y-scroll scrollbar-hide h-screen sm: max-w-[12rem] lg:max-w-[16rem] hidden md:inline-flex'>
             <div className='space-y-4'>
                 <div className="flex items-center justify-center space-x-2">
@@ -114,20 +115,16 @@ function Sidebar_admin() {
                 <hr className="border-t-[0.1px] border-gray-900"/>
                 <p>Playlist</p>
                 <button className="flex items-center space-x-2 hover:text-white" onClick={handlerMyPlaylists}>
-                    <LibraryIcon className="h5 w-5"/>
+                    <BiLibrary className="h5 w-5"/>
                     <p>Mis Playlists</p>
                 </button>
                 <button className="flex items-center space-x-2 hover:text-white" onClick={handlerFavoritos}>
                     <HeartIcon className="h5 w-5"/>
                     <p>Favoritos</p>
                 </button>
-                <button className="flex items-center space-x-2 hover:text-white">
+                <button className="flex items-center space-x-2 hover:text-white" onClick={handlerCreatePlaylist}>
                     <PlusCircleIcon className="h5 w-5"/>
                     <p>Crea tu Playlist</p>
-                </button>
-                <button className="flex items-center space-x-2 hover:text-white">
-                    <AiOutlineHighlight className="h5 w-5"/>
-                    <p>Edita tu Playlist</p>
                 </button>
             </div>
         </div>

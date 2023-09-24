@@ -36,8 +36,8 @@ export const updateDataUser = async (data, id) => {
 }
 
 //Actualizar la imagen del usuario
-export const updateImageUser = async (data, id) => {
-    const response = await instance.patch(`/usuario/modificar/image/${id}`, data,{
+export const updateImageUser = async (data) => {
+    const response = await instance.patch(`/usuario/modificar/imagen`, data,{
         headers: {
             'Content-Type': 'multipart/form-data'
         }
@@ -51,6 +51,49 @@ export const getDataUser = async (id) => {
     return response;
 }
 
+//-----------------------PLAYLISTS-----------------------
+//Crear playlist
+export const crearPlaylist = async (data) => {
+    const response = await instance.post('/playlist/crear', data,{
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+    return response;
+}
+
+//Obtener playlist
+export const getPlaylists = async (id_usuario) => {
+    const res = await instance.get(`/playlist/listar/${id_usuario}`);
+    return res;
+}
+
+//Editar playlist
+export const editarPortadaPlaylist = async (data, id) => {
+    const response = await instance.patch(`/playlist/modificar/portada/${id}`, data,{
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+    return response;
+}
+
+export const editarDataPlaylist = async (data, id) => {
+    const response = await instance.patch(`/playlist/modificar/info/${id}`, data,{
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    return response;
+}
+
+//Eliminar playlist
+export const eliminarPlaylist = async (id) => {
+    const res = await instance.delete(`/playlist/eliminar/${id}`);
+    return res;
+}
+
+//-----------------------TOPS-----------------------
 export const getTop5_Canciones= async (id_usuario) => {
     const res = await instance.get(`/usuario/ver/top5/songs/${id_usuario}`);
     return res;

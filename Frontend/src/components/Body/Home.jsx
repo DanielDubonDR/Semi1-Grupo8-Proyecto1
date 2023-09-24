@@ -9,6 +9,7 @@ import { profiles } from "../datos_test/artistas";
 import { canciones } from "../datos_test/canciones";
 import AlbumCard from "./AlbumCard";
 import ArtistCard from "./ArtistCard";
+import Header_name from "./Header_name";
 import SongCard from "./SongCard";
 
 function Home(){
@@ -40,6 +41,7 @@ function Home(){
     const activeSong = {};
     return(
         <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide bg-gradient-to-b from-purple to-black">
+            <Header_name/>
         <div className="flex flex-col ml-8 mb-32">
             <div className="w-full flex flex-wrap justify-between items-center sm:flex-row flex-col mt-4">
                 <h1 className="font-bold text-4xl text-white text-left">{text_welcome}</h1>

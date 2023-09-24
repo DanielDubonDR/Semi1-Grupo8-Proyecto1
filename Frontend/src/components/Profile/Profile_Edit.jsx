@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
 import Service from "../../Service/Service";
 import { useUserContext } from "../../context/UserContext";
+import Header_name from "../Body/Header_name";
 import "./Profile_Edit.css";
 function Profile_Edit(){
 
@@ -17,6 +18,7 @@ function Profile_Edit(){
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [id, setId] = useState(0);
+
     const style_font = {
         fontFamily: "'Quicksand', sans-serif",
     };
@@ -93,8 +95,9 @@ function Profile_Edit(){
           const pw = result.value;
           const formData = new FormData();
           formData.append('imagen', image);
+          formData.append('idUser', id)
           formData.append('password', pw);
-          Service.updateImageUser(formData, id)
+          Service.updateImageUser(formData)
           .then(response => {
             if(response.status){
               toast.success('Cambios aplicados a tu perfil con éxito!', {
@@ -220,8 +223,12 @@ function Profile_Edit(){
     
     }
 
+    const handleCancelar = () => {
+      navigate('/user/profile')
+    }
     return(
       <div className="flex flex-col flex-grow items-center justify-center mb-20 p-12 h-screen overflow-y-scroll scrollbar-hide bg-gradient-to-b from-purple to-black" style={style_font}>
+          <Header_name/>
           <ToastContainer
           position="top-center"
           autoClose={5000}
@@ -316,7 +323,7 @@ function Profile_Edit(){
         </button>
         &nbsp;&nbsp;
         <button
-          className="hover:shadow-form rounded-md bg-white py-3 px-8 text-base font-semibold text-lightPurple " 
+          className="hover:shadow-form rounded-md bg-white py-3 px-8 text-base font-semibold text-lightPurple " onClick={handleCancelar}
         >
           Cancelar
         </button>

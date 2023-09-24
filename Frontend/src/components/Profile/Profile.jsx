@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import Service from "../../Service/Service";
 import { useUserContext } from "../../context/UserContext";
+import Header_name from "../Body/Header_name";
 import "./Profile.css";
 function Profile(){
     const style_font = {
@@ -39,6 +40,7 @@ function Profile(){
 
     return(
         <div className="flex flex-col flex-grow items-center justify-center p-12 h-screen overflow-y-scroll scrollbar-hide bg-gradient-to-b from-purple to-black" style={style_font}>
+          <Header_name/>
     <h1 className="text-4xl font-bold text-white my-4 mx-auto">Mi Perfil</h1>
             <img className="rounded-full w-40 h-40 mx-auto block border-8 border-lightPurple" 
                     src={image_user} 
