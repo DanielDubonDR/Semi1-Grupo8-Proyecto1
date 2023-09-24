@@ -113,3 +113,43 @@ export const deleteSongFromPlaylist = async (req, res) => {
     
         res.status(200).json( { status } );
 }
+
+export const setLikedPlaylist = async (req, res) => {
+
+    const { id_usuario, id_cancion, id_album } = req.body;
+
+    try{
+        const getIDLikedPlaylist = await pool.query("SELECT pu.id_playlist FROM playlist_usuario pu INNER JOIN playlist ON playlist.id_playlist = pu.id_playlist WHERE playlist.nombre = 'Me gusta' AND pu.id_usuario=?", [id_usuario]);
+
+        const id_playlist = getIDLikedPlaylist[0][0].id_playlist;
+
+        const query = await pool.query("INSERT INTO canciones_playlist (id_cancion, id_playlist, id_album) VALUES (?,?,?)", [id_cancion, id_playlist, id_album]);
+
+        const status = query[0].affectedRows > 0;
+
+        res.status(200).json( { status } );
+    } catch (error) {
+        console.log(error);
+        res.status(500).json( { status: false } );
+    }
+}
+
+export const deleteLikedPlaylist = async (req, res) => {
+
+    const { id_usuario, id_cancion } = req.body;
+
+    try{
+        const getIDLikedPlaylist = await pool.query("SELECT pu.id_playlist FROM playlist_usuario pu INNER JOIN playlist ON playlist.id_playlist = pu.id_playlist WHERE playlist.nombre = 'Me gusta' AND pu.id_usuario=?", [id_usuario]);
+
+        const id_playlist = getIDLikedPlaylist[0][0].id_playlist;
+
+        const query = await pool.query("DELETE FROM canciones_playlist WHERE id_cancion = ? AND id_playlist = ?", [id_cancion, id_playlist]);
+
+        const status = query[0].affectedRows > 0;
+
+        res.status(200).json( { status } );
+    } catch (error) {
+        console.log(error);
+        res.status(500).json( { status: false } );
+    }
+}

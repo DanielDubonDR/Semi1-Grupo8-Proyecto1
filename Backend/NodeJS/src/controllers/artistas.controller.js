@@ -81,21 +81,7 @@ export const updateImageArtistById = async (req, res) => {
 }
 
 export const deleteArtistById = async (req, res) => {
-    // const id = req.params.id;
-    // let status = false;
-
-    // const query = await pool.query("SELECT id_fotografia FROM artista WHERE id_artista = ?", [id]);
-
-    // if(query[0].length > 0){
-    //     if(query[0][0].id_fotografia){
-    //         await deleteObj(query[0][0].id_fotografia);
-    //     }
-    //     const query2 = await pool.query("DELETE FROM artista WHERE id_artista = ?", [id]);
-    //     status = query2[0].affectedRows > 0;
-    // }
-
-    // return res.send({ "status": status });
-
+    
     const { idArtist, idUser, password } = req.body;
 
     const query = await pool.query("SELECT * FROM usuario WHERE id_usuario = ?", [idUser]);
@@ -118,11 +104,35 @@ export const deleteArtistById = async (req, res) => {
 
             if(query2[0].length > 0)
             {
-                const { id_fotografia } = query2[0][0];
-                await deleteObj(id_fotografia);
-                const delete4 = await pool.query("DELETE FROM artista WHERE id_artista = ?", [idArtist]);
-                const status = delete4[0].affectedRows > 0;
-                res.status(200).json( { status } );
+                try {
+
+                    const query3 = await pool.query("SELECT * FROM album WHERE id_artista = ?", [idArtist]);
+    
+                    for (const album of query3[0]) {
+                        const { id_imagen } = album;
+                        await deleteObj(id_imagen);
+                    }
+    
+                    const query5 = await pool.query("SELECT * FROM cancion WHERE id_artista = ?", [idArtist]);
+    
+                    for (const song of query5[0]) {
+                        const { id_imagen, id_obj_cancion } = song;
+                        await deleteObj(id_imagen);
+                        await deleteObj(id_obj_cancion);
+                    }
+
+                    const { id_fotografia } = query2[0][0];
+                    await deleteObj(id_fotografia);
+                    const deleteArtist = await pool.query("DELETE FROM artista WHERE id_artista = ?", [idArtist]);
+                    const status = deleteArtist[0].affectedRows > 0;
+                    const deleteSongs = await pool.query("DELETE FROM cancion WHERE id_artista = ?", [idArtist]);
+
+                    res.status(200).json( { status } );
+
+                } catch (error) {
+                    console.log(error);
+                    res.status(500).json( { status: false } );
+                }
             }
             else
             {

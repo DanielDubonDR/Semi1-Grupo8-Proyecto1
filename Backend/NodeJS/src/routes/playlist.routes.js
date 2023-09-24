@@ -8,7 +8,9 @@ import {
     upload,
     getPlaylistSongsById,
     addSongToPlaylist,
-    deleteSongFromPlaylist
+    deleteSongFromPlaylist,
+    setLikedPlaylist,
+    deleteLikedPlaylist
 } from "../controllers/playlist.controller.js";
 
 const router = Router();
@@ -21,5 +23,7 @@ router.patch("/playlist/modificar/info/:id", updatePlaylistInfoById);
 router.patch("/playlist/modificar/portada/:id", upload.single('portada'), updatePlaylistPortadaById);
 router.delete("/playlist/eliminar/:id", deletePlaylistById);
 router.delete("/playlist/eliminar/cancion/:idp/:idc", deleteSongFromPlaylist);
+router.post("/playlist/agregar/cancion/liked", setLikedPlaylist);
+router.delete("/playlist/eliminar/cancion/liked", deleteLikedPlaylist);
 
 export default router;

@@ -97,12 +97,12 @@ export const deleteAlbumById = async (req, res) => {
     
     const { idUser, idAlbum, password } = req.body;
 
-    const query = await pool.query("SELECT password FROM usuario WHERE id_usuario = ?", [idUser]);
+    const query = await pool.query("SELECT password, rol FROM usuario WHERE id_usuario = ?", [idUser]);
 
     if(query[0].length > 0)
     {
 
-        if(query[0][0].rol != 1)
+        if(query[0][0].rol !== 1)
         {
             return res.status(200).json( { status: false } );
         }
@@ -122,25 +122,24 @@ export const deleteAlbumById = async (req, res) => {
                 
                 const status = query3[0].affectedRows > 0;
 
-                if(status)
-                {
-                    // const query = await pool.query("SELECT cancion.*, id_album FROM cancion INNER JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion WHERE cancion_album.id_album = ?", [req.params.id]);
-
-                    const query4 = await pool.query("SELECT cancion.*, id_album FROM cancion INNER JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion WHERE cancion_album.id_album = ?", [idAlbum]);
-
-                    // eliminar canciones junto a sus datos como imagen y audio
-                    for(let i = 0; i < query4[0].length; i++)
-                    {
-                        const { id_imagen, id_obj_cancion, id_cancion } = query4[0][i];
-                        await deleteObj(id_imagen);
-                        await deleteObj(id_obj_cancion);
-
-                        const query5 = await pool.query("DELETE FROM cancion WHERE id_cancion = ?", [id_cancion]);
-                    }
-
-                    res.status(200).json( { status } );
-                }
+                res.status(200).json( { status } );
             }
         }
+    }
+}
+
+export const deleteSongAlbum = async (req, res) => {
+        
+    try {
+        const { id_album, id_cancion } = req.body;
+        let status = false;
+
+        const query = await pool.query("DELETE FROM cancion_album WHERE id_album = ? AND id_cancion = ?", [id_album, id_cancion]);
+        status = query[0].affectedRows > 0;
+
+        res.status(200).json( { status } );
+    } catch (error) {
+        console.log(error);
+        res.status(500).json( { status: false } );
     }
 }

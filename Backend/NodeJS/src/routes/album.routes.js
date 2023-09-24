@@ -3,6 +3,7 @@ import {
     addSongToAlbum,
     createAlbum, 
     deleteAlbumById,  
+    deleteSongAlbum,  
     getAlbumById,  
     getAlbumSongsById, 
     getAlbums, 
@@ -23,5 +24,6 @@ router.get("/album/ver/canciones/:id", getAlbumSongsById);
 router.patch("/album/modificar/info/:id", updateAlbumInfoById);
 router.patch("/album/modificar/imagen/:id", upload.single('imagen'), updateAlbumImagenById);
 router.delete("/album/eliminar", deleteAlbumById);
+router.delete("/album/eliminar/song", deleteSongAlbum);
 
 export default router;
