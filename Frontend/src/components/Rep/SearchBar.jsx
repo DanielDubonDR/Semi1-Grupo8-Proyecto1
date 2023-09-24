@@ -55,8 +55,18 @@ export default function Navbar({ fixed }) {
   }, []);
 
   const filteredCanciones = canciones.filter((cancion) =>
-  cancion.nombre.toLowerCase().includes(searchText.toLowerCase()) //|| cancion.artista.toLowerCase().includes(searchText.toLowerCase())
+  cancion.nombre.toLowerCase().includes(searchText.toLowerCase()) || cancion.nombre_artista.toLowerCase().includes(searchText.toLowerCase())
 );
+
+function formatDate(inputDate) {
+  const date = new Date(inputDate);
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear().toString();
+
+  return `${day}-${month}-${year}`;
+}
+
 
 const filteredAlbums = albums.filter((album) =>
   album.nombre.toLowerCase().includes(searchText.toLowerCase()) //|| album.artista.toLowerCase().includes(searchText.toLowerCase())
@@ -149,7 +159,7 @@ const filteredArtistas = artista.filter((artista) =>
                     </th>
 
                     <td class="px-6 py-4">{value.nombre}</td>
-                    <td class="px-6 py-4">{value.artista}</td>
+                    <td class="px-6 py-4">{value.nombre_artista}</td>
                     <td class="px-6 py-4">
                       <td class="px-6 py-4 text-right">
                         <button class="bg-purple hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-full">
@@ -278,7 +288,7 @@ const filteredArtistas = artista.filter((artista) =>
                     <td class="px-6 py-4">{value.nombres + " " + value.apellidos}</td>
                     <td class="px-6 py-4">
                       <td class="px-6 py-4 text-right">
-                        {value.fecha_nac}
+                        {formatDate(value.fecha_nac)}
                       </td>
                     </td>
                   </tr>

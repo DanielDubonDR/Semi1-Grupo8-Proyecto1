@@ -209,3 +209,58 @@ export const eliminarArtista = async (data) => {
 
     return res;
 }
+
+//listar canciones en un album:
+export const listarCancionesAlbum = async (id) => {
+    const res = await instance.get(`/album/ver/canciones/${id}`);
+    return res;
+}
+
+//obtener artista por ID:
+export const getArtista = async (id) => {
+    const res = await instance.get(`/artista/ver/${id}`);
+    return res;
+}
+
+//actualizar imagen album
+export const actualizarAlbumImagen = async (data, id) => {
+    const response = await instance.patch(`/album/modificar/imagen/${id}`, data,{
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    return response;
+}
+
+//actualizar album
+export const actualizarAlbum = async (data, id) => {
+    const response = await instance.patch(`/album/modificar/info/${id}`, data,{
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    return response;
+}
+
+export const crearAlbum = async (data) => {
+    const response = await instance.post('/album/crear', data,{
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+    return response;
+}
+
+export const listarCancionesSinAlbum = async (id) => {
+    const res = await instance.get(`/cancion/album/get/null/artist/${id}`);
+    return res;
+}
+
+export const agregarCancionAlbum = async (data) => {
+    const response = await instance.post('/album/add/song', data,{
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    return response;
+}

@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Service from "../../Service/Service";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
+import { set } from "lodash";
 
 export default function CRUD_cancion() {
   const [data, setData] = useState({});
@@ -34,7 +35,6 @@ export default function CRUD_cancion() {
       (error) {
         console.error("Error fetching data:", error);
       }
-
     };
 
     fetchData();
@@ -60,7 +60,7 @@ export default function CRUD_cancion() {
 
 function Item_CRUD_cancion(data, data2) {
   const usuario = JSON.parse(sessionStorage.getItem("data_user"));
-  
+  const [canci, setCanci] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showSongs, setShowSongs] = useState(false);
   const [addSong, setAddSong] = useState(false);
@@ -78,12 +78,45 @@ function Item_CRUD_cancion(data, data2) {
   const [PathImg, setPathImg] = useState("");
   const [PathSong, setPathSong] = useState("");
   const [passw, setPassw] = useState("");
-
+  const [nombreCompleto, setNombreCompleto] = useState("");
 
   const [title, setTitle] = useState("");
   const getRowValue = (e) => {
     console.log("HOLIWIS KIWIIIIIIIIS", e);
   };
+  
+  const [loading, setLoading] = useState(true);
+
+  const obtenerDataArtistas = async () => {
+    setLoading(true);
+    setCanci(data);
+    try {
+      const updatedData = await Promise.all(
+        data.map(async (item) => {
+          const res = await Service.getArtista(item.id_artista);
+          console.log("res: ", res);
+          if (!(res.status == 200)) {
+            console.log("error");
+          }
+          const artistaData = res.data;
+          console.log("artistaData: ", artistaData );
+          console.log("item: ", item)
+          return { ...item, artistaData };
+        })
+      );
+        console.log("updatedData: ", updatedData);
+        setCanci(updatedData); 
+        setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    obtenerDataArtistas();
+  }, [data]);
+
 
   const [sSong, setSSong] = useState({
     id_cancion: -1,
@@ -95,7 +128,7 @@ function Item_CRUD_cancion(data, data2) {
     id_obj_cancion: "",
   });
 
-  const openModal = (op, name, artist, img, description, songs, id_song) => {
+  const openModal = (op, name, artist, img, description, songs, id_song, nombre_Artista) => {
     setName("");
     setArtist("");
     setImg("");
@@ -103,6 +136,7 @@ function Item_CRUD_cancion(data, data2) {
     setSongs("");
     setID(-1);
     setIdCancionG(-1);
+    setNombreCompleto("");
 
     if (op === 1) {
       //actualizar
@@ -115,6 +149,7 @@ function Item_CRUD_cancion(data, data2) {
       setSongs(songs);
       setIdCancionG(id_song);
       setID(id_song);
+      setNombreCompleto(nombre_Artista);
     } else if (op === 2) {
       // agregar cancion al álbum
       setAddSong(true);
@@ -125,6 +160,7 @@ function Item_CRUD_cancion(data, data2) {
       setDescription(description);
       setIdCancionG(id_song);
       setSongs(songs);
+      setNombreCompleto(nombre_Artista);
     } else if (op === 3) {
       //detalle
       setShowModal(true);
@@ -135,6 +171,7 @@ function Item_CRUD_cancion(data, data2) {
       setImg(img);
       setDescription(description);
       setSongs(songs);
+      setNombreCompleto(nombre_Artista);
     } else if (op === 4) {
       //eliminar
       setDeleteAlbum(true);
@@ -145,6 +182,7 @@ function Item_CRUD_cancion(data, data2) {
       setDescription(description);
       setSongs(songs);
       setID(id_song);
+      setNombreCompleto(nombre_Artista);
     } else {
       //agregar
       setAddAlbum(true);
@@ -194,6 +232,10 @@ function Item_CRUD_cancion(data, data2) {
     }
   };
 
+
+  
+
+
   const handleSongChange = async (e) => {
     const file = e.target.files[0];
 
@@ -216,13 +258,14 @@ function Item_CRUD_cancion(data, data2) {
   const handleActualizacion = async (e) => {
     let nombre = "";
     let duracion = "";
-
+  
     nombre = name;
     duracion = description;
   
     let datos_Enviar = {
       nombre: nombre,
-      duracion: duracion
+      duracion: duracion,
+      id_artista: artist
     };
 
     console.log("datos a enviar: ", datos_Enviar);
@@ -307,7 +350,7 @@ function Item_CRUD_cancion(data, data2) {
 
   const [fData, setFData] = useState({
     nombre: "",
-    //artista: "",
+    id_artista: "",
     duracion: "",
     path_imagen: "",
     id_imagen: "",
@@ -329,7 +372,9 @@ function Item_CRUD_cancion(data, data2) {
   };
 
   const handleArtistChange = async (event) => {
+    console.log("event.target.value.id_artista: ", event.target.value);
     setArtist(event.target.value);
+    console.log("artist: ", artist);
   };
 
   const handleDuracionChange = async (event) => {
@@ -345,6 +390,7 @@ function Item_CRUD_cancion(data, data2) {
     let ImgID = img;
 
     fData.id_imagen = ImgID;
+    fData.id_artista = artist;
     fData.id_cancion = cancionID;
     fData.path_imagen = PathImg;
     fData.path_cancion = PathSong;
@@ -369,6 +415,7 @@ function Item_CRUD_cancion(data, data2) {
   };
 
   return (
+
     <>
       <div>
         <ToastContainer />
@@ -395,27 +442,7 @@ function Item_CRUD_cancion(data, data2) {
                   </label>
                   <div class="relative w-full">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <svg
-                        aria-hidden="true"
-                        class="w-5 h-5 text-gray-500 dark:text-gray-400"
-                        fill="currentColor"
-                        viewbox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
                     </div>
-                    <input
-                      type="text"
-                      id="simple-search"
-                      class="bg-black2 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-black3 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Buscar Cancion"
-                      required=""
-                    ></input>
                   </div>
                   <div class="w-full md:w-auto  space-y-2 md:space-y-0  flex-shrink-0">
                     <button
@@ -454,7 +481,6 @@ function Item_CRUD_cancion(data, data2) {
                   <th scope="col" class="px-6 py-3">
                     Artista
                   </th>
-
                   <th scope="col" class="px-6 py-3">
                     Actualizar
                   </th>
@@ -466,120 +492,130 @@ function Item_CRUD_cancion(data, data2) {
                   </th>
                 </tr>
               </thead>
-              <tbody>
-                {data.map((value, index) => (
-                  <tr class="bg-white border-b dark:bg-black2 dark:border-black hover:h_black dark:hover:bg-h_black">
-                    <th
-                      scope="row"
-                      class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                    >
-                      <img
-                        class="w-24 h-24 rounded-r-lg"
-                        src={value.path_imagen}
-                        alt="artista"
-                      ></img>
-                    </th>
-
-                    <td class="px-6 py-4">{value.nombre}</td>
-                    <td class="px-6 py-4">{value.artista}</td>
-                    <td class=" text-center">
-                      <button
-                        class="bg-yellow-400 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded "
-                        onClick={() =>
-                          openModal(
-                            1,
-                            value.nombre,
-                            value.artista,
-                            value.path_imagen,
-                            value.duracion,
-                            value.path_cancion,
-                            value.id_cancion
-                          )
-                        }
+              {
+                loading ? (
+                  <div className="flex justify-center items-center">
+                          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+                        </div>
+                ):(<tbody>
+                  {canci.map((value, index) => (
+                    <tr class="bg-white border-b dark:bg-black2 dark:border-black hover:h_black dark:hover:bg-h_black">
+                      <th
+                        scope="row"
+                        class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6"
+                        <img
+                          class="w-24 h-24 rounded-r-lg"
+                          src={value.path_imagen}
+                          alt="artista"
+                        ></img>
+                      </th>
+  
+                      <td class="px-6 py-4">{value.nombre}</td>
+                      <td class="px-6 py-4">{value.artistaData?.nombres + " " + value.artistaData?.apellidos}</td>
+                      <td class=" text-center">
+                        <button
+                          class="bg-yellow-400 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded "
+                          onClick={() =>
+                            openModal(
+                              1,
+                              value.nombre,
+                              value.id_artista,
+                              value.path_imagen,
+                              value.duracion,
+                              value.path_cancion,
+                              value.id_cancion,
+                              value.artistaData?.nombres + " " + value.artistaData?.apellidos
+                            )
+                          }
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
-                          />
-                        </svg>
-                      </button>
-                    </td>
-
-                    <td class="px-6 py-4 text-right">
-                      <button
-                        class="bg-red-700 hover:bg-red-950 text-white font-bold py-2 px-4 rounded"
-                        onClick={() =>
-                          openModal(
-                            4,
-                            value.nombre,
-                            value.artista,
-                            value.path_imagen,
-                            value.duracion,
-                            value.path_cancion,
-                            value.id_cancion
-                          )
-                        }
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6"
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                            />
+                          </svg>
+                        </button>
+                      </td>
+  
+                      <td class="px-6 py-4 text-right">
+                        <button
+                          class="bg-red-700 hover:bg-red-950 text-white font-bold py-2 px-4 rounded"
+                          onClick={() =>
+                            openModal(
+                              4,
+                              value.nombre,
+                              value.id_artista,
+                              value.path_imagen,
+                              value.duracion,
+                              value.path_cancion,
+                              value.id_cancion,
+                              value.artistaData?.nombres + " " + value.artistaData?.apellidos
+                            )
+                          }
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                          />
-                        </svg>
-                      </button>
-                    </td>
-
-                    <td class="px-6 py-4 text-right">
-                      <button
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded  "
-                        onClick={() =>
-                          openModal(
-                            3,
-                            value.nombre,
-                            value.artista,
-                            value.path_imagen,
-                            value.duracion,
-                            value.path_cancion,
-                            value.id_cancion
-                          )
-                        }
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6"
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                            />
+                          </svg>
+                        </button>
+                      </td>
+  
+                      <td class="px-6 py-4 text-right">
+                        <button
+                          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded  "
+                          onClick={() =>
+                            openModal(
+                              3,
+                              value.nombre,
+                              value.id_artista,
+                              value.path_imagen,
+                              value.duracion,
+                              value.path_cancion,
+                              value.id_cancion,
+                              value.artistaData?.nombres + " " + value.artistaData?.apellidos
+                            )
+                          }
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                          />
-                        </svg>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                            />
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>)
+              }
+              
             </table>
           </div>
 
@@ -691,10 +727,12 @@ function Item_CRUD_cancion(data, data2) {
                                   </label>
                                 </div>
                                 <div class="w-full mr-4">
-                                <select class="bg-gray-200 border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500">
+                                <select class="bg-gray-200 border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" onChange={handleArtistChange} value={artist}>
                                 {data2.map((value, index) => (
                                 <option 
-                                /*defaultValue={fData.artista}*/
+                                key={value.id_artista}
+                                value={value.id_artista}
+                                defaultValue="Selecciona un artista"
                                 >
                                   {value.nombres + " " + value.apellidos}
                                 </option>
@@ -751,7 +789,7 @@ function Item_CRUD_cancion(data, data2) {
                     ) : (
                       <div className="relative p-6 flex-auto">
                         <div class="w-full ">
-                          <form class="w-full grid grid-cols-2 grid-rows-3 gap-4">
+                          <form class="w-full grid grid-cols-2 grid-rows-2 gap-4">
                             <div class="row-span-3">
                               <div class="md:flex md:items-center mb-6">
                                 <div class="">
@@ -787,7 +825,7 @@ function Item_CRUD_cancion(data, data2) {
                                     class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                     id="inline-full-name"
                                     type="text"
-                                    defaultValue={artist}
+                                    defaultValue={nombreCompleto}
                                     readOnly={true}
                                   ></input>
                                 </div>
@@ -1054,10 +1092,12 @@ function Item_CRUD_cancion(data, data2) {
                               </label>
                             </div>
                             <div class="w-full mr-[250px]">
-                              <select class="bg-gray-200 border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500">
+                            <select class="bg-gray-200 border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" onChange={handleArtistChange} value={artist} defaultValue="default">
+                              <option value="default">Selecciona un Artista</option>
                                 {data2.map((value, index) => (
                                 <option 
-                                //{/*defaultValue={fData.id_artista}*/}
+                                key={value.id_artista}
+                                value={value.id_artista}
                                 >
                                   {value.nombres + " " + value.apellidos}
                                 </option>

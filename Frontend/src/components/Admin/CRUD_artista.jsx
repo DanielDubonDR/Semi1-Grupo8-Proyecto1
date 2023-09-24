@@ -38,7 +38,7 @@ export default function CRUD_artistas() {
   return (
     <div
       id="profile"
-      class="h-screen w-screen overflow-y-auto bg-gradient-to-t from-lightPurple/50"
+      class="h-screen w-screen overflow-y-auto bg-gradient-to-t from-lightPurple/50 scrollbar-hide mb-[100px]"
     >
       {Item_CRUD_artistas(artistas)}
     </div>
@@ -184,6 +184,23 @@ function Item_CRUD_artistas(data) {
     }
   };
 
+  function formatDate(inputDate) {
+    const date = new Date(inputDate);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear().toString();
+  
+    return `${day}-${month}-${year}`;
+  }
+
+  const formatDateForInput = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear().toString();
+  
+    return `${year}-${month}-${day}`;
+  };
 
 
   const obtDatos = async () => {
@@ -326,27 +343,9 @@ function Item_CRUD_artistas(data) {
                   </label>
                   <div class="relative w-full">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <svg
-                        aria-hidden="true"
-                        class="w-5 h-5 text-gray-500 dark:text-gray-400"
-                        fill="currentColor"
-                        viewbox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
+
                     </div>
-                    <input
-                      type="text"
-                      id="simple-search"
-                      class="bg-black2 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-black3 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Buscar Artista"
-                      required=""
-                    ></input>
+
                   </div>
                   <div class="w-full md:w-auto  space-y-2 md:space-y-0  flex-shrink-0">
                     <button
@@ -382,6 +381,7 @@ function Item_CRUD_artistas(data) {
                   <th scope="col" class="px-6 py-3">
                     Nombre
                   </th>
+                  
                   <th scope="col" class="px-6 py-3">
                     Fecha de Nacimiento
                   </th>
@@ -414,7 +414,7 @@ function Item_CRUD_artistas(data) {
                     <td class="px-6 py-4">
                       {value.nombres + " " + value.apellidos}
                     </td>
-                    <td class="px-6 py-4">{value.fecha_nac}</td>
+                    <td class="px-6 py-4">{formatDate(value.fecha_nac)}</td>
                     <td class=" text-center">
                       <button
                         class="bg-yellow-400 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded "
@@ -626,7 +626,7 @@ function Item_CRUD_artistas(data) {
                                     class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                     id="inline-full-name"
                                     type="date"
-                                    defaultValue={artist}
+                                    defaultValue={formatDateForInput(artist)}
                                     onChange={handleArtistChange}
                                   ></input>
                                 </div>
@@ -694,7 +694,7 @@ function Item_CRUD_artistas(data) {
                                     class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                     id="inline-full-name"
                                     type="text"
-                                    defaultValue={artist}
+                                    defaultValue={formatDate(artist)}
                                     readOnly={true}
                                   ></input>
                                 </div>
@@ -922,7 +922,7 @@ function Item_CRUD_artistas(data) {
                                 id="inline-full-name"
                                 type="text"
                                 name="apellidos"
-                                required
+                                
                                 defaultValue={fData.apellidos}
                                 onChange={handleInputChange}
                               ></input>
