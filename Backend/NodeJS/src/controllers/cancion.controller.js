@@ -159,12 +159,17 @@ export const deleteSongById = async (req, res) => {
 
             if(query2[0].length > 0)
             {
-                const { id_imagen, id_obj_cancion } = query2[0][0];
-                await deleteObj(id_imagen);
-                await deleteObj(id_obj_cancion);
-                const delete4 = await pool.query("DELETE FROM cancion WHERE id_cancion = ?", [idSong]);
-                const status = delete4[0].affectedRows > 0;
-                res.status(200).json( { status } );
+                try {
+                    const { id_imagen, id_obj_cancion } = query2[0][0];
+                    await deleteObj(id_imagen);
+                    await deleteObj(id_obj_cancion);
+                    const delete4 = await pool.query("DELETE FROM cancion WHERE id_cancion = ?", [idSong]);
+                    const status = delete4[0].affectedRows > 0;
+                    res.status(200).json( { status } );
+                } catch (error) {
+                    console.log(error);
+                    res.status(500).json( { status: false } );
+                }
             }
             else
             {
@@ -177,5 +182,21 @@ export const deleteSongById = async (req, res) => {
     }
     else{
         res.status(200).json( { status: false } );
+    }
+}
+
+export const getSongAlbumNullByArtist = async (req, res) => {
+    
+    const { id } = req.params;
+
+    try{
+        const query = await pool.query("SELECT * FROM cancion WHERE id_artista = ? AND id_cancion NOT IN (SELECT id_cancion FROM cancion_album)", [id]);
+
+        const songs = query[0];
+
+        res.status(200).send(songs);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send([]);
     }
 }
