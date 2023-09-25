@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
-import { album_artista } from "../datos_test/album_artista";
-import { profiles } from "../datos_test/artistas";
+import Service from "../../Service/Service";
 import AlbumCard from "./AlbumCard";
 import DetailsHeader from "./DetailsHeader";
 import Header_name from "./Header_name";
@@ -10,9 +9,24 @@ const ArtistDetails = () => {
     const isPlaying = false;
     const { id } = useParams();
     const [artist, setArtist] = useState({});
+    const [albumes, setAlbumes] = useState([]);
+    const [canciones, setCanciones] = useState([]);
     useEffect(() => {
-        setArtist(profiles[id])
-    })
+        Service.getArtista(id)
+        .then((response)=>{
+            setArtist(response.data)
+        })
+
+        Service.getAlbumsbyArtist(id)
+        .then((response)=>{
+            setAlbumes(response.data)
+        })
+
+        Service.getCancionesbyArtist(id)
+        .then((response)=>{
+            setCanciones(response.data)
+        })
+    },[])
     const activeSong = {};
     return (
         <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide ">
@@ -20,17 +34,17 @@ const ArtistDetails = () => {
             <div className="flex flex-col">
                 <DetailsHeader 
                 artistData={artist}
-                artistId={1}/>
+                artistId={id}/>
             </div>
             <div className="ml-10">
                 <div className="w-full flex justify-between items-center sm:flex-row flex-col mt-4 mb-10">
                     <h2 className="font-bold text-3xl text-white text-left">Álbumes</h2>
                 </div>
                 <div className="flex flex-wrap sm:justify-start justify-center gap-8 ml-5">
-                    {album_artista.map((song, i) => (
+                    {albumes.map((album, i) => (
                         <AlbumCard 
-                            key={i}
-                            song={song}
+                            key={albumes.id_album}
+                            album={album}
                             isPlaying={isPlaying}
                             activeSong={activeSong}
                             i={i}
@@ -41,7 +55,9 @@ const ArtistDetails = () => {
                     <h2 className="font-bold text-3xl text-white text-left">Canciones</h2>
                 </div>
                 <div>
-                    <Songs/>
+                    <Songs
+                    canciones={canciones}
+                    artist={artist}/>
                 </div>
             </div>
         </div>

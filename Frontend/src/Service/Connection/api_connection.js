@@ -4,6 +4,7 @@ const instance = axios.create({
     baseURL: 'http://localhost:4000/'
 });
 
+//-----------------------USUARIOS-----------------------
 // Registro de usuario
 export const registro = async (formData) => {
     console.log([...formData.entries()]);
@@ -62,7 +63,7 @@ export const crearPlaylist = async (data) => {
     return response;
 }
 
-//Obtener playlist
+//Obtener playlists del usuario
 export const getPlaylists = async (id_usuario) => {
     const res = await instance.get(`/playlist/listar/${id_usuario}`);
     return res;
@@ -91,6 +92,55 @@ export const editarDataPlaylist = async (data, id) => {
 export const eliminarPlaylist = async (id) => {
     const res = await instance.delete(`/playlist/eliminar/${id}`);
     return res;
+}
+
+//Obtener la info de la playlist por individual
+export const getPlaylist = async (id) => {
+    const res = await instance.get(`/playlist/ver/detalle/${id}`);
+    return res;
+}
+
+//Obtener las canciones de la playlist
+export const getCancionesPlaylist = async (id) => {
+    const res = await instance.get(`/playlist/ver/${id}`);
+    return res;
+}
+
+//Agregar canciones a la playlist
+export const agregarCancionPlaylist = async (data) => {
+    const response = await instance.post('/playlist/agregar/cancion', data,{
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    return response;
+}
+
+//Eliminar canciones de la playlist
+export const eliminarCancionPlaylist = async (id_playlist, id_cancion) => {
+    const res = await instance.delete(`/playlist/eliminar/cancion/${id_playlist}/${id_cancion}`);
+    return res;
+}
+
+//-----------------------HOME-----------------------
+export const getHomeSongs = async (id_usuario) => {
+    const res = await instance.get(`/home/canciones/user/${id_usuario}`);
+    return res;
+}
+
+export const getAlbumsbyArtist = async (id_artista) => {
+    const res = await instance.get(`/album/ver/${id_artista}`)
+    return res
+}
+
+export const getCancionesbyArtist = async (id_artista) => {
+    const res = await instance.get(`/artista/ver/canciones/${id_artista}`)
+    return res
+}
+
+export const getAlbum = async (id_album) => {
+    const res = await instance.get(`/album/ver/album/${id_album}`)
+    return res
 }
 
 //-----------------------TOPS-----------------------

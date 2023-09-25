@@ -1,15 +1,32 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { BsPlusCircle } from "react-icons/bs";
-function Song({order, track}){
+import Service from "../../Service/Service";
+function Song({order, track, artist}){
     const [isLiked, setIsLiked] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
     const [showMessage1, setShowMessage1] = useState(false);
     const [showMessage2, setShowMessage2] = useState(false);
+    const [album, setAlbum] = useState('');
+    const [duracion, setDuracion] = useState('');
+    const [nombres, setNombres] = useState('');
+    useEffect(() => {
+        Service.getAlbum(track.id_album)
+        .then(response => {
+            setAlbum(response.data.nombre);
+        })
+
+        Service.getCancion(track.id_cancion)
+        .then(response => {
+            setDuracion(response.data.duracion);
+        })
+
+        setNombres(artist.nombres +" "+ artist.apellidos);
+    }, [])
     const handleMouseEnter = () => {
         setShowMessage(true);
     };
-
+    console.log(nombres)
     const toggleLike = () => {
         setIsLiked(!isLiked);
     };
@@ -30,23 +47,24 @@ function Song({order, track}){
         setShowMessage2(false);
     };
     return (
-        <div className="grid grid-cols-2 text-gray-500 py-4 px-5 hover:bg-gray-900 rounded-lg cursor-pointer">
-            <div className="flex items-center space-x-4">
+        <div className="grid grid-cols-3 text-gray-500 py-4 px-5 hover:bg-gray-900 rounded-lg cursor-pointer">
+            <div className="flex items-center space-x-4 ">
                 <p>{order +1}</p>
                 <img 
                     className="h-10 w-10" 
-                    src={track.img} 
+                    src={track.path_imagen} 
                     alt="" 
                 />
 
                 <div>
-                    <p className="w-36 lg:w-64 text-white truncate">{track.name}</p>
-                    <p>{track.artist}</p>
+                    <p className="w-36 lg:w-64 text-white truncate">{track.songName}</p>
+                    <p>{nombres}</p>
                 </div>
             </div>
-
+            <div className="flex items-center justify-center">
+            <p className="flex-grow w-12 hidden md:inline">{album}</p>
+            </div>
             <div className="flex items-center justify-between">
-                <p className="w-20 hidden md:inline">{track.album}</p>
 
                 <div
                     className="text-gray-500 hover:text-lightPurple flex items-center justify-center relative" // Añadida la clase "relative"
@@ -81,7 +99,7 @@ function Song({order, track}){
                     )*/}
                 </div>
 
-                <p>{track.duration}</p>
+                <p>{duracion}</p>
             </div>
         </div>
     )

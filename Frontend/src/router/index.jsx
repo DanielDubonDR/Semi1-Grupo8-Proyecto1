@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import CRUD_album from '../components/Admin/CRUD_album'
 import CRUD_artista from '../components/Admin/CRUD_artista'
 import CRUD_cancion from '../components/Admin/CRUD_cancion'
+import Album from '../components/Body/Album'
 import ArtistDetails from '../components/Body/ArtistDetails'
 import CrearPlaylist from '../components/Body/CrearPlaylist'
 import EditarPlaylist from '../components/Body/EditarPlaylist'
@@ -23,6 +24,17 @@ import Login from '../pages/Login/Login'
 import NotFound from '../pages/NotFound'
 import Registro from '../pages/Registro/Registro'
 const user = JSON.parse(sessionStorage.getItem('data_user'));
+
+const PrivateRoute = ({ children }) => {
+const navigate = useNavigate();
+
+if (!user) {
+    navigate('/login'); // Redirigir al usuario a la página de inicio de sesión si no está autenticado
+    return null;
+}
+
+return children;
+};
 
 export const router = createBrowserRouter([
     {
@@ -46,7 +58,7 @@ export const router = createBrowserRouter([
         errorElement: <NotFound />,
         children: [
             {   
-                element: user !== null ?(user.rol === 0 ? <Sidebar />: <Sidebar_admin />): <Login/>,
+                element: user?.rol === 0 ? <Sidebar />: <Sidebar_admin />,
                 children: [
                     {
                         path:'home',
@@ -115,6 +127,10 @@ export const router = createBrowserRouter([
                     {
                         path: 'playlist/editar/:id',
                         element: <EditarPlaylist/>
+                    },
+                    {
+                        path: 'album/:id',
+                        element: <Album />
                     }
                 ]
             },

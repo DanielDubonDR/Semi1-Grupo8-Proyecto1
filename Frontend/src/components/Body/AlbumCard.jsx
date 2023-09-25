@@ -1,21 +1,27 @@
-import React from "react";
-import PlayPause from "./PlayPause";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Service from "../../Service/Service";
 
 
-const AlbumCard = ({song, isPlaying, activeSong, i}) => {
+const AlbumCard = ({album, isPlaying, activeSong, i}) => {
 
-    const handlePauseClick = () => {
+    const [nameArtista, setNameArtista] = useState('');
 
+    useEffect(() => {
+        Service.getArtista(album.id_artista)
+        .then(response => {
+            setNameArtista(response.data.nombres + ' ' + response.data.apellidos);
+        })
+    }, [])
+    const navigate = useNavigate();
+    const handleClick = () => {
+        navigate(`/user/album/${album.id_album}`)
     }
-
-    const handlePlayClick = () => {
-    }
-
 
     return(
-        <div className="flex flex-col w-[250px] p-4 bg-white bg-opacity-20 backdrop-blur-sm animate-slideup rounded-lg cursor-pointer">
+        <div className="flex flex-col w-[250px] p-4 bg-white bg-opacity-20 backdrop-blur-sm animate-slideup rounded-lg cursor-pointer" onClick={handleClick}>
             <div className="relative w-full h-56 group">
-                <div className={`absolute inset-0 justify-center items-center bg-black bg-opacity-50 group-hover:flex ${activeSong?.title === song.name? 'flex bg-black bg-opacity-70': 'hidden'}`}>
+                {/*<div className={`absolute inset-0 justify-center items-center bg-black bg-opacity-50 group-hover:flex ${activeSong?.title === song.name? 'flex bg-black bg-opacity-70': 'hidden'}`}>
                     <PlayPause
                         isPlaying={isPlaying}
                         activeSong={activeSong}
@@ -23,15 +29,15 @@ const AlbumCard = ({song, isPlaying, activeSong, i}) => {
                         handlePause={handlePauseClick}
                         handlePlay={handlePlayClick}
                     />
-                </div>
-                <img src={song?.img} alt="song_img" />
+    </div>*/}
+                <img src={album.path_imagen} alt="song_img" />
             </div>
             <div className="mt-4 flex flex-col">
                 <p className="font-semibold text-lg text-white truncate">
-                    {song?.name}
+                    {album.nombre}
                 </p>
                 <p className="text-sm truncate text-gray-400 mt-1">
-                    {song?.artist}
+                    {nameArtista}
                 </p>
             </div>
         </div>

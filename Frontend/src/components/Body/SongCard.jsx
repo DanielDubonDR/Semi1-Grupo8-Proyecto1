@@ -1,16 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { BsPlusCircle } from "react-icons/bs";
-import PlayPause from "./PlayPause";
+import Service from "../../Service/Service";
 
-
-const SongCard = ({song, isPlaying, activeSong, i}) => {
+const SongCard = ({song, isPlaying, activeSong, opcion,idSongModal,idSongAlbumModal, i}) => {
     const [isLiked, setIsLiked] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
     const [showMessage1, setShowMessage1] = useState(false);
     const [showMessage2, setShowMessage2] = useState(false);
+    const [nameArtista, setNameArtista] = useState('');
 
-
+    useEffect(() => {
+        Service.getArtista(song.id_artista)
+        .then(response => {
+            setNameArtista(response.data.nombres + ' ' + response.data.apellidos);
+        })
+    }, [])
     const toggleLike = () => {
         setIsLiked(!isLiked);
     };
@@ -41,11 +46,15 @@ const SongCard = ({song, isPlaying, activeSong, i}) => {
         setShowMessage1(false);
         setShowMessage2(false);
     };
-
+    const handleOptionPlaylist = () => {
+        opcion()
+        idSongModal(song.id_cancion)
+        idSongAlbumModal(song.id_album)
+    }
     return(
         <div className="flex flex-col w-[250px] p-4 bg-white bg-opacity-20 backdrop-blur-sm animate-slideup rounded-lg cursor-pointer">
             <div className="relative w-full h-56 group">
-                <div className={`absolute inset-0 justify-center items-center bg-black bg-opacity-50 group-hover:flex ${activeSong?.title === song.name? 'flex bg-black bg-opacity-70': 'hidden'}`}>
+                {/*<div className={`absolute inset-0 justify-center items-center bg-black bg-opacity-50 group-hover:flex ${activeSong?.title === song.name? 'flex bg-black bg-opacity-70': 'hidden'}`}>
                     <PlayPause
                         isPlaying={isPlaying}
                         activeSong={activeSong}
@@ -53,15 +62,15 @@ const SongCard = ({song, isPlaying, activeSong, i}) => {
                         handlePause={handlePauseClick}
                         handlePlay={handlePlayClick}
                     />
-                </div>
-                <img src={song?.img} alt="song_img" />
+    </div>*/}
+                <img src={song?.path_imagen} alt="song_img" />
             </div>
             <div className="mt-4 flex flex-col">
                 <p className="font-semibold text-lg text-white truncate">
-                    {song?.name}
+                    {song?.nombre}
                 </p>
                 <p className="text-sm truncate text-gray-300 mt-1">
-                    {song?.artist}
+                    {nameArtista}
                 </p>
                 <div className="flex mt-2">
                 <div
@@ -76,6 +85,7 @@ const SongCard = ({song, isPlaying, activeSong, i}) => {
                 className="w-10 h-10 rounded-full text-white hover:text-white flex items-center justify-center mt-2 mr-3"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
+                onClick={handleOptionPlaylist}
                 >
                 <BsPlusCircle className="text-xl"/>
                 </div>

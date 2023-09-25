@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 const ArtistCard = ({ artist, i }) => {
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate(`/user/artista/${i}`)
+        navigate(`/user/artista/${artist.id_artista}`)
     }
 
   return (
@@ -11,13 +11,13 @@ const ArtistCard = ({ artist, i }) => {
       <div className="relative w-full h-56 group rounded-full overflow-hidden">
         <img
           className="object-cover w-full h-full"
-          src={artist?.img}
+          src={artist?.path_fotografia}
           alt="song_img"
         />
       </div>
       <div className="mt-4 flex flex-col">
         <p className="font-semibold text-lg text-white truncate">
-          {artist?.name}
+          {artist?.nombres + " " + artist?.apellidos}
         </p>
         <p>
             Artista
