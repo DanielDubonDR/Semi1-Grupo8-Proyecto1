@@ -153,3 +153,12 @@ export const deleteLikedPlaylist = async (req, res) => {
         res.status(500).json( { status: false } );
     }
 }
+
+export const getPlaylistByID = async (req, res) => {
+    
+    const id_playlist = req.params.id;
+
+    const query = await pool.query("SELECT * FROM playlist WHERE id_playlist = ?", [id_playlist]);
+
+    res.status(200).send(query[0]);
+}

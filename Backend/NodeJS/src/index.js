@@ -9,6 +9,7 @@ import handler404 from "./routes/404.routes.js";
 import handlerPlaylist from "./routes/playlist.routes.js";
 import handlerAlbum from "./routes/album.routes.js";
 import handlerUser from "./routes/user.routes.js";
+import handlerHome from "./routes/home.routes.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(handlerCancion);
 app.use(handlerPlaylist);
 app.use(handlerAlbum);
 app.use(handlerUser);
+app.use(handlerHome);
 app.use(handler404);
 
 app.listen(4000);

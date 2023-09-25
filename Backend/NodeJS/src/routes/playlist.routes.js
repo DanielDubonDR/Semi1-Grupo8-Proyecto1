@@ -10,7 +10,8 @@ import {
     addSongToPlaylist,
     deleteSongFromPlaylist,
     setLikedPlaylist,
-    deleteLikedPlaylist
+    deleteLikedPlaylist,
+    getPlaylistByID
 } from "../controllers/playlist.controller.js";
 
 const router = Router();
@@ -25,5 +26,6 @@ router.delete("/playlist/eliminar/:id", deletePlaylistById);
 router.delete("/playlist/eliminar/cancion/:idp/:idc", deleteSongFromPlaylist);
 router.post("/playlist/agregar/cancion/liked", setLikedPlaylist);
 router.delete("/playlist/eliminar/cancion/liked", deleteLikedPlaylist);
+router.get("/playlist/ver/detalle/:id", getPlaylistByID);
 
 export default router;
