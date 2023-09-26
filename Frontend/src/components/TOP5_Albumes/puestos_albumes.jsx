@@ -57,7 +57,7 @@ function Item(data) {
                   </td>
                   <td class="text-right px-10 py-6 ">
                     <p class="text-sm font-medium text-gray-900 truncate dark:text-black">
-                      {value.nombre}
+                      {value.reproducciones}
                     </p>
                   </td>
                 </tr>

@@ -9,12 +9,11 @@ import { useUserContext } from '../../context/UserContext';
 import { usePlayer } from "../../context_Player/playerContext";
 
 function Reproductor()  {
-  const {cancionActual, setCancionActual} = usePlayer();
+  const {cancionActual, setCancionActual, canc, setCanc} = usePlayer();
 
-  const [canc, setCanc] = useState(canciones);
+ // const [canc, setCanc] = useState(canciones);
 
   const [reproduciendose, setReproduciendose] = useState(false);
-  //const [cancionActual, setCancionActual] = useState(canciones[0]);
   const usuario = JSON.parse(sessionStorage.getItem('data_user'));
   const audioElem = useRef();
 
@@ -47,7 +46,7 @@ function Reproductor()  {
   };
   const fetchData = async () => {
     try {
-      
+      console.log(cancionActual);
       let values = {
         id_cancion: cancionActual.id_cancion,
         id_album: cancionActual.id_album,
@@ -70,7 +69,11 @@ function Reproductor()  {
   };
 
   const atras = () => {
-    let index = canc.findIndex(c=>c.name===cancionActual.name);
+    if (reproduciendose) {
+      fetchData();
+    }
+    
+    let index = canc.findIndex(c=>c.id_cancion===cancionActual.id_cancion);
 
     if (index == 0) {
       setCancionActual(canc[canc.length - 1]);
@@ -81,7 +84,12 @@ function Reproductor()  {
   };
 
   const adelante = () => {
-    let index = canc.findIndex(c=>c.name===cancionActual.name);
+
+    if (reproduciendose) {
+      fetchData();
+    }
+
+    let index = canc.findIndex(c=>c.id_cancion===cancionActual.id_cancion);
     if (index == canc.length - 1) {
       setCancionActual(canc[0]);
     } else {

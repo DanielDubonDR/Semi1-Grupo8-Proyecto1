@@ -2,30 +2,30 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 import Service from "../../Service/Service";
-import { albumes } from "../datos_test/albumes";
 import { usePlayer } from "../../context_Player/playerContext";
 
 export default function Navbar({ fixed }) {
   const { logueado, setLogueado } = useUserContext();
-  const { cancionActual, setCancionActual, canciones, setCanciones } = usePlayer();
+  const { cancionActual, setCancionActual, canc, setCanc } = usePlayer();
   const navigate = useNavigate();
   const [cancionesB, setCancionesB] = useState([]);
   const [albums, setAlbumes] = useState([]);
   const [artista, setArtista] = useState([]);
   const [searchText, setSearchText] = useState('');
-
+  
   const handleInputChange = (e) => {
     setSearchText(e.target.value);
   };
-
+  const usuario = JSON.parse(sessionStorage.getItem('data_user'));
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let res = await Service.listarCanciones();
-        //console.log("este es el res:", res.data);
+        let res = await Service.getHomeSongs(usuario.id);
+        console.log("este es el res:", res.data['songsWithLike']);
+
         if (res.status === 200) {
           //console.log("este es el res:", res);
-          setCancionesB(res.data);
+          setCancionesB( res.data['songsWithLike']);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -60,13 +60,33 @@ export default function Navbar({ fixed }) {
   cancion.nombre.toLowerCase().includes(searchText.toLowerCase()) || cancion.nombre_artista.toLowerCase().includes(searchText.toLowerCase())
 );
 
+
+
+const handleClickArtista = (e) => {
+  navigate(`/user/artista/${e}`)
+}
+
+const handleClickAlbum = (e) => {
+  navigate(`/user/album/${e}`)
+}
+
+
 const handleSetSong = (cancion) => {
-  console.log("cancion", cancion);
   setCancionActual(cancion);
-  //setCancionActual(cancion);
-  //setCanciones(cancionesB);
-  //navigate("/player");
+  setCanc([cancion])
 };
+
+const playAlbum = async (album) => {
+  console.log(album);
+  try {
+    const res = await Service.listarCancionesAlbum(album.id_album);
+    console.log(res.data);
+    setCanc(res.data);
+    setCancionActual(res.data[0]);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
 
 
 function formatDate(inputDate) {
@@ -77,7 +97,6 @@ function formatDate(inputDate) {
 
   return `${day}-${month}-${year}`;
 }
-
 
 const filteredAlbums = albums.filter((album) =>
   album.nombre.toLowerCase().includes(searchText.toLowerCase()) //|| album.artista.toLowerCase().includes(searchText.toLowerCase())
@@ -221,7 +240,7 @@ const filteredArtistas = artista.filter((artista) =>
               </thead>
               <tbody>
                 {filteredAlbums.map((value, index) => (
-                  <tr class="bg-white border-b dark:bg-black2 dark:border-black hover:h_black dark:hover:bg-h_black">
+                  <tr class="bg-white border-b dark:bg-black2 dark:border-black hover:h_black dark:hover:bg-h_black" onClick={()=> handleClickAlbum(value.id_album)}>
                     <th
                       scope="row"
                       class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
@@ -236,7 +255,7 @@ const filteredArtistas = artista.filter((artista) =>
                     <td class="px-6 py-4">{value.nombre}</td>
                     <td class="px-6 py-4">
                       <td class="px-6 py-4 text-right">
-                        <button class="bg-purple hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-full  ">
+                        <button class="bg-purple hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-full  " onClick={()=>playAlbum(value)}>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -284,7 +303,7 @@ const filteredArtistas = artista.filter((artista) =>
               </thead>
               <tbody>
                 {filteredArtistas.map((value, index) => (
-                  <tr class="bg-white border-b dark:bg-black2 dark:border-black hover:h_black dark:hover:bg-h_black">
+                  <tr class="bg-white border-b dark:bg-black2 dark:border-black hover:h_black dark:hover:bg-h_black" onClick={()=>handleClickArtista(value.id_artista)}>
                     <th
                       scope="row"
                       class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
