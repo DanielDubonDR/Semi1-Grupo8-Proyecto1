@@ -12,7 +12,7 @@ export default function Top3_artistas() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let res = await Service.getTop3_Artistas(usuario.id_usuario);
+        let res = await Service.getTop3_Artistas(usuario.id);
         if (res.status === 200) {
           setProfiles(res.data);
         }

@@ -201,6 +201,33 @@ function Item_CRUD_album(data, artistasDisponibles) {
     setArtist(event.target.value);
   };
 
+  const handleEliminarCancion = async (event) =>
+  {
+    try {
+      const res = await Service.eliminarCancionAlbum({
+        id_album: songs,
+        id_cancion: parseInt(event) 
+      });
+      console.log("ESTE ES EL RES", res);
+      if (res.status === 200) {
+        toast.success("La canción ha sido eliminada correctamente del álbum.", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        
+      } else {
+        toast.error("Ha ocurrido un error - la canción no ha sido eliminada.", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      }
+    } catch (error){
+      
+      console.log(error);
+      toast.error("Ha ocurrido un error - la canción no ha sido eliminada.", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  }
+
   const handleActualizacion = async () => {
     let datos_Enviar = {
       nombre: name,
@@ -971,7 +998,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
                                     {" " + value.nombre}
                                   </td>
                                   <td class="text-gray-300 text-center">
-                                    <button class="bg-red-500 px-8 rounded-lg mt-1 my-1/2  hover:bg-red-900" type="submit">
+                                    <button class="bg-red-500 px-8 rounded-lg mt-1 my-1/2  hover:bg-red-900" type="submit" onClick={()=>handleEliminarCancion(value.id_cancion)}>
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="none"

@@ -6,16 +6,21 @@ import Vol from "./Volumen";
 import Service from "../../Service/Service";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from '../../context/UserContext';
+import { usePlayer } from "../../context_Player/playerContext";
 
-const Reproductor = () => {
+function Reproductor()  {
+  const {cancionActual, setCancionActual} = usePlayer();
+
   const [canc, setCanc] = useState(canciones);
 
   const [reproduciendose, setReproduciendose] = useState(false);
-  const [cancionActual, setCancionActual] = useState(canciones[0]);
+  //const [cancionActual, setCancionActual] = useState(canciones[0]);
   const usuario = JSON.parse(sessionStorage.getItem('data_user'));
   const audioElem = useRef();
 
   useEffect(() => {
+    //console.log(cancionActual);
+
     if (reproduciendose) {
       audioElem.current.play();
     } else {
@@ -44,11 +49,11 @@ const Reproductor = () => {
     try {
       
       let values = {
-        id_cancion: 1,
-        id_album: 1,
-        id_usuario: usuario.id_usuario
+        id_cancion: cancionActual.id_cancion,
+        id_album: cancionActual.id_album,
+        id_usuario: usuario.id
       }
-      let res = Service.postReproduccion(values);
+      let res = await Service.postReproduccion(values);
       console.log(res.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -88,13 +93,13 @@ const Reproductor = () => {
   return (
     <div className="fixed bottom-0 bg-black text-white p-2 z-50 w-screen grid grid-cols-4 gap-2 flex-auto">
       <div className="relative md:flex md:items-center">
-        <img className="h-20 w-20" src={cancionActual.img} alt="" />
+        <img className="h-20 w-20" src={cancionActual.path_imagen} alt="" />
         <div>
           <p className="flex justify-between text-white mx-2">
-            {cancionActual.name}
+            {cancionActual.nombre}
           </p>
           <p className="flex justify-between text-white/75 mx-2">
-            {cancionActual.artist}
+            {cancionActual.nombre_artista}
           </p>
         </div>
       </div>
@@ -182,7 +187,7 @@ const Reproductor = () => {
           ref={audioElem}
           onTimeUpdate={onPlaying}
           className="justify-center w-full h-8 bg-purple"
-          src={cancionActual.cancion}
+          src={cancionActual.path_cancion}
         ></audio>
         <div className="text-center ">
          <Barra audioElem={audioElem} reproduciendose={reproduciendose} setReproduciendos={setReproduciendose} cancionActual={cancionActual} setCancionActual={setCancionActual} canciones={canciones}/>

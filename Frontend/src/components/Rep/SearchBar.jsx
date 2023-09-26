@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 import Service from "../../Service/Service";
 import { albumes } from "../datos_test/albumes";
+import { usePlayer } from "../../context_Player/playerContext";
+
 export default function Navbar({ fixed }) {
   const { logueado, setLogueado } = useUserContext();
-
+  const { cancionActual, setCancionActual, canciones, setCanciones } = usePlayer();
   const navigate = useNavigate();
-  const [canciones, setCanciones] = useState([]);
+  const [cancionesB, setCancionesB] = useState([]);
   const [albums, setAlbumes] = useState([]);
   const [artista, setArtista] = useState([]);
   const [searchText, setSearchText] = useState('');
@@ -23,7 +25,7 @@ export default function Navbar({ fixed }) {
         //console.log("este es el res:", res.data);
         if (res.status === 200) {
           //console.log("este es el res:", res);
-          setCanciones(res.data);
+          setCancionesB(res.data);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -54,9 +56,18 @@ export default function Navbar({ fixed }) {
     fetchData();
   }, []);
 
-  const filteredCanciones = canciones.filter((cancion) =>
+  const filteredCanciones = cancionesB.filter((cancion) =>
   cancion.nombre.toLowerCase().includes(searchText.toLowerCase()) || cancion.nombre_artista.toLowerCase().includes(searchText.toLowerCase())
 );
+
+const handleSetSong = (cancion) => {
+  console.log("cancion", cancion);
+  setCancionActual(cancion);
+  //setCancionActual(cancion);
+  //setCanciones(cancionesB);
+  //navigate("/player");
+};
+
 
 function formatDate(inputDate) {
   const date = new Date(inputDate);
@@ -162,7 +173,7 @@ const filteredArtistas = artista.filter((artista) =>
                     <td class="px-6 py-4">{value.nombre_artista}</td>
                     <td class="px-6 py-4">
                       <td class="px-6 py-4 text-right">
-                        <button class="bg-purple hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-full">
+                        <button class="bg-purple hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-full" onClick={()=> handleSetSong(value)}>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"

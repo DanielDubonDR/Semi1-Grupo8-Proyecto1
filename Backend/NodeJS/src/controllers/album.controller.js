@@ -129,11 +129,12 @@ export const deleteAlbumById = async (req, res) => {
 }
 
 export const deleteSongAlbum = async (req, res) => {
-        
+
+        console.log(req.body)
     try {
         const { id_album, id_cancion } = req.body;
         let status = false;
-
+        console.log(req.body);
         const query = await pool.query("DELETE FROM cancion_album WHERE id_album = ? AND id_cancion = ?", [id_album, id_cancion]);
         status = query[0].affectedRows > 0;
 

@@ -11,7 +11,7 @@ export default function Top5_Albumes() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let res = await Service.getTop5_Albumes(usuario.id_usuario);
+        let res = await Service.getTop5_Albumes(usuario.id);
         if (res.status === 200) {
             setAlbumes(res.data);
         }

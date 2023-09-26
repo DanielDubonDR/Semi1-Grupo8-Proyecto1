@@ -357,3 +357,13 @@ export const agregarCancionAlbum = async (data) => {
     });
     return response;
 }
+
+export const eliminarCancionAlbum = async (data) => {
+    const res = await instance.delete('/album/eliminar/song', {
+        data,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+        });
+    return res;
+}

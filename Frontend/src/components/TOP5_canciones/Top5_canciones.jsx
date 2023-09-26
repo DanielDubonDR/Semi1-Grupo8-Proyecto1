@@ -7,11 +7,12 @@ import { useUserContext } from '../../context/UserContext';
 export default function Top5_Canciones() {
     const [canciones, setCanciones] = useState();
     const usuario = JSON.parse(sessionStorage.getItem('data_user'));
-
+    console.log(usuario);
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let res = await Service.getTop5_Canciones(usuario.id_usuario);
+
+                let res = await Service.getTop5_Canciones(usuario.id);
                 if (res.status === 200) {
                     console.log(res);
                     setCanciones(res.data);
