@@ -143,6 +143,26 @@ export const getAlbum = async (id_album) => {
     return res
 }
 
+//-----------------------FAVORITOS-----------------------
+export const addFavorito = async (data) => {
+    const response = await instance.post('/playlist/agregar/cancion/liked', data,{
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    return response;
+}
+
+export const deleteFavorito = async (data) => {
+    const res = await instance.delete('/playlist/eliminar/cancion/liked', {
+        data,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+        });
+    return res;
+}
+
 //-----------------------TOPS-----------------------
 export const getTop5_Canciones= async (id_usuario) => {
     const res = await instance.get(`/usuario/ver/top5/songs/${id_usuario}`);

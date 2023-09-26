@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { BsPlusCircle } from "react-icons/bs";
+import { toast } from 'react-toastify';
 import Service from "../../Service/Service";
 
 const SongCard = ({song, isPlaying, activeSong, opcion,idSongModal,idSongAlbumModal, i}) => {
@@ -15,9 +16,77 @@ const SongCard = ({song, isPlaying, activeSong, opcion,idSongModal,idSongAlbumMo
         .then(response => {
             setNameArtista(response.data.nombres + ' ' + response.data.apellidos);
         })
+        setIsLiked(song.isLiked)
     }, [])
+    console.log(isLiked)
     const toggleLike = () => {
-        setIsLiked(!isLiked);
+        if(isLiked==false){
+            const data = {
+                id_cancion: song.id_cancion,
+                id_album: song.id_album,
+                id_usuario: JSON.parse(sessionStorage.getItem('data_user')).id
+            }
+            Service.addFavorito(data)
+            .then(response => {
+                if(response.data.status){
+                    toast.success('Se añadió tu canción a Favoritos!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                        });
+                    setIsLiked(true);
+                }else{
+                    toast.error('Ocurrio un Error!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                        });
+                    }
+            })
+        }else{
+            const data = {
+                id_cancion: song.id_cancion,
+                id_usuario: JSON.parse(sessionStorage.getItem('data_user')).id
+            }
+            Service.deleteFavorito(data)
+            .then(response => {
+                if(response.data.status){
+                    toast.success('Se eliminó tu canción de Favoritos!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                        });
+                    setIsLiked(false);
+                }else{
+                    toast.error('Ocurrio un Error!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                        });
+                    }
+            })
+        }
+        
     };
 
     const handlePauseClick = () => {

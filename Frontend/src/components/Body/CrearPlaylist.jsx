@@ -26,6 +26,7 @@ const CrearPlaylist = () => {
         const image = URL.createObjectURL(files[0]);
         setInfoImage(files[0].name);
         setPreviewImage(image);
+        setImage(files[0]);
     };
     const handleDrop = (e) => {
         e.preventDefault();
