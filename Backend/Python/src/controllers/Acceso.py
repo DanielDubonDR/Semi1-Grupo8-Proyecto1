@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify
-from config.imageHandler import guardarObjeto
+from config.imageHandler import guardarObjeto, compararPassword
 from db import  obtenerConexion
 import bcrypt
-import base64
 from io import BytesIO
 
 
@@ -40,10 +39,10 @@ def login():
         'path_foto': query[0][8]
         }
 
- 
-    
+        if status == False:
+            usuario = {}
 
-
+        
     cursor.close()
     conexion.close()
     return jsonify({'status': status, 'rol': rol, 'datosUusario': usuario})
@@ -75,7 +74,7 @@ def registrar():
     if query is None or len(query) == 0:
         passwordCifrado = cifrarPassword(password)
          #Guardar la imagen
-        nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
+        nombre_imagen = guardarObjeto(BytesIO(data), extension,"Fotos/")
         id_foto = nombre_imagen['Key']
         path_foto = nombre_imagen['Location']
         cursor.execute("INSERT INTO usuario (correo, nombres, apellidos, password, fecha_nac, rol, id_foto, path_foto) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);", (correo, nombres, apellidos, passwordCifrado, fecha_nac, 0, id_foto, path_foto))
@@ -106,12 +105,3 @@ def cifrarPassword(password):
 
     #se retorna la contraseña cifrada
     return hashed_password.decode('utf-8')
-
-def compararPassword(password, passwordCifrado):
-    #se compara la contraseña que se recibe del front con la que esta en la base de datos
-    password = password.encode('utf-8')
-    passwordCifrado = passwordCifrado.encode('utf-8')
-    if bcrypt.checkpw(password, passwordCifrado):
-        return True
-    else:
-        return False

@@ -25,7 +25,7 @@ def crearPlaylist():
     cursor = conexion.cursor()
 
     #Guardar la imagen
-    nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
+    nombre_imagen = guardarObjeto(BytesIO(data), extension,"Fotos/")
     id_foto = nombre_imagen['Key']
     path_foto = nombre_imagen['Location']
     cursor.execute("INSERT INTO playlist (nombre, descripcion, id_portada, path_portada) VALUES (%s, %s, %s, %s);", (nombre, descripcion,  id_foto, path_foto))
@@ -152,7 +152,7 @@ def modificarPortadaPlaylist(id_playlist):
     if len(result) > 0:
         id_portada = result[0][0]
         eliminarObjeto(id_portada)
-        newObject = guardarObjeto(BytesIO(data), extension,"Imagenes/")
+        newObject = guardarObjeto(BytesIO(data), extension,"Fotos/")
         id_foto = newObject['Key']
         path_foto = newObject['Location']
         cursor.execute("UPDATE playlist SET id_portada = %s, path_portada = %s WHERE id_playlist = %s;", (id_foto, path_foto, id_playlist))
@@ -203,3 +203,91 @@ def deleteSongFromPlaylist(id_playlist,id_cancion):
     conexion.close()
 
     return jsonify({'status': status})
+
+@BlueprintPlaylist.route('/playlist/agregar/cancion/liked', methods=['POST'])
+def setLikedPlaylist():
+
+    data = request.get_json()
+    id_playlist = data['id_playlist']
+    id_cancion = data['id_cancion']
+    id_album = data['id_album']
+
+    status = False
+
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor()
+        cursor.execute("SELECT pu.id_playlist FROM playlist_usuario pu INNER JOIN playlist ON playlist.id_playlist = pu.id_playlist WHERE playlist.nombre = 'Me gusta' AND pu.id_usuario = %s;", (data['id_usuario'],))
+        result = cursor.fetchone()
+
+        id_playlist = result[0]
+
+        cursor.execute("INSERT INTO canciones_playlist (id_playlist, id_cancion, id_album) VALUES (%s, %s, %s);", (id_playlist, id_cancion, id_album))
+
+        status = cursor.rowcount > 0
+
+        conexion.commit()
+
+        cursor.close()
+        conexion.close()
+    except:
+        status = False
+
+    return jsonify({'status': status})
+
+@BlueprintPlaylist.route('/playlist/eliminar/cancion/liked', methods=['DELETE'])
+def deleteLikedPlaylist():
+
+    data = request.get_json()
+    id_cancion = data['id_cancion']
+    id_usuario = data['id_usuario']
+
+    status = False
+
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor()
+        cursor.execute("SELECT pu.id_playlist FROM playlist_usuario pu INNER JOIN playlist ON playlist.id_playlist = pu.id_playlist WHERE playlist.nombre = 'Me gusta' AND pu.id_usuario = %s;", (id_usuario,))
+        result = cursor.fetchone()
+
+        id_playlist = result[0]
+
+        cursor.execute("DELETE FROM canciones_playlist WHERE id_cancion = %s AND id_playlist = %s;", (id_cancion, id_playlist))
+
+        status = cursor.rowcount > 0
+
+        conexion.commit()
+
+        cursor.close()
+        conexion.close()
+    except:
+        status = False
+
+    return jsonify({'status': status})
+
+@BlueprintPlaylist.route('/playlist/ver/detalle/<id_playlist>', methods=['GET'])
+def getPlaylistByID(id_playlist):
+
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
+
+    cursor.execute("SELECT * FROM playlist WHERE id_playlist = %s;", (id_playlist,))
+
+    result = cursor.fetchall()
+
+    arr = []
+
+    for i in range(len(result)):
+        arr[i] = {
+            'id_playlist': result[i][0],
+            'nombre': result[i][1],
+            'descripcion': result[i][2],
+            'id_portada': result[i][3],
+            'path_portada': result[i][4]
+        }
+
+    cursor.close()
+    cursor = conexion.cursor()
+
+    return jsonify(arr)
+

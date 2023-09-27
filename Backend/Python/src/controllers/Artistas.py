@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from config.imageHandler import guardarObjeto, eliminarObjeto
+from config.imageHandler import guardarObjeto, eliminarObjeto, compararPassword
 from db import  obtenerConexion
 from io import BytesIO
 
@@ -24,7 +24,7 @@ def crearArtista():
     conexion = obtenerConexion()
     cursor = conexion.cursor()
     #Guardar la imagen
-    nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
+    nombre_imagen = guardarObjeto(BytesIO(data), extension,"Fotos/")
     id_foto = nombre_imagen['Key']
     path_foto = nombre_imagen['Location']
     cursor.execute("INSERT INTO artista (nombres, apellidos, fecha_nac, path_fotografia, id_fotografia) VALUES (%s, %s, %s, %s, %s);", (nombres, apellidos, fecha_nac, path_foto, id_foto))
@@ -78,7 +78,6 @@ def verArtista(id):
     conexion.close()
     return jsonify(lista)
 
-#Falta probar hasta que se creen canciones
 @BlueprintArtistas.route('/artista/ver/canciones/<id>', methods=['GET'])
 def verCancionesArtista(id):
     conexion = obtenerConexion()
@@ -165,7 +164,7 @@ def modificarImagenArtista(id):
     if len(result) > 0:
         id_foto = result[0][0]
         eliminarObjeto(id_foto)
-        nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
+        nombre_imagen = guardarObjeto(BytesIO(data), extension,"Fotos/")
         id_foto = nombre_imagen['Key']
         path_foto = nombre_imagen['Location']
         cursor.execute("UPDATE artista SET path_fotografia = %s, id_fotografia = %s WHERE id_artista = %s;", (path_foto, id_foto, id))
@@ -177,26 +176,76 @@ def modificarImagenArtista(id):
 
     return jsonify({'status': status})
 
-@BlueprintArtistas.route('/artista/eliminar/<id>', methods=['DELETE'])
-def eliminarArtista(id):
+@BlueprintArtistas.route('/artista/eliminar/', methods=['DELETE'])
+def eliminarArtista():
+
+    data = request.get_json()
+    id = data['idArtist']
+    idUser = data['idUser']
+    password = data['password']
     status = False
 
     conexion = obtenerConexion()
     cursor = conexion.cursor()
-    cursor.execute("SELECT id_fotografia FROM artista WHERE id_artista = %s;", (id,))
+    cursor.execute("SELECT * FROM usuario WHERE id_usuario = %s;", (idUser,))
 
-    result = cursor.fetchall()
+    result = cursor.fetchone()
 
     if len(result) > 0:
-        if result[0][0]:
-            id_foto = result[0][0]
-            eliminarObjeto(id_foto)
-        cursor.execute("DELETE FROM artista WHERE id_artista = %s;", (id,))
-    status = cursor.rowcount > 0
-    conexion.commit()
-    
-    cursor.close()
-    conexion.close()
+        if result[6] != 1:
+            status = False
+            cursor.close()
+            conexion.close()
+            return jsonify({'status': status})
+        contraseniaCifrada = result[4]
+        status = compararPassword(password, contraseniaCifrada)
+        if status == False:
+            cursor.close()
+            conexion.close()
+            return jsonify({'status': status})
+        cursor.execute("SELECT * FROM artista WHERE id_artista = %s;", (id,))
+        result = cursor.fetchone()
+        if len(result) > 0:
+            try:
+                cursor.execute("SELECT * FROM album WHERE id_artista = %s;", (id,))
+                result = cursor.fetchall()
 
-    return jsonify({'status': status})
-    
+                for i in range(len(result)):
+                    id_imagen = result[i][4]
+                    eliminarObjeto(id_imagen)
+                
+                cursor.execute("SELECT * FROM cancion WHERE id_artista = %s;", (id,))
+                result = cursor.fetchall()
+
+                for i in range(len(result)):
+                    id_imagen = result[i][3]
+                    eliminarObjeto(id_imagen)
+                    id_obj_cancion = result[i][6]
+                    eliminarObjeto(id_obj_cancion)
+                
+                cursor.execute("SELECT * FROM artista WHERE id_artista = %s;", (id,))
+                result = cursor.fetchone()
+                id_imagen = result[7]
+                eliminarObjeto(id_imagen)
+                cursor.execute("DELETE FROM artista WHERE id_artista = %s;", (id,))
+                conexion.commit()
+                status = cursor.rowcount > 0
+                cursor.execute("DELETE FROM cancion WHERE id_artista = %s;", (id,))
+                conexion.commit()
+                status = cursor.rowcount > 0
+
+                return jsonify({'status': status})
+            except:
+                cursor.close()
+                conexion.close()
+                status = False
+                return jsonify({'status': status})
+        else:
+            cursor.close()
+            conexion.close()
+            status = False
+            return jsonify({'status': status})
+    else:
+        cursor.close()
+        conexion.close()
+        return jsonify({'status': False})

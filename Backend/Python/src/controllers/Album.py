@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from config.imageHandler import guardarObjeto, eliminarObjeto
+from config.imageHandler import guardarObjeto, eliminarObjeto, compararPassword
 from db import  obtenerConexion
 from io import BytesIO
 
@@ -25,7 +25,7 @@ def crearAlbum():
     cursor = conexion.cursor()
 
     #Guardar la imagen
-    nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
+    nombre_imagen = guardarObjeto(BytesIO(data), extension,"Fotos/")
     id_foto = nombre_imagen['Key']
     path_foto = nombre_imagen['Location']
     cursor.execute("INSERT INTO album (nombre, descripcion, id_artista, id_imagen, path_imagen) VALUES (%s, %s, %s, %s, %s);", (nombre, descripcion, id_artista, id_foto, path_foto))
@@ -161,7 +161,7 @@ def modificarImagenAlbum(id_album):
     if len(result) > 0:
         id_foto = result[0][0]
         eliminarObjeto(id_foto)
-        nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
+        nombre_imagen = guardarObjeto(BytesIO(data), extension,"Fotos/")
         id_foto = nombre_imagen['Key']
         path_foto = nombre_imagen['Location']
         cursor.execute("UPDATE album SET path_imagen = %s, id_imagen = %s WHERE id_album = %s;", (path_foto, id_foto, id_album))
@@ -192,24 +192,65 @@ def addSong():
 
     return jsonify({'status': status})
 
-@BlueprintAlbum.route('/album/eliminar/<id_album>', methods=['DELETE'])
-def eliminarAlbum(id_album):
+@BlueprintAlbum.route('/album/eliminar/', methods=['DELETE'])
+def eliminarAlbum():
+
+    data = request.get_json()
+    idAlbum = data['idAlbum']
+    idUser = data['idUser']
+    password = data['password']
+    status = False
 
     conexion = obtenerConexion()
     cursor = conexion.cursor()
-    cursor.execute("SELECT id_imagen FROM album WHERE id_album = %s;", (id_album,))
-
-    result = cursor.fetchall()
+    cursor.execute("SELECT * FROM usuario WHERE id_usuario = %s;", (idUser,))
+    result = cursor.fetchone()
 
     if len(result) > 0:
-        if result[0][0]:
-            id_foto = result[0][0]
-            eliminarObjeto(id_foto)
-    cursor.execute("DELETE FROM album WHERE id_album = %s;", (id_album,))
-    status = cursor.rowcount > 0
-    conexion.commit()
-    
+        if result[6] != 1:
+            status = False
+            cursor.close()
+            conexion.close()
+            return jsonify({'status': status})
+        contraseniaCifrada = result[4]
+        status = compararPassword(password, contraseniaCifrada)
+        if status == False:
+            cursor.close()
+            conexion.close()
+            return jsonify({'status': status})
+        
+        cursor.execute("SELECT id_imagen FROM album WHERE id_album = %s;", (idAlbum,))
+        result = cursor.fetchall()
+
+        if len(result) > 0:
+            if result[0][0] != None:
+                id_imagen = result[0][0]
+                eliminarObjeto(id_imagen)
+            cursor.execute("DELETE FROM album WHERE id_album = %s;", (idAlbum,))
+            status = cursor.rowcount > 0
+            conexion.commit()
+            
     cursor.close()
     conexion.close()
 
+    return jsonify({'status': status})
+
+@BlueprintAlbum.route('/album/eliminar/song', methods=['DELETE'])
+def deleteSongAlbum():
+
+    data = request.get_json()
+    id_album = data['id_album']
+    id_cancion = data['id_cancion']
+    status = False
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor()
+        cursor.execute("DELETE FROM cancion_album WHERE id_album = %s AND id_cancion = %s;", (id_album, id_cancion))
+        status = cursor.rowcount > 0
+        conexion.commit()
+
+        cursor.close()
+        conexion.close()
+    except:
+        status = False
     return jsonify({'status': status})

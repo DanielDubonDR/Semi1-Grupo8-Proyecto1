@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from config.imageHandler import guardarObjeto, eliminarObjeto
+from config.imageHandler import guardarObjeto, eliminarObjeto, compararPassword
 from db import  obtenerConexion
 import bcrypt
 from datetime import datetime
@@ -39,9 +39,6 @@ def modificarInfoUsuario(id_usuario):
     conexion = obtenerConexion()
     cursor = conexion.cursor()
 
-    #cursor.execute("SELECT * FROM usuario WHERE correo = %s;", (correo,))
-    #query = cursor.fetchall()
-    #if query is None or len(query) == 0:
 
     cursor.execute("SELECT password, correo FROM usuario WHERE id_usuario = %s;", (id_usuario,))
     query = cursor.fetchone()
@@ -62,10 +59,12 @@ def modificarInfoUsuario(id_usuario):
 
     return jsonify({'status': status})
 
-@BlueprintUser.route('/usuario/modificar/imagen/<id_usuario>', methods=['PATCH'])
-def modificarImagenUsuario(id_usuario):
+@BlueprintUser.route('/usuario/modificar/imagen/', methods=['PATCH'])
+def modificarImagenUsuario():
     
     imagen = request.files['imagen']
+    idUser = request.form['idUser']
+    password = request.form['password']
     #Extension de la imagen
     extension = imagen.filename.split('.')[-1]
     if imagen.filename != '':
@@ -77,18 +76,24 @@ def modificarImagenUsuario(id_usuario):
     conexion = obtenerConexion()
     cursor = conexion.cursor()
 
-    cursor.execute("SELECT id_foto FROM usuario WHERE id_usuario = %s;", (id_usuario,))
-    result = cursor.fetchall()
+    cursor.execute("SELECT password FROM usuario WHERE id_usuario = %s;", (idUser,))
+    query = cursor.fetchone()
 
-    if len(result) > 0:
-        id_foto = result[0][0]
-        eliminarObjeto(id_foto)
-    nombre_imagen = guardarObjeto(BytesIO(data), extension,"Imagenes/")
-    id_foto = nombre_imagen['Key']
-    path_foto = nombre_imagen['Location']
-    cursor.execute("UPDATE usuario SET path_foto = %s, id_foto = %s WHERE id_usuario = %s;", (path_foto, id_foto, id_usuario))
-    status = cursor.rowcount > 0
-    conexion.commit()
+    status = compararPassword(password, query[0])
+
+    if status:
+        cursor.execute("SELECT id_foto FROM usuario WHERE id_usuario = %s;", (idUser,))
+        result = cursor.fetchall()
+
+        if len(result) > 0:
+            id_foto = result[0][0]
+            eliminarObjeto(id_foto)
+        newObject = guardarObjeto(BytesIO(data), extension,"Fotos/")
+        id_foto = newObject['Key']
+        path_foto = newObject['Location']
+        cursor.execute("UPDATE usuario SET id_foto = %s, path_foto = %s WHERE id_usuario = %s;", (id_foto, path_foto, idUser))
+        status = cursor.rowcount > 0
+        conexion.commit()
 
     cursor.close()
     conexion.close()
@@ -146,6 +151,9 @@ def verTop5Songs(id_usuario):
     cursor = conexion.cursor()
     cursor.execute("SELECT id_cancion, COUNT(id_cancion) AS reproducciones FROM historico WHERE id_usuario = %s GROUP BY id_cancion ORDER BY reproducciones DESC LIMIT 5;", (id_usuario,))
     query1_result = cursor.fetchall()
+
+    if len(query1_result) == 0:
+        return jsonify([])
 
     cancion_ids = [row[0] for row in query1_result]
 
@@ -247,7 +255,6 @@ def verHistorico(id_usuario):
 
     return jsonify(query_result)
 
-def compararPassword(password, passwordCifrado):
     #se compara la contraseña que se recibe del front con la que esta en la base de datos
     password = password.encode('utf-8')
     passwordCifrado = passwordCifrado.encode('utf-8')

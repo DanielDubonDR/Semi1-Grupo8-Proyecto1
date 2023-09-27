@@ -1,6 +1,7 @@
 import uuid
 import boto3
 from config.credentials import bucketConfig
+import bcrypt
 
 s3 = boto3.client(
     's3',
@@ -35,4 +36,13 @@ def eliminarObjeto(key):
         return True
     except Exception as e:
         print(e)
+        return False
+    
+def compararPassword(password, passwordCifrado):
+    #se compara la contraseña que se recibe del front con la que esta en la base de datos
+    password = password.encode('utf-8')
+    passwordCifrado = passwordCifrado.encode('utf-8')
+    if bcrypt.checkpw(password, passwordCifrado):
+        return True
+    else:
         return False
