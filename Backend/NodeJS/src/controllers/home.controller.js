@@ -12,7 +12,7 @@ export const getSongsByArtistUser = async (req, res) => {
         
         const songsLikedPlaylist = await pool.query("SELECT cancion.*, canciones_playlist.id_album FROM cancion INNER JOIN canciones_playlist ON cancion.id_cancion = canciones_playlist.id_cancion WHERE canciones_playlist.id_playlist = ?", [id_playlist]);
         
-        const songsArtist = await pool.query("SELECT cancion.nombre AS songName, cancion.path_imagen, cancion.id_cancion, album.nombre AS albumName, album.id_album FROM cancion INNER JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion INNER JOIN album ON cancion_album.id_album = album.id_album WHERE album.id_artista = ?", [artist]);
+        const songsArtist = await pool.query("SELECT cancion.nombre AS songName, cancion.path_imagen, cancion.id_cancion, album.nombre AS albumName, album.id_album, CONCAT(artista.nombres, ' ', COALESCE(artista.apellidos, '')) AS nombre_artista FROM cancion INNER JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion INNER JOIN album ON cancion_album.id_album = album.id_album INNER JOIN artista ON cancion.id_artista = artista.id_artista WHERE album.id_artista = ?", [artist]);
     
         const songs = songsArtist[0].map(song => {
             const isLiked = songsLikedPlaylist[0].some(songLiked => songLiked.id_cancion === song.id_cancion);
@@ -31,7 +31,7 @@ export const getSongs = async (req, res) => {
     try {
         const { user } = req.params;
 
-        const canciones = await pool.query("SELECT cancion.*, cancion_album.id_album FROM cancion LEFT JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion");
+        const canciones = await pool.query("SELECT cancion.*, cancion_album.id_album, CONCAT(a.nombres, ' ', COALESCE(a.apellidos, '')) AS nombre_artista FROM artista a, cancion LEFT JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion WHERE cancion.id_artista =  a.id_artista");
 
         const songs = canciones[0].filter(song => song.id_album !== null);
 
@@ -59,7 +59,31 @@ export const getSongByAlbum = async (req, res) => {
 
         const { user, album } = req.params;
     
-        const songs = await pool.query("SELECT cancion.*, id_album FROM cancion INNER JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion WHERE cancion_album.id_album = ?", [album]);
+        const songs = await pool.query("SELECT cancion.*, id_album, CONCAT(a.nombres, ' ', COALESCE(a.apellidos, '')) AS nombre_artista FROM artista a, cancion INNER JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion WHERE cancion.id_artista = a.id_artista AND cancion_album.id_album = ?", [album]);
+    
+        const getIDLikedPlaylist = await pool.query("SELECT pu.id_playlist FROM playlist_usuario pu INNER JOIN playlist ON playlist.id_playlist = pu.id_playlist WHERE playlist.nombre = 'Me gusta' AND pu.id_usuario=?", [user]);
+    
+        const id_playlist = getIDLikedPlaylist[0][0].id_playlist;
+    
+        const songsLikedPlaylist = await pool.query("SELECT cancion.*, canciones_playlist.id_album FROM cancion INNER JOIN canciones_playlist ON cancion.id_cancion = canciones_playlist.id_cancion WHERE canciones_playlist.id_playlist = ?", [id_playlist]);
+    
+        const songsWithLike = songs[0].map(song => {
+            const isLiked = songsLikedPlaylist[0].some(songLiked => songLiked.id_cancion === song.id_cancion);
+            return { ...song, isLiked };
+        });
+    
+        res.status(200).json( { songsWithLike } );
+    } catch (error) {
+        res.status(500).json( { message: error.message } );
+    }
+};
+
+export const getSongsByPlaylist = async (req, res) => {
+    
+    try {
+        const { user, playlist } = req.params;
+    
+        const songs = await pool.query("SELECT cancion.*, id_album, CONCAT(a.nombres, ' ', COALESCE(a.apellidos, '')) AS nombre_artista FROM artista a, cancion INNER JOIN canciones_playlist ON cancion.id_cancion = canciones_playlist.id_cancion WHERE cancion.id_artista = a.id_artista AND canciones_playlist.id_playlist = ?", [playlist]);
     
         const getIDLikedPlaylist = await pool.query("SELECT pu.id_playlist FROM playlist_usuario pu INNER JOIN playlist ON playlist.id_playlist = pu.id_playlist WHERE playlist.nombre = 'Me gusta' AND pu.id_usuario=?", [user]);
     
