@@ -81,6 +81,8 @@ function Item_CRUD_album(data, artistasDisponibles) {
   const [artistaAlbum, setArtistaAlbum] = useState("");
   const [cancionesSinA, setCancionesSinA] = useState([]); //canciones sin album
   const [cancionAdd, setCancionAdd] = useState(-1); 
+  const [passw, setPassw] = useState("");
+
   useEffect(() => {
     obtDatos();
   }, []);
@@ -105,6 +107,10 @@ function Item_CRUD_album(data, artistasDisponibles) {
     console.log("ESTE ES EL VALOR DE LA CANCION", event.target.value);
     setCancionAdd(event.target.value);
   }
+
+  const handlePasswChange = async (event) => {
+    setPassw(event.target.value);
+  };
 
   const handleAddSong = async (event) => {
     try {
@@ -281,6 +287,32 @@ function Item_CRUD_album(data, artistasDisponibles) {
     } catch (error) {
       console.log(error);
       toast.error("Ha ocurrido un error - la imagen no ha sido actualizada.", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  };
+
+  const handleEliminacion = async () => {
+    try {
+      let enviar = {
+        idAlbum: songs,
+        idUser: usuario.id,
+        password: passw, 
+      };
+
+      console.log("ESTE ES EL ENVIO", enviar);
+      const res = await Service.eliminarAlbum(enviar);
+      
+      if (res.status == 200) {
+        toast.success("El album ha sido eliminado correctamente.", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        // Window.location.reload();
+      } else {
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Ha ocurrido un error - el album no ha sido eliminado.", {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
@@ -1127,10 +1159,11 @@ function Item_CRUD_album(data, artistasDisponibles) {
                               id="inline-full-name"
                               type="password"
                               autoComplete="on"
+                              onChange={handlePasswChange}
                             ></input>
                           </div>
                           <button
-                            type="button"
+                            type="submit"
                             className="text-white flex ml-4 bg-gradient-to-br from-red-900 to-red-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2 mb-2"
                           >
                             Eliminar

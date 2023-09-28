@@ -6,7 +6,7 @@ import { usePlayer } from "../../context_Player/playerContext";
 
 export default function Navbar({ fixed }) {
   const { logueado, setLogueado } = useUserContext();
-  const { cancionActual, setCancionActual, canc, setCanc } = usePlayer();
+  const { cancionActual, setCancionActual, canc, setCanc, reproduciendose, setReproduciendose } = usePlayer();
   const navigate = useNavigate();
   const [cancionesB, setCancionesB] = useState([]);
   const [albums, setAlbumes] = useState([]);
@@ -70,10 +70,22 @@ const handleClickAlbum = (e) => {
   navigate(`/user/album/${e}`)
 }
 
-
-const handleSetSong = (cancion) => {
+const handleSetSong = async (cancion) => {
+  try {
   setCancionActual(cancion);
   setCanc([cancion])
+    let values = {
+      id_cancion: cancion.id_cancion,
+      id_album: cancion.id_album,
+      id_usuario: usuario.id
+    }
+    console.log(values);
+    let res = await Service.postReproduccion(values);
+    console.log(res.data);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+  setReproduciendose(true);
 };
 
 const playAlbum = async (album) => {
@@ -83,6 +95,15 @@ const playAlbum = async (album) => {
     console.log(res.data);
     setCanc(res.data);
     setCancionActual(res.data[0]);
+
+    let values = {
+      id_cancion: res.data[0].id_cancion,
+      id_album: res.data[0].id_album,
+      id_usuario: usuario.id
+    }
+    let res2 = await Service.postReproduccion(values);
+    console.log(res2.data);
+    setReproduciendose(true);
   } catch (error) {
     console.error("Error fetching data:", error);
   }

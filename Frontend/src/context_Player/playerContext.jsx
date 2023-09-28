@@ -5,12 +5,15 @@ const PlayerContext = createContext();
 const PlayerProvider = ({ children }) => {
     const [cancionActual, setCancionActual] = useState({});
     const [canc, setCanc] = useState([]);
+    const [reproduciendose, setReproduciendose] = useState(true);
 
     const value = {
         cancionActual,
         setCancionActual,
         canc,
-        setCanc
+        setCanc,
+        reproduciendose,
+        setReproduciendose
     }
 
     return (

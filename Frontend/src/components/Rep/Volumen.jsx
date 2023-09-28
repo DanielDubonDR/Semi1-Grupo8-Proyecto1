@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Reproductor.css";
 
 const Vol = ({
@@ -10,7 +10,7 @@ const Vol = ({
   canciones,
 }) => {
   const volumenRef = useRef();
-  const [volValue, setVolValue] = useState(0.5);
+  const [volValue, setVolValue] = useState(1);
 
   const setVolume = (e) => {
     const vol = e.nativeEvent.offsetX;

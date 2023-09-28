@@ -38,7 +38,7 @@ export default function CRUD_artistas() {
   return (
     <div
       id="profile"
-      class="h-screen w-screen overflow-y-auto bg-gradient-to-t from-lightPurple/50 scrollbar-hide mb-[100px]"
+      class="flex h-screen w-screen overflow-y-auto bg-gradient-to-t from-lightPurple/50 scrollbar-hide mb-[100px]"
     >
       {Item_CRUD_artistas(artistas)}
     </div>
@@ -136,7 +136,7 @@ function Item_CRUD_artistas(data) {
     try {
       let datos = {
         idArtist : id,
-        idUser : usuario.id_usuario,
+        idUser : usuario.id,
         password : passw
       }
 

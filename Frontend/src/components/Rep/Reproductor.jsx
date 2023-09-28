@@ -5,35 +5,37 @@ import "./Reproductor.css";
 import Vol from "./Volumen";
 import Service from "../../Service/Service";
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from '../../context/UserContext';
+import { useUserContext } from "../../context/UserContext";
 import { usePlayer } from "../../context_Player/playerContext";
 
-function Reproductor()  {
-  const {cancionActual, setCancionActual, canc, setCanc} = usePlayer();
+function Reproductor() {
+  const {
+    cancionActual,
+    setCancionActual,
+    canc,
+    setCanc,
+    reproduciendose,
+    setReproduciendose,
+  } = usePlayer();
 
- // const [canc, setCanc] = useState(canciones);
-
-  const [reproduciendose, setReproduciendose] = useState(false);
-  const usuario = JSON.parse(sessionStorage.getItem('data_user'));
+  const usuario = JSON.parse(sessionStorage.getItem("data_user"));
   const audioElem = useRef();
 
   useEffect(() => {
-    //console.log(cancionActual);
-
     if (reproduciendose) {
       audioElem.current.play();
     } else {
       audioElem.current.pause();
     }
-  }, [reproduciendose]);
-  
-  const {logueado, setLogueado} = useUserContext();
-    const navigate = useNavigate();
-      useEffect(() => {
-          if(!logueado){
-              navigate('/login');
-          }
-      }, [logueado])
+  }, [cancionActual, reproduciendose]);
+
+  const { logueado, setLogueado } = useUserContext();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!logueado) {
+      navigate("/login");
+    }
+  }, [logueado]);
 
   const onPlaying = () => {
     const duration = audioElem.current.duration;
@@ -43,15 +45,34 @@ function Reproductor()  {
       progress: (ct / duration) * 100,
       length: duration,
     });
+
+    if (ct == duration && canc.length > 1) {
+      adelante();
+    }
   };
+
   const fetchData = async () => {
     try {
       console.log(cancionActual);
       let values = {
         id_cancion: cancionActual.id_cancion,
         id_album: cancionActual.id_album,
-        id_usuario: usuario.id
-      }
+        id_usuario: usuario.id,
+      };
+      let res = await Service.postReproduccion(values);
+      console.log(res.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const fetchData2 = async (test) => {
+    try {
+      let values = {
+        id_cancion: test.id_cancion,
+        id_album: test.id_album,
+        id_usuario: usuario.id,
+      };
       let res = await Service.postReproduccion(values);
       console.log(res.data);
     } catch (error) {
@@ -60,42 +81,65 @@ function Reproductor()  {
   };
 
   const pausar = () => {
-   if (!reproduciendose) {
+    if (!reproduciendose) {
       fetchData();
     }
-
 
     setReproduciendose(!reproduciendose);
   };
 
-  const atras = () => {
-    if (reproduciendose) {
-      fetchData();
-    }
-    
-    let index = canc.findIndex(c=>c.id_cancion===cancionActual.id_cancion);
+  const atras = async () => {
+    try {
+      let index = canc.findIndex(
+        (c) => c.id_cancion === cancionActual.id_cancion
+      );
+      let back;
+      if (index == 0) {
+        back = canc[0];
+      } else {
+        back = canc[index - 1];
+      }
 
-    if (index == 0) {
-      setCancionActual(canc[canc.length - 1]);
-    } else {
-      setCancionActual(canc[index - 1]);
+      setCancionActual(back);
+
+      let values = {
+        id_cancion: back.id_cancion,
+        id_album: back.id_album,
+        id_usuario: usuario.id,
+      };
+      let res = await Service.postReproduccion(values);
+      setReproduciendose(true);
+      audioElem.current.currentTime = 0;
+    } catch (error) {
+      console.error("Error fetching data adelante:", error);
     }
-    audioElem.current.currentTime = 0;
   };
 
-  const adelante = () => {
+  const adelante = async () => {
+    try {
+      let index = canc.findIndex(
+        (c) => c.id_cancion === cancionActual.id_cancion
+      );
+      let siguiente;
+      if (index == canc.length - 1) {
+        siguiente = canc[0];
+      } else {
+        siguiente = canc[index + 1];
+      }
 
-    if (reproduciendose) {
-      fetchData();
-    }
+      setCancionActual(siguiente);
 
-    let index = canc.findIndex(c=>c.id_cancion===cancionActual.id_cancion);
-    if (index == canc.length - 1) {
-      setCancionActual(canc[0]);
-    } else {
-      setCancionActual(canc[index + 1]);
+      let values = {
+        id_cancion: siguiente.id_cancion,
+        id_album: siguiente.id_album,
+        id_usuario: usuario.id,
+      };
+      let res = await Service.postReproduccion(values);
+      setReproduciendose(true);
+      audioElem.current.currentTime = 0;
+    } catch (error) {
+      console.error("Error fetching data adelante:", error);
     }
-    audioElem.current.currentTime = 0;
   };
 
   return (
@@ -114,7 +158,10 @@ function Reproductor()  {
 
       <div className="md:items-center ">
         <div className="flex justify-between items-center space-x-2 hover:text-white">
-          <button className="flex justify-between items-center space-x-2 hover:text-white" onClick={atras}>
+          <button
+            className="flex justify-between items-center space-x-2 hover:text-white"
+            onClick={atras}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -173,7 +220,10 @@ function Reproductor()  {
             </button>
           )}
 
-          <button className="flex justify-between items-center space-x-2 p-2 hover:text-white" onClick={adelante}>
+          <button
+            className="flex justify-between items-center space-x-2 p-2 hover:text-white"
+            onClick={adelante}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -198,14 +248,28 @@ function Reproductor()  {
           src={cancionActual.path_cancion}
         ></audio>
         <div className="text-center ">
-         <Barra audioElem={audioElem} reproduciendose={reproduciendose} setReproduciendos={setReproduciendose} cancionActual={cancionActual} setCancionActual={setCancionActual} canciones={canciones}/>
+          <Barra
+            audioElem={audioElem}
+            reproduciendose={reproduciendose}
+            setReproduciendos={setReproduciendose}
+            cancionActual={cancionActual}
+            setCancionActual={setCancionActual}
+            canciones={canciones}
+          />
         </div>
       </div>
       <div className="ml-10">
-       <Vol audioElem={audioElem} reproduciendose={reproduciendose} setReproduciendos={setReproduciendose} cancionActual={cancionActual} setCancionActual={setCancionActual} canciones={canciones}/>
+        <Vol
+          audioElem={audioElem}
+          reproduciendose={reproduciendose}
+          setReproduciendos={setReproduciendose}
+          cancionActual={cancionActual}
+          setCancionActual={setCancionActual}
+          canciones={canciones}
+        />
       </div>
     </div>
   );
-};
+}
 
 export default Reproductor;
