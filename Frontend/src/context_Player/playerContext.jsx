@@ -5,7 +5,7 @@ const PlayerContext = createContext();
 const PlayerProvider = ({ children }) => {
     const [cancionActual, setCancionActual] = useState({});
     const [canc, setCanc] = useState([]);
-    const [reproduciendose, setReproduciendose] = useState(true);
+    const [reproduciendose, setReproduciendose] = useState(false);
 
     const value = {
         cancionActual,
