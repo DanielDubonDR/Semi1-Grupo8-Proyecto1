@@ -51,7 +51,7 @@ export default function CRUD_cancion() {
   return (
     <div
       id="profile"
-      class="h-screen w-full overflow-y-auto bg-gradient-to-t from-silver/40 mb-[100px] scrollbar-hide"
+      class="flex h-screen w-full overflow-y-auto bg-gradient-to-t from-silver/40 mb-[100px] scrollbar-hide"
     >
       {Item_CRUD_cancion(canciones, artista)}
     </div>
@@ -193,7 +193,7 @@ function Item_CRUD_cancion(data, data2) {
   const DeleteSong = async (id) => {
     console.log("id de la cancion: ", id, usuario.id_usuario, passw);
     let data = {
-      idUser: usuario.id_usuario,
+      idUser: usuario.id,
       idSong: id,
       password: passw,
     };

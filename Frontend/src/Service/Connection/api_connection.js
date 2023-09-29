@@ -206,7 +206,9 @@ export const listarArtistas = async () => {
 
 // DELETE CANCIONES, ALBUMES Y ARTISTAS
 export const eliminarCancion = async (data) => {
-    const res = await instance.delete(`/cancion/eliminar`, data,{
+    console.log(data);
+    const res = await instance.delete(`/cancion/eliminar`,{
+        data,
         headers: {
             'Content-Type': 'application/json'
         }
@@ -314,7 +316,9 @@ export const actualizarArtista = async (data, id) => {
 
 // eliminar artista
 export const eliminarArtista = async (data) => {
-    const res = await instance.delete(`/artista/eliminar`, data,{
+    console.log(data);
+    const res = await instance.delete(`/artista/eliminar`, {
+        data,
         headers: {
             'Content-Type': 'application/json'
         }
@@ -380,6 +384,18 @@ export const agregarCancionAlbum = async (data) => {
 
 export const eliminarCancionAlbum = async (data) => {
     const res = await instance.delete('/album/eliminar/song', {
+        data,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+        });
+    return res;
+}
+
+export const eliminarAlbum = async (data) => {
+    console.log(data);
+
+    const res = await instance.delete('/album/eliminar', {
         data,
         headers: {
             'Content-Type': 'application/json'

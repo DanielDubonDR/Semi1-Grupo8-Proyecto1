@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import json
 from flask_cors import CORS
-from db import blueprint as dbprueba, obtenerConexion, cerrarConexion
+from db import blueprint as dbprueba
 from controllers.Acceso import BlueprintAcceso
 from controllers.Artistas import BlueprintArtistas
 from controllers.Album import BlueprintAlbum
