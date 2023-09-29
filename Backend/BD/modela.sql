@@ -126,12 +126,8 @@ CREATE TABLE `historico` (
   `id_usuario` int DEFAULT NULL,
   `fecha` datetime DEFAULT NULL,
   PRIMARY KEY (`id_historico`),
-  KEY `fk4_idx` (`id_usuario`),
-  KEY `fk4_id_album_idx` (`id_album`),
   KEY `fk4_id_cancion_idx` (`id_cancion`),
-  CONSTRAINT `fk4_id_album` FOREIGN KEY (`id_album`) REFERENCES `cancion_album` (`id_album`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk4_id_cancion` FOREIGN KEY (`id_cancion`) REFERENCES `cancion_album` (`id_cancion`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk4_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk4_id_cancion` FOREIGN KEY (`id_cancion`) REFERENCES `cancion_album` (`id_cancion`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -199,4 +195,4 @@ CREATE TABLE `usuario` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-09-24  0:02:37
+-- Dump completed on 2023-09-29  1:49:52
