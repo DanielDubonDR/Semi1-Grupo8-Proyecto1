@@ -124,26 +124,29 @@ def eliminarUsuario(id_usuario):
 
 @BlueprintUser.route('/usuario/add/history', methods=['POST'])
 def addHistory():
-    data = request.get_json()
-    id_cancion = data['id_cancion']
-    id_usuario = data['id_usuario']
-    id_album = data['id_album']
+    try:
+        data = request.get_json()
+        id_cancion = data['id_cancion']
+        id_usuario = data['id_usuario']
+        id_album = data['id_album']
 
-    current_date = datetime.now()
-    fecha = current_date.strftime("%Y-%m-%d %H:%M:%S")
+        current_date = datetime.now()
+        fecha = current_date.strftime("%Y-%m-%d %H:%M:%S")
 
-    conexion = obtenerConexion()
-    cursor = conexion.cursor()
+        conexion = obtenerConexion()
+        cursor = conexion.cursor()
 
-    cursor.execute("INSERT INTO historico (id_cancion, id_usuario, id_album, fecha) VALUES (%s, %s, %s, %s);", (id_cancion, id_usuario, id_album, fecha))
+        cursor.execute("INSERT INTO historico (id_cancion, id_usuario, id_album, fecha) VALUES (%s, %s, %s, %s);", (id_cancion, id_usuario, id_album, fecha))
 
-    status = cursor.rowcount > 0
-    conexion.commit()
+        status = cursor.rowcount > 0
+        conexion.commit()
 
-    cursor.close()
-    conexion.close()
+        cursor.close()
+        conexion.close()
 
-    return jsonify({'status': status})
+        return jsonify({'status': status}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @BlueprintUser.route('/usuario/ver/top5/songs/<id_usuario>', methods=['GET'])
 def verTop5Songs(id_usuario):
