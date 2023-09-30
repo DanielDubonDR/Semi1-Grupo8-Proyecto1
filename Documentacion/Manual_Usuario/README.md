@@ -27,8 +27,11 @@
             - [Mi historial](#mi-historial)
         * [Cerrar Sesión](#9-cerrar-sesión)
 
-
     - [Usuario Administrador](#usuario-administrador)
+        * [CRUD Cancion](#crud-cancion)
+        * [CRUD Artista](#crud-artista)
+        * [CRUD Album](#crud-album)
+
 
 
 ## Objetivos:
@@ -131,19 +134,30 @@ Donde usted podrá acceder a las playlists que ha creado y reproducirlas:
 
 #### _Agregando canciones a una playlist_:
 Para agregar canciones a una playlist, usted deberá de hacer click en el botón de _más_ que se le presenta cada vez que se lista una canción, una vez lo haga, se le presentará la siguiente opción:
+<br>
+
 ![Playlist](img/playlist5.png)
 
 Donde en el dropdown menu, usted deberá de seleccionar la playlist a la que desea agregar la canción y hacer click en el botón de _Agregar_. Si el proceso ha sido completado exitosamente, se le presentará el siguiente mensaje:
+<br>
+
 ![Playlist](img/playlist6.png)
 
 Y cuando revise la playlist, la canción se encontrará agregada:
+<br>
+
 ![Playlist](img/playlist7.png)
 
 #### _Eliminando canciones de una playlist_:
 Si ya no desea que una canción se encuentre en una playlist, usted deberá de hacer click derecho sobre la canción a eliminar:
+<br>
 ![Playlist](img/playlist8.png)
+<br>
+
 Y deberá de seleccionar la opción de _Eliminar de la playlist_, una vez lo haga, la canción se eliminará de su playlist.
+<br>
 ![Playlist](img/playlist9.png)
+<br>
 
 #### _Favoritos_:
 Para agregar una canción a favoritos, bastará con hacer click al corazón que se le presenta cada vez que se lista una canción:
@@ -245,7 +259,7 @@ Una vez llena la información, deberá de hacer click en el botón de _Guardar_.
 
 *_Actualizar_*:
 Es posible actualizar los datos de un artista, para ello, deberá de hacer click en el botón amarillo de _Actualizar_ que se le presenta y con esto, se le presentará el siguiente formulario:
-![Artista](act.png)
+![Artista](img/act.png)
 
 
 *_Delete_*:

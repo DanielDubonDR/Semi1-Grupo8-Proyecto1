@@ -14,6 +14,7 @@ export default function Top5_Albumes() {
         let res = await Service.getTop5_Albumes(usuario.id);
         if (res.status === 200) {
             setAlbumes(res.data);
+            console.log(res.data);
         }
       } catch (error) {
         console.error("Error fetching data:", error);

@@ -203,11 +203,12 @@ export const top5Albumes = async (req, res) => {
         const query2 = await pool.query("SELECT id_album, nombre, path_imagen FROM album WHERE id_album IN (?)", [query[0].map((item) => item.id_album)]);
     
         // unir los dos arrays
-        for(let i = 0; i < query[0].length; i++){
-            query[0][i] = {...query[0][i], ...query2[0][i]};
-        }
-        return res.send(query[0]);
-        
+        const result = query[0].map( album => {
+            const datos = query2[0].find( detalle => detalle.id_album === album.id_album );
+            return {...album, ...datos}
+        });
+
+        return res.send(result);
     } catch (error) {
         console.log(error);
         res.status(500).json( { status: false } );
