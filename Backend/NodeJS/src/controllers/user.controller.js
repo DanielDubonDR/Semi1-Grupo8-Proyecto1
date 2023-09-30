@@ -206,14 +206,13 @@ export const top5Albumes = async (req, res) => {
         for(let i = 0; i < query[0].length; i++){
             query[0][i] = {...query[0][i], ...query2[0][i]};
         }
-
+        return res.send(query[0]);
+        
     } catch (error) {
         console.log(error);
         res.status(500).json( { status: false } );
     }
-    
 
-        return res.send(query[0]);
 }
 
 export const getHistory = async (req, res) => {
