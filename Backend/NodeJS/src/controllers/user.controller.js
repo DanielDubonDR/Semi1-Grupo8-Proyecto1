@@ -161,11 +161,12 @@ export const getTop5songs = async (req, res) => {
         const query2 = await pool.query("SELECT id_cancion, nombre, duracion, path_cancion, path_imagen FROM cancion WHERE id_cancion IN (?)", [query[0].map((item) => item.id_cancion)]);
     
         // unir los dos arrays
-        for(let i = 0; i < query[0].length; i++){
-            query[0][i] = {...query[0][i], ...query2[0][i]};
-        }
-    
-        return res.send(query[0]);
+        const result = query[0].map( album => {
+            const datos = query2[0].find( detalle => detalle.id_cancion === album.id_cancion );
+            return {...album, ...datos}
+        });
+
+        return res.send(result);
 
     }catch(error){
         console.log(error);
