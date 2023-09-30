@@ -132,15 +132,14 @@ function Item_CRUD_artistas(data) {
   };
 
 
-  const DeleteArtist = async (id) => {
+  const DeleteArtist = async (id, e) => {
+    e.preventDefault();
     try {
       let datos = {
         idArtist : id,
         idUser : usuario.id,
         password : passw
       }
-
-      
       const res = await Service.eliminarArtista(datos);
 
       if (res.status == 200) {
@@ -155,11 +154,11 @@ function Item_CRUD_artistas(data) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
-    Window.location.reload();
+    window.location.reload();
   };
 
-  const handleActualizacion = async () => { 
-
+  const handleActualizacion = async (e) => { 
+    e.preventDefault();
     let datos_Enviar = {
       nombres: name,
       apellidos: description,
@@ -173,7 +172,8 @@ function Item_CRUD_artistas(data) {
           position: toast.POSITION.TOP_RIGHT,
         });
 
-        Window.location.reload();
+        window.location.reload();
+        setShowSongs(false);
       } else {
       }
     } catch (error) {
@@ -182,6 +182,7 @@ function Item_CRUD_artistas(data) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
+
   };
 
   function formatDate(inputDate) {
@@ -232,6 +233,7 @@ function Item_CRUD_artistas(data) {
   };
 
   const handleAdd = async (e) => {
+    e.preventDefault();
     const formData = new FormData();
     formData.append("nombres", fData.nombres);
     formData.append("apellidos", fData.apellidos);
@@ -260,7 +262,7 @@ function Item_CRUD_artistas(data) {
       id_imagen: "",
       fecha_nac: "",
     });
-    Window.location.reload();
+    window.location.reload();
 
     setAddAlbum(false);
   };
@@ -570,7 +572,7 @@ function Item_CRUD_artistas(data) {
                     {!showSongs ? (
                       <div className="relative p-6 flex-auto">
                         <div class="w-full ">
-                          <form class="w-full " onSubmit={() => handleActualizacion()}>
+                          <form class="w-full " onSubmit={(e) => handleActualizacion(e)}>
                             <div class="grid grid-cols-2 gap-2">
                               <div class="md:flex md:items-center mb-6">
                                 <div class="">
@@ -786,7 +788,7 @@ function Item_CRUD_artistas(data) {
                             Confirme su contraseña:
                           </label>
                         </div>
-                        <form className="justify-center flex" onSubmit={() => DeleteArtist(id_artist)}>
+                        <form className="justify-center flex" onSubmit={(e) => DeleteArtist(id_artist, e)}>
                           <div class="w-full flex">
                             <input
                               class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
@@ -865,7 +867,7 @@ function Item_CRUD_artistas(data) {
                       </button>
                     </div>
                     {/*body*/}
-                    <form onSubmit={() => handleAdd()}>
+                    <form onSubmit={(e) => handleAdd(e)}>
                       <div className="w-full bg-black2 items-center justify-center">
                         <div class=" w-full p-5 rounded-xl z-10">
                           <div class="grid grid-cols-1 space-y-2">

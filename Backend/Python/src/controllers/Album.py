@@ -224,7 +224,7 @@ def addSong():
         print(e)
         return jsonify({'status': False})
 
-@BlueprintAlbum.route('/album/eliminar/', methods=['DELETE'])
+@BlueprintAlbum.route('/album/eliminar/', methods=['DELETE'], strict_slashes=False)
 def eliminarAlbum():
     try:
         data = request.get_json()

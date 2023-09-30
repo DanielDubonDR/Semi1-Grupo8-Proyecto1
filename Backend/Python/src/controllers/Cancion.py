@@ -58,7 +58,7 @@ def crearCancion():
         id_cancion = data['id_cancion']
         path_cancion = data['path_cancion']
         id_artista = data['id_artista']
-
+        print(path_cancion)
         status = False
 
         #Conexion a la base de datos
@@ -265,7 +265,7 @@ def modificarCancionCancion(id_cancion):
         print(e)
         return jsonify({'status': False})
 
-@BlueprintCancion.route('/cancion/eliminar/', methods=['DELETE'])
+@BlueprintCancion.route('/cancion/eliminar/', methods=['DELETE'], strict_slashes=False)
 def eliminarCancion():
     try:
         status = False
@@ -322,7 +322,7 @@ def eliminarCancion():
         print(e)
         return jsonify({'status': False})
 
-@BlueprintCancion.route('/cancion/album/get/null/artist/<id_artist>', methods=['GET'])
+@BlueprintCancion.route('/cancion/album/get/null/artist/<id_artista>', methods=['GET'])
 def getSongAlbumNullByArtist(id_artista):
     try:
         conexion = obtenerConexion()
@@ -346,4 +346,5 @@ def getSongAlbumNullByArtist(id_artista):
         return jsonify(cancion)
     except Exception as e:
         print(e)
+        conexion.close()
         return jsonify({'status': False})

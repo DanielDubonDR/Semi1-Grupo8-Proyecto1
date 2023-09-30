@@ -113,6 +113,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
   };
 
   const handleAddSong = async (event) => {
+    event.preventDefault();
     try {
       let enviar = {
         "id_album": parseInt(songs),
@@ -123,6 +124,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
         toast.success("La canción ha sido agregada correctamente.", {
           position: toast.POSITION.TOP_RIGHT,
         });
+        window.location.reload();
       } else {
       }
     } catch (error) {
@@ -136,12 +138,14 @@ function Item_CRUD_album(data, artistasDisponibles) {
 
 
   const handleAdd = async (event) => {
+    event.preventDefault();
+
     fData.imagen = img;
     fData.id_artista = artist;
 
     setImg("");
     setArtist("");
-
+    
     try {
       const res = await Service.crearAlbum(fData);
 
@@ -157,6 +161,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
+    window.location.reload();
     setAddAlbum(false);
   };
 
@@ -207,8 +212,9 @@ function Item_CRUD_album(data, artistasDisponibles) {
     setArtist(event.target.value);
   };
 
-  const handleEliminarCancion = async (event) =>
-  {
+  const handleEliminarCancion = async (e, event) =>
+  { 
+    e.preventDefault();
     try {
       const res = await Service.eliminarCancionAlbum({
         id_album: songs,
@@ -219,7 +225,8 @@ function Item_CRUD_album(data, artistasDisponibles) {
         toast.success("La canción ha sido eliminada correctamente del álbum.", {
           position: toast.POSITION.TOP_RIGHT,
         });
-        
+        window.location.reload();
+
       } else {
         toast.error("Ha ocurrido un error - la canción no ha sido eliminada.", {
           position: toast.POSITION.TOP_RIGHT,
@@ -234,7 +241,8 @@ function Item_CRUD_album(data, artistasDisponibles) {
     }
   }
 
-  const handleActualizacion = async () => {
+  const handleActualizacion = async (e) => {
+    e.preventDefault();
     let datos_Enviar = {
       nombre: name,
       descripcion: description,
@@ -248,7 +256,8 @@ function Item_CRUD_album(data, artistasDisponibles) {
         toast.success("El album ha sido actualizado correctamente.", {
           position: toast.POSITION.TOP_RIGHT,
         });
-        // Window.location.reload();
+
+         window.location.reload();
       } else {
       }
     } catch (error) {
@@ -282,6 +291,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
         toast.success("La imagen ha sido actualizada correctamente.", {
           position: toast.POSITION.TOP_RIGHT,
         });
+        window.location.reload();
       } else {
       }
     } catch (error) {
@@ -292,7 +302,8 @@ function Item_CRUD_album(data, artistasDisponibles) {
     }
   };
 
-  const handleEliminacion = async () => {
+  const handleEliminacion = async (e, songs) => {
+    e.preventDefault();
     try {
       let enviar = {
         idAlbum: songs,
@@ -306,8 +317,9 @@ function Item_CRUD_album(data, artistasDisponibles) {
       if (res.status == 200) {
         toast.success("El album ha sido eliminado correctamente.", {
           position: toast.POSITION.TOP_RIGHT,
+
         });
-        // Window.location.reload();
+         window.location.reload();
       } else {
       }
     } catch (error) {
@@ -330,10 +342,10 @@ function Item_CRUD_album(data, artistasDisponibles) {
     try {
       if (op === 1 || op === 2 || op === 3 || op === 4) {
         let res = await Service.getArtista(artist);
-        if (res.status === 200) {
+        if (res.status == 200) {
           setArtistaAlbum(res.data);
-
-          obtCancionesSinAlbum(res.data.id_artista);
+          console.log("ESTE ES EL ARTISTA", res.data);
+          await obtCancionesSinAlbum(res.data.id_artista);
         } else {
           console.log("Error al obtener el artista");
         }
@@ -362,7 +374,8 @@ function Item_CRUD_album(data, artistasDisponibles) {
         setDescription(description);
         setSongs(songs);
 
-        obtCancionesAlbum(songs);
+
+        await obtCancionesAlbum(songs);
       } else if (op === 3) {
         //detalle
         setShowModal(true);
@@ -674,7 +687,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
                         <div class="w-full ">
                           <form
                             class="w-full "
-                            onSubmit={() => handleActualizacion()}
+                            onSubmit={(e) => handleActualizacion(e)}
                           >
                             <div class="md:flex md:items-center mb-6">
                               <div class="">
@@ -956,7 +969,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
                           {artistaAlbum.nombres + " " + artistaAlbum.apellidos}
                         </span>
                       </h1>
-                      <form onSubmit={()=>handleAddSong()}>
+                      <form onSubmit={(e)=>handleAddSong(e)}>
                       <div class="md:flex md:items-center mb-6">
                         
                         <label
@@ -1030,7 +1043,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
                                     {" " + value.nombre}
                                   </td>
                                   <td class="text-gray-300 text-center">
-                                    <button class="bg-red-500 px-8 rounded-lg mt-1 my-1/2  hover:bg-red-900" type="submit" onClick={()=>handleEliminarCancion(value.id_cancion)}>
+                                    <button class="bg-red-500 px-8 rounded-lg mt-1 my-1/2  hover:bg-red-900" type="submit" onClick={(e)=>handleEliminarCancion(e, value.id_cancion)}>
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="none"
@@ -1151,7 +1164,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
                         </div>
                         <form
                           className="justify-center flex"
-                          onSubmit={() => handleEliminacion(songs)}
+                          onSubmit={(e) => handleEliminacion(e, songs)}
                         >
                           <div class="w-full flex">
                             <input
@@ -1227,7 +1240,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
                     </div>
                     {/*body*/}
 
-                    <form onSubmit={()=> handleAdd()}>
+                    <form onSubmit={(e)=> handleAdd(e)}>
                       <div className="w-full bg-black2 items-center justify-center">
                         <div class=" w-full p-5 rounded-xl z-10">
                           <div class="grid grid-cols-1 space-y-2">

@@ -190,8 +190,9 @@ function Item_CRUD_cancion(data, data2) {
     }
   };
 
-  const DeleteSong = async (id) => {
-    console.log("id de la cancion: ", id, usuario.id_usuario, passw);
+  const DeleteSong = async (e, id) => {
+    e.preventDefault();
+    console.log("id de la cancion: ", id, usuario.id, passw);
     let data = {
       idUser: usuario.id,
       idSong: id,
@@ -204,7 +205,7 @@ function Item_CRUD_cancion(data, data2) {
       if (res.status === 200 || res.status === 204) {
         toast.success("Canción eliminada con éxito");
         setDeleteAlbum(false);
-        Window.location.reload();
+        window.location.reload();
       } else {
         toast.error("Error al eliminar la canción");
       }
@@ -256,6 +257,7 @@ function Item_CRUD_cancion(data, data2) {
   };
 
   const handleActualizacion = async (e) => {
+    e.preventDefault();
     let nombre = "";
     let duracion = "";
   
@@ -273,6 +275,9 @@ function Item_CRUD_cancion(data, data2) {
     let res2 = await Service.updateCancionInfo(datos_Enviar, id_song);
     if (res2.status === 200) {
       toast.success("Canción actualizada con éxito");
+      setShowModal(false)
+      setShowSongs(false);
+      window.location.reload();
     } else {
       toast.error("Error al actualizar la canción");
     }
@@ -283,7 +288,7 @@ function Item_CRUD_cancion(data, data2) {
   };
 
   const handleSongUpdate = async (e) => {
-    
+    e.preventDefault();
     const file = e.target.files[0];
     let idActualizada = "";
     let PathActualizado = "";
@@ -386,6 +391,7 @@ function Item_CRUD_cancion(data, data2) {
   };
 
   const handleAdd = async (e) => {
+    e.preventDefault();
     let cancionID = songs;
     let ImgID = img;
 
@@ -407,6 +413,7 @@ function Item_CRUD_cancion(data, data2) {
     console.log("res de la creación: ", res.data);
     if (res.status === 200) {
       toast.success("Canción creada con éxito");
+      window.location.reload();
     } else {
       toast.error("Error al crear la canción");
     }
@@ -693,7 +700,7 @@ function Item_CRUD_cancion(data, data2) {
                     {!showSongs ? (
                       <div className="relative p-6 flex-auto">
                         <div class="w-full ">
-                          <form class="w-full " onSubmit={() => handleActualizacion()}>
+                          <form class="w-full " onSubmit={(e) => handleActualizacion(e)}>
                             <div class="grid grid-cols-2 gap-2">
                               <div class="md:flex md:items-center mb-6">
                                 <div class="">
@@ -947,7 +954,7 @@ function Item_CRUD_cancion(data, data2) {
                         </div>
                         <form
                           className="justify-center"
-                          onSubmit={() => DeleteSong(id_song)}
+                          onSubmit={(e) => DeleteSong(e, id_song)}
                         >
                           <div class="w-full ">
                             <input
@@ -1025,7 +1032,7 @@ function Item_CRUD_cancion(data, data2) {
                       </button>
                     </div>
                     {/*body*/}
-                    <form onSubmit={()=> handleAdd()}>
+                    <form onSubmit={(e)=> handleAdd(e)}>
                       <div className="w-full bg-black2 items-center justify-center">
                         <div class=" w-full p-5 rounded-xl z-10">
                           <div class="grid grid-cols-1 space-y-2">

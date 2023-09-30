@@ -316,7 +316,6 @@ export const actualizarArtista = async (data, id) => {
 
 // eliminar artista
 export const eliminarArtista = async (data) => {
-    console.log(data);
     const res = await instance.delete(`/artista/eliminar`, {
         data,
         headers: {

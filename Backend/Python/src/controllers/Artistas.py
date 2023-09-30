@@ -85,9 +85,10 @@ def verArtista(id):
         lista.append(data)
         cursor.close()
         conexion.close()
-        return jsonify(lista)
+        return jsonify(data)
     except Exception as e:
         print(e)
+        conexion.close()
         return jsonify([])
 
 @BlueprintArtistas.route('/artista/ver/canciones/<id>', methods=['GET'])
@@ -198,7 +199,7 @@ def modificarImagenArtista(id):
         print(e)
         return jsonify({'status': False})
 
-@BlueprintArtistas.route('/artista/eliminar/', methods=['DELETE'])
+@BlueprintArtistas.route('/artista/eliminar/', methods=['DELETE'], strict_slashes=False)
 def eliminarArtista():
     try:
         data = request.get_json()
@@ -212,6 +213,7 @@ def eliminarArtista():
         cursor.execute("SELECT * FROM usuario WHERE id_usuario = %s;", (idUser,))
 
         result = cursor.fetchone()
+        print(result[6])
 
         if len(result) > 0:
             if result[6] != 1:
@@ -221,33 +223,37 @@ def eliminarArtista():
                 return jsonify({'status': status})
             contraseniaCifrada = result[4]
             status = compararPassword(password, contraseniaCifrada)
+            print(status)
             if status == False:
                 cursor.close()
                 conexion.close()
                 return jsonify({'status': status})
             cursor.execute("SELECT * FROM artista WHERE id_artista = %s;", (id,))
             result = cursor.fetchone()
+            print(result)
             if len(result) > 0:
                 try:
                     cursor.execute("SELECT * FROM album WHERE id_artista = %s;", (id,))
                     result = cursor.fetchall()
 
-                    for i in range(len(result)):
-                        id_imagen = result[i][4]
-                        eliminarObjeto(id_imagen)
+                    if len(result) > 0:
+                        for i in range(len(result)):
+                            id_imagen = result[i][4]
+                            eliminarObjeto(id_imagen)
                     
                     cursor.execute("SELECT * FROM cancion WHERE id_artista = %s;", (id,))
                     result = cursor.fetchall()
 
-                    for i in range(len(result)):
-                        id_imagen = result[i][3]
-                        eliminarObjeto(id_imagen)
-                        id_obj_cancion = result[i][6]
-                        eliminarObjeto(id_obj_cancion)
+                    if len(result) > 0:
+                        for i in range(len(result)):
+                            id_imagen = result[i][3]
+                            eliminarObjeto(id_imagen)
+                            id_obj_cancion = result[i][6]
+                            eliminarObjeto(id_obj_cancion)
                     
                     cursor.execute("SELECT * FROM artista WHERE id_artista = %s;", (id,))
                     result = cursor.fetchone()
-                    id_imagen = result[7]
+                    id_imagen = result[5]
                     eliminarObjeto(id_imagen)
                     cursor.execute("DELETE FROM artista WHERE id_artista = %s;", (id,))
                     conexion.commit()
@@ -255,9 +261,10 @@ def eliminarArtista():
                     cursor.execute("DELETE FROM cancion WHERE id_artista = %s;", (id,))
                     conexion.commit()
                     status = cursor.rowcount > 0
-
+                    conexion.close() #Cerrar conexion, este faltaba
                     return jsonify({'status': status})
-                except:
+                except Exception as e:
+                    print(e)
                     cursor.close()
                     conexion.close()
                     status = False
@@ -271,6 +278,8 @@ def eliminarArtista():
             cursor.close()
             conexion.close()
             return jsonify({'status': False})
+        
     except Exception as e:
         print(e)
+        conexion.close()
         return jsonify({'status': False})
