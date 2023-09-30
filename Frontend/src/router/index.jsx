@@ -23,6 +23,7 @@ import LayoutPrivate from '../layout/LayoutPrivate'
 import Login from '../pages/Login/Login'
 import NotFound from '../pages/NotFound'
 import Registro from '../pages/Registro/Registro'
+import Radio from '../components/Body/Radio'
 const user = JSON.parse(sessionStorage.getItem('data_user'));
 
 const PrivateRoute = ({ children }) => {
@@ -131,6 +132,10 @@ export const router = createBrowserRouter([
                     {
                         path: 'album/:id',
                         element: <Album />
+                    },
+                    {
+                        path: 'radio',
+                        element: <Radio />
                     }
                 ]
             },

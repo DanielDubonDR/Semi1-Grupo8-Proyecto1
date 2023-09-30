@@ -41,6 +41,11 @@ function Sidebar_admin() {
     const handlerCRUDAlbum = () => {
         navigate('/user/crud_album');
     }
+    
+    const handlerRadio = () => {
+        console.log("Radio");
+        navigate('/user/radio');
+    }
 
     const handlerCRUDCancion = () => {
         navigate('/user/crud_cancion');
@@ -76,7 +81,7 @@ function Sidebar_admin() {
                     <UserIcon className="h5 w-5"/>
                     <p>Perfil</p>
                 </button>
-                <button className="flex items-center space-x-2 hover:text-white">
+                <button className="flex items-center space-x-2 hover:text-white" onClick={handlerRadio}>
                     <RssIcon className="h5 w-5"/>
                     <p>Radio</p>
                 </button>
