@@ -202,7 +202,7 @@ En esta sección, se le presentará un top 5 de los albumes más escuchados por 
 #### Mi historial
 ![Historico](img/historico4.png)
 
-En esta sección, se le presentará un historial de las canciones que el usuario ha escuchado, FALTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+En esta sección, se le presentará un historial de las canciones que el usuario ha escuchado, brindando información como el nombre de la canción, el artista, el album, la duración y hace cuánto tiempo la canción se reprodujo.
 
 #### 9. Cerrar Sesión
 Para cerrar sesión, deberá de hacer click en la opción de Salida que aparece en la parte superior derecha de la pantalla:

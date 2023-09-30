@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import Service from "../../Service/Service";
 import { useUserContext } from "../../context/UserContext";
 import { usePlayer } from "../../context_Player/playerContext";
+import { ToastContainer, toast } from 'react-toastify';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import { BsPlay, BsPlusCircle } from "react-icons/bs";
+import { set } from "lodash";
 
 export default function Navbar({ fixed }) {
   const { logueado, setLogueado } = useUserContext();
@@ -12,11 +16,102 @@ export default function Navbar({ fixed }) {
   const [albums, setAlbumes] = useState([]);
   const [artista, setArtista] = useState([]);
   const [searchText, setSearchText] = useState('');
-  
+  const [isModal, setIsModal] = useState(false);
+  const [playlist_seleccionada, setPlaylist_seleccionada] = useState('');
+  const [playlists, setPlaylists] = useState([]);
+  const [canciones_playlist, setCanciones_playlist] = useState([]);
+  const [idSongModal, setIdSongModal] = useState('');
+  const [idSongAlbumModal, setIdSongAlbumModal] = useState('');
+  const usuario = JSON.parse(localStorage.getItem('data_user'));
+  const handleSelectChange = (e) => {
+    console.log("QUIERO REVISAR: ", e.target.value)
+    setPlaylist_seleccionada(e.target.value);
+    if(e.target.value !== ''){
+        Service.getCancionesPlaylist(e.target.value, usuario.id)
+        .then(response => {
+            setCanciones_playlist(response.data);
+        })
+    }
+}
+
+const handleAddSongtoPlaylist = (e) => {
+  e.preventDefault();
+  if(playlist_seleccionada === ''){
+      toast.error('Debe seleccionar una playlist', {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "dark",
+        });
+        return;
+  }
+  if(canciones_playlist.length > 0 && canciones_playlist.some(cancion => cancion.id_cancion === idSongModal)){
+      toast.error('Esta canción ya fue agregada anteriormente a esa playlist', {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "dark",
+        });
+        return;
+  }
+  const enviar = {
+      id_cancion: idSongModal,
+      id_album: idSongAlbumModal,
+      id_playlist: playlist_seleccionada
+  }
+  console.log(enviar);
+  Service.agregarCancionPlaylist(enviar)
+  .then(response => {
+      console.log(response);
+      if(response.data.status){
+          closeModal();
+          toast.success('Se agrego la canción a tu Playlist', {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "colored",
+              });
+      }else{
+          toast.error('Ocurrió un Error!,No se pudo agregar la cancion a la playlist', {
+              position: "top-right",
+              autoClose: 4000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+            });
+      }
+  })
+  .catch(error => {
+      toast.error('Ocurrió un Error!,No se pudo agregar la cancion a la playlist', {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+  })
+}
+
   const handleInputChange = (e) => {
     setSearchText(e.target.value);
   };
-  const usuario = JSON.parse(localStorage.getItem('data_user'));
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -52,6 +147,13 @@ export default function Navbar({ fixed }) {
         console.error("Error fetching data:", error);
       }
     };
+
+    Service.getPlaylists(usuario.id)
+        .then((response) => {
+            response.data.shift()
+            setPlaylists(response.data);
+        })
+
 
     fetchData();
   }, []);
@@ -119,6 +221,81 @@ function formatDate(inputDate) {
   return `${day}-${month}-${year}`;
 }
 
+const toggleLike = (cancion) => {
+  if(cancion.isLiked==false){
+      const data = {
+          id_cancion: cancion.id_cancion,
+          id_album: cancion.id_album,
+          id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+      }
+      Service.addFavorito(data)
+      .then(response => {
+          if(response.data.status){
+              toast.success('Se añadió tu canción a Favoritos!', {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "dark",
+                  });
+                  cancion.isLiked = true;
+              setTimeout(() => {
+                  window.location.reload();
+              },500)
+          }else{
+              toast.error('Ocurrio un Error!', {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "dark",
+                  });
+              }
+      })
+  }else{
+      const data = {
+          id_cancion: track.id_cancion,
+          id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+      }
+      Service.deleteFavorito(data)
+      .then(response => {
+          if(response.data.status){
+              toast.success('Se eliminó tu canción de Favoritos!', {
+                  position:"top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "dark",
+                  });
+              cancion.isLiked = false;
+              setTimeout(() => {
+                  navigate('/user/home');
+              },1000)
+          }else{
+              toast.error('Ocurrio un Error!', {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "dark",
+                  });
+              }
+      })
+  }
+};
+
 const filteredAlbums = albums.filter((album) =>
   album.nombre.toLowerCase().includes(searchText.toLowerCase()) //|| album.artista.toLowerCase().includes(searchText.toLowerCase())
 );
@@ -128,6 +305,34 @@ const filteredArtistas = artista.filter((artista) =>
     .toLowerCase()
     .includes(searchText.toLowerCase())
 );
+
+const handleOptionPlaylist = (id, idA) => {
+  handleAbrirModal()
+  setIdSongModal(id)
+  setIdSongAlbumModal(idA)
+}
+
+const handleCancelarModal = (e) => {
+  e.preventDefault();
+  closeModal();
+}
+
+const handleAbrirModal = () => {
+  openModal()
+}
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+  closeModal();
+};
+
+const openModal = () => {
+  setIsModal(true);
+};
+
+const closeModal = () => {
+  setIsModal(false);
+};
 
 
   useEffect(() => {
@@ -145,6 +350,7 @@ const filteredArtistas = artista.filter((artista) =>
             <div>
               <span class="self-center text-2xl font-semibold whitespace-nowrap text-white"></span>
             </div>
+            
             <div class="relative hidden md:block">
               <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg
@@ -176,7 +382,7 @@ const filteredArtistas = artista.filter((artista) =>
             <div></div>
           </div>
         </nav>
-
+        <ToastContainer />
         <div className="py-8 px-8">
           <div class="relative overflow-x-auto overflow-y-auto shadow-md sm:rounded-lg">
             <h1 class="text-2xl font-semibold text-white dark:text-white"> CANCIONES </h1>
@@ -189,6 +395,11 @@ const filteredArtistas = artista.filter((artista) =>
                   </th>
                   <th scope="col" class="px-6 py-3">
                     Artista
+                  </th>
+                  <th scope="col" class="px-6 py-3">
+                  </th>
+
+                  <th scope="col" class="px-6 py-3">
                   </th>
 
                   <th scope="col" class="px-6 py-3">
@@ -235,7 +446,35 @@ const filteredArtistas = artista.filter((artista) =>
                           </svg>
                         </button>
                       </td>
+
                     </td>
+                    <td class="px-6 py-4"><div
+                    className="text-gray-500 hover:text-lightPurple flex items-center justify-center relative" // Añadida la clase "relative"
+                    onClick={()=>toggleLike(value)}
+                    //onMouseEnter={handleMouseEnterFavorite}
+                   // onMouseLeave={handleMouseLeaveFavorite}
+                >
+                    {value.isLiked ? <AiFillHeart className="text-xl text-lightPurple" /> : <AiOutlineHeart className="text-xl" />}
+                    
+                    {/*showMessage1 && (
+                        <div className="bg-gray-900 text-white py-1 px-2 rounded-md absolute top-10 left-0 mt-2 ml-2"> 
+                            Añadir a favoritos
+                        </div>
+                    )*/}
+
+                    {/*showMessage2 && (
+                        <div className="bg-gray-900 text-white py-1 px-2 rounded-md absolute top-10 left-0 mt-2 ml-2">
+                            Quitar de favoritos
+                        </div>
+                    )*/}
+                </div></td>
+                    <td class="px-6 py-4"><div
+                    className="text-gray-500 hover:text-lightPurple flex items-center justify-center relative" // Añadida la clase "relative"
+                    onClick={()=>handleOptionPlaylist(value.id_cancion, value.id_album)}
+                >
+                    <BsPlusCircle className="text-xl" />
+                    
+                </div></td>
                   </tr>
                 ))}
               </tbody>
@@ -348,7 +587,59 @@ const filteredArtistas = artista.filter((artista) =>
             </table>
           </div>
         </div>
+        {isModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-black p-8 rounded shadow-lg">
+            <h2 className="text-xl mb-4">Selecciona la playlist a agregar</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label
+                  className="block text-white text-sm font-bold mb-2"
+                  htmlFor="nombre"
+                >
+                  PLAYLIST
+                </label>
+                <select
+                  className="block appearance-none w-full bg-white border border-lightPurple text-black hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                  id="example-select"
+                  value={playlist_seleccionada}
+                  onChange={handleSelectChange}
+                >
+                  <option selected={true} className="text-black" value="">
+                    Selecciona una playlist
+                  </option>
+                  {playlists.map((playlist, i) => (
+                    <option
+                      className="text-black"
+                      key={playlist.id_playlist}
+                      value={playlist.id_playlist}
+                    >
+                      {playlist.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="submit"
+                className="bg-lightPurple text-white hover:bg-white hover:text-lightPurple font-bold py-2 px-4 rounded"
+                onClick={handleAddSongtoPlaylist}
+              >
+                Agregar
+              </button>
+              <button
+                type="submit"
+                className="bg-lightPurple text-white hover:bg-white hover:text-lightPurple font-bold py-2 px-4 rounded ml-3"
+                onClick={handleCancelarModal}
+              >
+                Cancelar
+              </button>
+            </form>
+          </div>
+          
+        </div>
+      )}
       </div>
+
     </>
   );
 }
