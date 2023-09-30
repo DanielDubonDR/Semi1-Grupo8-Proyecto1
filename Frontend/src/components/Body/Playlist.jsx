@@ -41,7 +41,7 @@ function Playlist() {
         if(!logueado){
             navigate('/login');
         }
-        const user_data = JSON.parse(sessionStorage.getItem('data_user'));
+        const user_data = JSON.parse(localStorage.getItem('data_user'));
         Service.getDataUser(user_data.id)
         .then(response => {
             setNombre(response.data.nombres);
@@ -56,9 +56,9 @@ function Playlist() {
             setPortada(info_playlist.path_portada);
         })
 
-        Service.getCancionesPlaylist(id)
+        Service.getCancionesPlaylist(id, user_data.id)
         .then(response => {
-            setCanciones(response.data);
+            setCanciones(response.data.songsWithLike);
         })
         
         Service.getPlaylists(user_data.id)
@@ -66,6 +66,7 @@ function Playlist() {
             response.data.shift()
             setPlaylists(response.data);
         })
+        
     }, [logueado]);
 
     const openModal = () => {

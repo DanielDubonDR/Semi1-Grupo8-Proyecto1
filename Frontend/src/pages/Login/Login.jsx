@@ -63,7 +63,7 @@ function Login() {
           id: response.data.datosUusario.id_usuario,
           rol: response.data.datosUusario.rol
         }
-        sessionStorage.setItem('data_user', JSON.stringify(data_a_guardar));
+        localStorage.setItem('data_user', JSON.stringify(data_a_guardar));
         setLogueado(true);
         navigate('/user/home');
       })

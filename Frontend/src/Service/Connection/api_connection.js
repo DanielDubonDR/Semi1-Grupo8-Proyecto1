@@ -52,6 +52,12 @@ export const getDataUser = async (id) => {
     return response;
 }
 
+//Obtener el historial del usuario
+export const getHistorial = async (id) => {
+    const response = await instance.get(`/usuario/ver/historico/${id}`);
+    return response;
+}
+
 //-----------------------PLAYLISTS-----------------------
 //Crear playlist
 export const crearPlaylist = async (data) => {
@@ -101,8 +107,8 @@ export const getPlaylist = async (id) => {
 }
 
 //Obtener las canciones de la playlist
-export const getCancionesPlaylist = async (id) => {
-    const res = await instance.get(`/playlist/ver/${id}`);
+export const getCancionesPlaylist = async (id, id_user) => {
+    const res = await instance.get(`/home/playlist/user/${id_user}/${id}`);
     return res;
 }
 
@@ -133,8 +139,8 @@ export const getAlbumsbyArtist = async (id_artista) => {
     return res
 }
 
-export const getCancionesbyArtist = async (id_artista) => {
-    const res = await instance.get(`/artista/ver/canciones/${id_artista}`)
+export const getCancionesbyArtist = async (id_artista, id_user) => {
+    const res = await instance.get(`/home/artista/canciones/user/${id_user}/${id_artista}`)
     return res
 }
 
@@ -327,8 +333,11 @@ export const eliminarArtista = async (data) => {
 }
 
 //listar canciones en un album:
-export const listarCancionesAlbum = async (id) => {
-    const res = await instance.get(`/album/ver/canciones/${id}`);
+export const listarCancionesAlbum = async (id, id_user) => {
+    console.log(id_user);
+    console.log(id)
+    const res = await instance.get(`/home/album/user/${id_user}/${id}`);
+    console.log(res);
     return res;
 }
 

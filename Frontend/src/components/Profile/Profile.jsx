@@ -24,7 +24,7 @@ function Profile(){
       if(!logueado){
           navigate('/login');
       }
-      const user_data = JSON.parse(sessionStorage.getItem('data_user'));
+      const user_data = JSON.parse(localStorage.getItem('data_user'));
       console.log(user_data.id)
       Service.getDataUser(user_data.id)
       .then(response => {

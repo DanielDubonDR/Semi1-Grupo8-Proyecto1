@@ -1,14 +1,14 @@
-import Perfil from "./Perfil2";
-import React, {useState, useEffect} from "react";
-import "./style_top3.css";
-import Service from "../../Service/Service";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Service from "../../Service/Service";
 import { useUserContext } from '../../context/UserContext';
+import Perfil from "./Perfil2";
+import "./style_top3.css";
 
 
 export default function Top3_artistas() {
   const [profiles, setProfiles] = useState();
-  const usuario = JSON.parse(sessionStorage.getItem('data_user'));
+  const usuario = JSON.parse(localStorage.getItem('data_user'));
   useEffect(() => {
     const fetchData = async () => {
       try {

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Puestos from "./puestos_canciones";
-import Service from "../../Service/Service";
 import { useNavigate } from "react-router-dom";
+import Service from "../../Service/Service";
 import { useUserContext } from '../../context/UserContext';
+import Puestos from "./puestos_canciones";
 
 export default function Top5_Canciones() {
     const [canciones, setCanciones] = useState();
-    const usuario = JSON.parse(sessionStorage.getItem('data_user'));
+    const usuario = JSON.parse(localStorage.getItem('data_user'));
     console.log(usuario);
     useEffect(() => {
         const fetchData = async () => {

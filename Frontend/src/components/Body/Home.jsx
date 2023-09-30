@@ -28,7 +28,7 @@ function Home(){
         if(!logueado){
             navigate('/login');
         }
-        const user_data = JSON.parse(sessionStorage.getItem('data_user'));
+        const user_data = JSON.parse(localStorage.getItem('data_user'));
         Service.getDataUser(user_data.id)
         .then(response => {
             const hora = new Date().getHours();

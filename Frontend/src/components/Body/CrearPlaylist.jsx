@@ -73,7 +73,7 @@ const CrearPlaylist = () => {
         formData.append('nombre', name);
         formData.append('descripcion', description);
         formData.append('portada', image);
-        const user_data = JSON.parse(sessionStorage.getItem('data_user'));
+        const user_data = JSON.parse(localStorage.getItem('data_user'));
         formData.append('id_usuario', user_data.id);
         console.log(formData);
         Service.crearPlaylist(formData)

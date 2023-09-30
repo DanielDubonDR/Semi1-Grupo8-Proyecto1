@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { BsPlusCircle } from "react-icons/bs";
+import { toast } from 'react-toastify';
 import Service from "../../Service/Service";
-function Song({order, track, artist}){
+function Song({order, track, artist, opcion,idSongModal,idSongAlbumModa}){
     const [isLiked, setIsLiked] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
     const [showMessage1, setShowMessage1] = useState(false);
@@ -22,17 +23,89 @@ function Song({order, track, artist}){
         })
 
         setNombres(artist.nombres +" "+ artist.apellidos);
+        setIsLiked(track.isLiked)
     }, [])
     const handleMouseEnter = () => {
         setShowMessage(true);
     };
     console.log(nombres)
-    const toggleLike = () => {
-        setIsLiked(!isLiked);
-    };
 
     const handleMouseLeave = () => {
     setShowMessage(false);
+    };
+    const toggleLike = () => {
+        if(isLiked==false){
+            const data = {
+                id_cancion: track.id_cancion,
+                id_album: track.id_album,
+                id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+            }
+            Service.addFavorito(data)
+            .then(response => {
+                if(response.data.status){
+                    toast.success('Se añadió tu canción a Favoritos!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                        });
+                    setIsLiked(true);
+                    setTimeout(() => {
+                        navigate('/user/home');
+                    },1000)
+                }else{
+                    toast.error('Ocurrio un Error!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                        });
+                    }
+            })
+        }else{
+            const data = {
+                id_cancion: track.id_cancion,
+                id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+            }
+            Service.deleteFavorito(data)
+            .then(response => {
+                if(response.data.status){
+                    toast.success('Se eliminó tu canción de Favoritos!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                        });
+                    setIsLiked(false);
+                    setTimeout(() => {
+                        navigate('/user/home');
+                    },1000)
+                }else{
+                    toast.error('Ocurrio un Error!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                        });
+                    }
+            })
+        }
     };
     const handleMouseEnterFavorite = () => {
         if (isLiked) {
@@ -41,6 +114,12 @@ function Song({order, track, artist}){
             setShowMessage1(true); // Mostrar "Añadir a favoritos"
         }
     };
+
+    const handleOptionPlaylist = () => {
+        opcion()
+        idSongModal(track.id_cancion)
+        idSongAlbumModal(track.id_album)
+    }
 
     const handleMouseLeaveFavorite = () => {
         setShowMessage1(false);
@@ -88,6 +167,7 @@ function Song({order, track, artist}){
                 </div>
                 <div
                     className="text-gray-500 hover:text-lightPurple flex items-center justify-center relative" // Añadida la clase "relative"
+                    onClick={handleOptionPlaylist}
                 >
                     <BsPlusCircle className="text-xl" />
                     {/*isLiked ? <AiFillHeart className="text-xl text-lightPurple" /> : <AiOutlineHeart className="text-xl" />*/}

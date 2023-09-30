@@ -6,7 +6,7 @@ const MyPlaylists = () => {
   const [playlists, setPlaylists] = useState([]);
   const [nombre, setNombre] = useState('');
   useEffect(() => {
-    const user_data = JSON.parse(sessionStorage.getItem("data_user"));
+    const user_data = JSON.parse(localStorage.getItem("data_user"));
     Service.getDataUser(user_data.id)
     .then(response => {
         setNombre(response.data.nombres);

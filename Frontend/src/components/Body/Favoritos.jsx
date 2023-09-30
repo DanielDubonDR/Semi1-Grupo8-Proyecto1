@@ -29,7 +29,7 @@ function Favoritos() {
 
     useEffect(() => {
         setColor(shuffle(colors).pop());
-        const user_data = JSON.parse(sessionStorage.getItem('data_user'));
+        const user_data = JSON.parse(localStorage.getItem('data_user'));
         Service.getDataUser(user_data.id)
         .then(response => {
             console.log(response)
@@ -43,17 +43,13 @@ function Favoritos() {
         .then((response) => {
             setPlaylists(response.data);
             setId(response.data[0].id_playlist);
-            Service.getCancionesPlaylist(response.data[0].id_playlist)
+            Service.getCancionesPlaylist(response.data[0].id_playlist, user_data.id)
             .then(response => {
-                setCanciones(response.data);
+                setCanciones(response.data.songsWithLike);
             })
         })
-
-        Service.getHomeSongs(user_data.id)
-        .then(response => {
-            setFullCanciones(response.data);
-        })
     }, []);
+
     const openModal = () => {
         setIsModal(true);
     }

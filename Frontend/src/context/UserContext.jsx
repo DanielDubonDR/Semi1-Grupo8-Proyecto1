@@ -3,7 +3,7 @@ import { createContext, useContext, useState } from 'react';
 export const UserContext = createContext();
 
 const UserProvider = ({children}) =>{
-    const user = JSON.parse(sessionStorage.getItem('data_user'));
+    const user = JSON.parse(localStorage.getItem('data_user'));
     let data_u = false;
     if(user){
         data_u = true;

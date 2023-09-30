@@ -24,7 +24,7 @@ const SongCard = ({song, isPlaying, activeSong, opcion,idSongModal,idSongAlbumMo
             const data = {
                 id_cancion: song.id_cancion,
                 id_album: song.id_album,
-                id_usuario: JSON.parse(sessionStorage.getItem('data_user')).id
+                id_usuario: JSON.parse(localStorage.getItem('data_user')).id
             }
             Service.addFavorito(data)
             .then(response => {
@@ -56,7 +56,7 @@ const SongCard = ({song, isPlaying, activeSong, opcion,idSongModal,idSongAlbumMo
         }else{
             const data = {
                 id_cancion: song.id_cancion,
-                id_usuario: JSON.parse(sessionStorage.getItem('data_user')).id
+                id_usuario: JSON.parse(localStorage.getItem('data_user')).id
             }
             Service.deleteFavorito(data)
             .then(response => {

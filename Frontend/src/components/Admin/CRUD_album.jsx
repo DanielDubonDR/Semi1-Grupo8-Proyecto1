@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { albumes } from "../datos_test/albumes";
 import { ToastContainer, toast } from "react-toastify";
 import Service from "../../Service/Service";
-import { set } from "lodash";
-import { json } from "react-router-dom";
 export default function CRUD_album() {
   const [data, setData] = useState({});
-  const usuario = JSON.parse(sessionStorage.getItem("data_user"));
+  const usuario = JSON.parse(localStorage.getItem("data_user"));
   const [albumes, setAlbumes] = useState([]);
   const [artistasDisponibles, setArtistasDisponibles] = useState([]);
 
@@ -48,7 +45,7 @@ export default function CRUD_album() {
 }
 
 function Item_CRUD_album(data, artistasDisponibles) {
-  const usuario = JSON.parse(sessionStorage.getItem("data_user"));
+  const usuario = JSON.parse(localStorage.getItem("data_user"));
   const showToastMessageError = () => {
     toast.error("Ha ocurrido un error - el álbum no ha sido eliminado.", {
       position: toast.POSITION.TOP_RIGHT,

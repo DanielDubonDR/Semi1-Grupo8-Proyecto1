@@ -48,11 +48,11 @@ function Album() {
             })
         })
 
-        Service.listarCancionesAlbum(id)
+        Service.listarCancionesAlbum(id, JSON.parse(localStorage.getItem('data_user')).id)
         .then(response => {
-            setCanciones(response.data);
+            setCanciones(response.data.songsWithLike);
         })
-        const user_data = JSON.parse(sessionStorage.getItem('data_user'));
+        const user_data = JSON.parse(localStorage.getItem('data_user'));
         Service.getPlaylists(user_data.id)
         .then((response) => {
             response.data.shift()
@@ -60,7 +60,7 @@ function Album() {
         })
 
     }, []);
-
+    console.log(canciones)
     const openModal = () => {
         setIsModal(true);
     }
@@ -168,7 +168,7 @@ function Album() {
             })
         }
     }
-
+    console.log(nombre)
     return (
         <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide">
             <Header_name/>
@@ -190,7 +190,7 @@ function Album() {
                 <SongsAlbum
                 canciones={canciones}
                 artist={nombre_artista}
-                album={nombre}
+                name_album={nombre}
                 opcion={handleAbrirModal}
                 idSongModal={setIdSongModal}
                 idSongAlbumModal={setIdSongAlbumModal}

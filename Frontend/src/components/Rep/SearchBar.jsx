@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from "../../context/UserContext";
 import Service from "../../Service/Service";
+import { useUserContext } from "../../context/UserContext";
 import { usePlayer } from "../../context_Player/playerContext";
 
 export default function Navbar({ fixed }) {
@@ -16,7 +16,7 @@ export default function Navbar({ fixed }) {
   const handleInputChange = (e) => {
     setSearchText(e.target.value);
   };
-  const usuario = JSON.parse(sessionStorage.getItem('data_user'));
+  const usuario = JSON.parse(localStorage.getItem('data_user'));
   useEffect(() => {
     const fetchData = async () => {
       try {

@@ -2,12 +2,11 @@
 import { shuffle } from 'lodash';
 import React, { useEffect, useState } from "react";
 import { BsPlayFill } from "react-icons/bs";
-import { useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import Service from '../../Service/Service';
+import { usePlayer } from "../../context_Player/playerContext";
 import Header_name from "./Header_name";
 import SongsAlbum2 from './SongsAlbum2';
-import { usePlayer } from "../../context_Player/playerContext";
 const colors = [
     "from-indigo-500",
     "from-blue-500",
@@ -30,7 +29,7 @@ function Radio() {
     const [idSongAlbumModal, setIdSongAlbumModal] = useState('');
     const [playlist_seleccionada, setPlaylist_seleccionada] = useState('');
     const [canciones_playlist, setCanciones_playlist] = useState([]);
-    const usuario = JSON.parse(sessionStorage.getItem("data_user"));
+    const usuario = JSON.parse(localStorage.getItem("data_user"));
     function suffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
           let j = Math.floor(Math.random() * (i + 1));

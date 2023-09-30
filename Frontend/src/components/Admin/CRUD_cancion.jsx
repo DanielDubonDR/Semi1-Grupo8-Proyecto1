@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { canciones } from "../datos_test/canciones";
+import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import Service from "../../Service/Service";
 import { useUserContext } from "../../context/UserContext";
-import { useNavigate } from "react-router-dom";
-import { set } from "lodash";
 
 export default function CRUD_cancion() {
   const [data, setData] = useState({});
-  const usuario = JSON.parse(sessionStorage.getItem("data_user"));
+  const usuario = JSON.parse(localStorage.getItem("data_user"));
   const [artista, setArtista] = useState([]);
   const [canciones, setCanciones] = useState([]);
   useEffect(() => {
@@ -59,7 +57,7 @@ export default function CRUD_cancion() {
 }
 
 function Item_CRUD_cancion(data, data2) {
-  const usuario = JSON.parse(sessionStorage.getItem("data_user"));
+  const usuario = JSON.parse(localStorage.getItem("data_user"));
   const [canci, setCanci] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showSongs, setShowSongs] = useState(false);

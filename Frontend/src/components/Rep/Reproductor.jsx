@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import Service from "../../Service/Service";
+import { useUserContext } from "../../context/UserContext";
+import { usePlayer } from "../../context_Player/playerContext";
 import { canciones } from "../datos_test/canciones";
 import Barra from "./Barra";
 import "./Reproductor.css";
 import Vol from "./Volumen";
-import Service from "../../Service/Service";
-import { useNavigate } from "react-router-dom";
-import { useUserContext } from "../../context/UserContext";
-import { usePlayer } from "../../context_Player/playerContext";
 
 function Reproductor() {
   const {
@@ -18,7 +18,7 @@ function Reproductor() {
     setReproduciendose,
   } = usePlayer();
 
-  const usuario = JSON.parse(sessionStorage.getItem("data_user"));
+  const usuario = JSON.parse(localStorage.getItem("data_user"));
   const audioElem = useRef();
 
   useEffect(() => {

@@ -1,13 +1,12 @@
-import React from "react";
-import PuestosA from "./puestos_albumes";
-import { useEffect, useState } from "react";
-import Service from "../../Service/Service";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Service from "../../Service/Service";
 import { useUserContext } from '../../context/UserContext';
+import PuestosA from "./puestos_albumes";
 
 export default function Top5_Albumes() {
   const [albumes, setAlbumes] = useState();
-  const usuario = JSON.parse(sessionStorage.getItem('data_user'));
+  const usuario = JSON.parse(localStorage.getItem('data_user'));
   useEffect(() => {
     const fetchData = async () => {
       try {

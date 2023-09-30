@@ -10,7 +10,7 @@ function Header_name() {
     const {logueado, setLogueado} = useUserContext();
     const navigate = useNavigate();
     const handlelogout = () => {
-        sessionStorage.removeItem('data_user');
+        localStorage.removeItem('data_user');
         setLogueado(false);
         navigate('/login');
     }
@@ -18,7 +18,7 @@ function Header_name() {
     const [name_user, setName_user] = useState('');
 
     useEffect(() => {
-        const user_data = JSON.parse(sessionStorage.getItem('data_user'));
+        const user_data = JSON.parse(localStorage.getItem('data_user'));
         console.log(user_data.id)
         Service.getDataUser(user_data.id)
         .then(response => {
