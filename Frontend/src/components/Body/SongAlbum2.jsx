@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
-import { BsPlusCircle } from "react-icons/bs";
+import { BsPlay, BsPlusCircle } from "react-icons/bs";
 import Service from "../../Service/Service";
+import { usePlayer } from "../../context_Player/playerContext";
 function Song_Album2({order, track, artist, name_album, opcion,idSongModal,idSongAlbumModal}){
     const [isLiked, setIsLiked] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
     const [showMessage1, setShowMessage1] = useState(false);
     const [showMessage2, setShowMessage2] = useState(false);
     const [duracion, setDuracion] = useState('');
+    const { cancionActual, setCancionActual, canc, setCanc, reproduciendose, setReproduciendose } = usePlayer();
     useEffect(() => {
         Service.getCancion(track.id_cancion)
         .then(response => {
@@ -26,6 +28,23 @@ function Song_Album2({order, track, artist, name_album, opcion,idSongModal,idSon
     const handleMouseLeave = () => {
     setShowMessage(false);
     };
+    const handleSetSong = async (cancion) => {
+        try {
+        setCancionActual(cancion);
+        setCanc([cancion])
+          let values = {
+            id_cancion: cancion.id_cancion,
+            id_album: cancion.id_album,
+            id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+          }
+          console.log(values);
+          let res = await Service.postReproduccion(values);
+          console.log(res.data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+        setReproduciendose(true);
+      };
     const handleMouseEnterFavorite = () => {
         if (isLiked) {
             setShowMessage2(true); // Mostrar "Quitar de favoritos"
@@ -98,6 +117,9 @@ function Song_Album2({order, track, artist, name_album, opcion,idSongModal,idSon
                 </div>
 
                 <p>{duracion}</p>
+                <div className="text-gray-500 hover:text-lightPurple flex items-center justify-center relative">
+                    <BsPlay className="text-xl" onClick={()=> handleSetSong(track)}/>
+                </div>
             </div>
         </div>
     )

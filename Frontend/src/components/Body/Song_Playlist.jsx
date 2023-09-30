@@ -4,6 +4,7 @@ import { BsPlay, BsPlusCircle } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import Service from "../../Service/Service";
+import { usePlayer } from "../../context_Player/playerContext";
 import ContextMenu from "../contextmenu/contextmenu";
 function Song_Playlist({order, track, id_playlist, opcion,idSongModal,idSongAlbumModal}){
     const [isLiked, setIsLiked] = useState(false);
@@ -14,6 +15,7 @@ function Song_Playlist({order, track, id_playlist, opcion,idSongModal,idSongAlbu
     const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
     const [nombre_artista, setNombre_artista] = useState('');
     const [nombre_album, setNombre_album] = useState('');
+    const { cancionActual, setCancionActual, canc, setCanc, reproduciendose, setReproduciendose } = usePlayer();
     const navigate = useNavigate();
     const handleMouseEnter = () => {
         setShowMessage(true);
@@ -97,6 +99,24 @@ function Song_Playlist({order, track, id_playlist, opcion,idSongModal,idSongAlbu
             })
         }
     };
+
+    const handleSetSong = async (cancion) => {
+        try {
+        setCancionActual(cancion);
+        setCanc([cancion])
+          let values = {
+            id_cancion: cancion.id_cancion,
+            id_album: cancion.id_album,
+            id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+          }
+          console.log(values);
+          let res = await Service.postReproduccion(values);
+          console.log(res.data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+        setReproduciendose(true);
+      };
 
     const handleMouseLeave = () => {
     setShowMessage(false);
@@ -210,7 +230,7 @@ function Song_Playlist({order, track, id_playlist, opcion,idSongModal,idSongAlbu
 
                 <p>{track.duration}</p>
                 <div className="text-gray-500 hover:text-lightPurple flex items-center justify-center relative">
-                    <BsPlay className="text-xl" />
+                    <BsPlay className="text-xl" onClick={()=> handleSetSong(track)}/>
                 </div>
             </div>
             <ContextMenu

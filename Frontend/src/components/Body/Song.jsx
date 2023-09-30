@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
-import { BsPlusCircle } from "react-icons/bs";
+import { BsPlay, BsPlusCircle } from "react-icons/bs";
 import { toast } from 'react-toastify';
 import Service from "../../Service/Service";
+import { usePlayer } from "../../context_Player/playerContext";
+
 function Song({order, track, artist, opcion,idSongModal,idSongAlbumModa}){
     const [isLiked, setIsLiked] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
@@ -11,6 +13,8 @@ function Song({order, track, artist, opcion,idSongModal,idSongAlbumModa}){
     const [album, setAlbum] = useState('');
     const [duracion, setDuracion] = useState('');
     const [nombres, setNombres] = useState('');
+    const [song, setSong] = useState([]);
+    const { cancionActual, setCancionActual, canc, setCanc, reproduciendose, setReproduciendose } = usePlayer();
     useEffect(() => {
         Service.getAlbum(track.id_album)
         .then(response => {
@@ -19,9 +23,9 @@ function Song({order, track, artist, opcion,idSongModal,idSongAlbumModa}){
 
         Service.getCancion(track.id_cancion)
         .then(response => {
+            setSong(response.data);
             setDuracion(response.data.duracion);
         })
-
         setNombres(artist.nombres +" "+ artist.apellidos);
         setIsLiked(track.isLiked)
     }, [])
@@ -30,6 +34,23 @@ function Song({order, track, artist, opcion,idSongModal,idSongAlbumModa}){
     };
     console.log(nombres)
 
+    const handleSetSong = async (cancion) => {
+        try {
+        setCancionActual(cancion);
+        setCanc([cancion])
+          let values = {
+            id_cancion: cancion.id_cancion,
+            id_album: cancion.id_album,
+            id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+          }
+          console.log(values);
+          let res = await Service.postReproduccion(values);
+          console.log(res.data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+        setReproduciendose(true);
+      };
     const handleMouseLeave = () => {
     setShowMessage(false);
     };
@@ -126,7 +147,7 @@ function Song({order, track, artist, opcion,idSongModal,idSongAlbumModa}){
         setShowMessage2(false);
     };
     return (
-        <div className="grid grid-cols-3 text-gray-500 py-4 px-5 hover:bg-gray-900 rounded-lg cursor-pointer">
+        <div className="grid grid-cols-3 text-gray-500 py-4 px-5 hover:bg-gray-900 rounded-lg cursor-pointer" >
             <div className="flex items-center space-x-4 ">
                 <p>{order +1}</p>
                 <img 
@@ -180,6 +201,9 @@ function Song({order, track, artist, opcion,idSongModal,idSongAlbumModa}){
                 </div>
 
                 <p>{duracion}</p>
+                <div className="text-gray-500 hover:text-lightPurple flex items-center justify-center relative">
+                    <BsPlay className="text-xl" onClick={()=> handleSetSong(song)}/>
+                </div>
             </div>
         </div>
     )

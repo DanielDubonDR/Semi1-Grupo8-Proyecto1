@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
-import { BsPlusCircle } from "react-icons/bs";
+import { BsPlay, BsPlusCircle } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import Service from "../../Service/Service";
 import { useUserContext } from '../../context/UserContext';
+import { usePlayer } from "../../context_Player/playerContext";
 function Song_Album({order, track, artist, name_album, opcion,idSongModal,idSongAlbumModal}){
     const [isLiked, setIsLiked] = useState(false);
     const {logueado, setLogueado} = useUserContext();
@@ -12,6 +13,7 @@ function Song_Album({order, track, artist, name_album, opcion,idSongModal,idSong
     const [showMessage1, setShowMessage1] = useState(false);
     const [showMessage2, setShowMessage2] = useState(false);
     const [duracion, setDuracion] = useState('');
+    const { cancionActual, setCancionActual, canc, setCanc, reproduciendose, setReproduciendose } = usePlayer();
     const navigate = useNavigate();
     console.log(name_album)
     useEffect(() => {
@@ -121,6 +123,23 @@ function Song_Album({order, track, artist, name_album, opcion,idSongModal,idSong
         idSongModal(track.id_cancion)
         idSongAlbumModal(track.id_album)
     }
+    const handleSetSong = async (cancion) => {
+        try {
+        setCancionActual(cancion);
+        setCanc([cancion])
+          let values = {
+            id_cancion: cancion.id_cancion,
+            id_album: cancion.id_album,
+            id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+          }
+          console.log(values);
+          let res = await Service.postReproduccion(values);
+          console.log(res.data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+        setReproduciendose(true);
+      };
     return (
         <div className="grid grid-cols-3 text-gray-500 py-4 px-5 hover:bg-gray-900 rounded-lg cursor-pointer">
             <div className="flex items-center space-x-4 ">
@@ -176,6 +195,9 @@ function Song_Album({order, track, artist, name_album, opcion,idSongModal,idSong
                 </div>
 
                 <p>{duracion}</p>
+                <div className="text-gray-500 hover:text-lightPurple flex items-center justify-center relative">
+                    <BsPlay className="text-xl" onClick={()=> handleSetSong(track)}/>
+                </div>
             </div>
         </div>
     )

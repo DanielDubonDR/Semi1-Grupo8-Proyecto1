@@ -3,6 +3,8 @@ import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { BsPlusCircle } from "react-icons/bs";
 import { toast } from 'react-toastify';
 import Service from "../../Service/Service";
+import { usePlayer } from "../../context_Player/playerContext";
+import PlayPause from "./PlayPause";
 
 const SongCard = ({song, isPlaying, activeSong, opcion,idSongModal,idSongAlbumModal, i}) => {
     const [isLiked, setIsLiked] = useState(false);
@@ -10,6 +12,8 @@ const SongCard = ({song, isPlaying, activeSong, opcion,idSongModal,idSongAlbumMo
     const [showMessage1, setShowMessage1] = useState(false);
     const [showMessage2, setShowMessage2] = useState(false);
     const [nameArtista, setNameArtista] = useState('');
+    const [isMouseOver, setIsMouseOver] = useState(false);
+    const { cancionActual, setCancionActual, canc, setCanc, reproduciendose, setReproduciendose } = usePlayer();
 
     useEffect(() => {
         Service.getArtista(song.id_artista)
@@ -120,10 +124,34 @@ const SongCard = ({song, isPlaying, activeSong, opcion,idSongModal,idSongAlbumMo
         idSongModal(song.id_cancion)
         idSongAlbumModal(song.id_album)
     }
+    const handleSetSong = async (cancion) => {
+        try {
+        setCancionActual(cancion);
+        setCanc([cancion])
+          let values = {
+            id_cancion: cancion.id_cancion,
+            id_album: cancion.id_album,
+            id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+          }
+          console.log(values);
+          let res = await Service.postReproduccion(values);
+          console.log(res.data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+        setReproduciendose(true);
+      };
+      
     return(
         <div className="flex flex-col w-[250px] p-4 bg-white bg-opacity-20 backdrop-blur-sm animate-slideup rounded-lg cursor-pointer">
-            <div className="relative w-full h-56 group">
-                {/*<div className={`absolute inset-0 justify-center items-center bg-black bg-opacity-50 group-hover:flex ${activeSong?.title === song.name? 'flex bg-black bg-opacity-70': 'hidden'}`}>
+            <div className="relative w-full h-56 group" onClick={()=> handleSetSong(song)}>
+            <div
+                className={`relative group`}
+                onMouseEnter={() => setIsMouseOver(true)}
+                onMouseLeave={() => setIsMouseOver(false)}
+                >
+                {isMouseOver && (
+                    <div className={`absolute inset-0 justify-center items-center bg-black bg-opacity-50 flex`}>
                     <PlayPause
                         isPlaying={isPlaying}
                         activeSong={activeSong}
@@ -131,8 +159,11 @@ const SongCard = ({song, isPlaying, activeSong, opcion,idSongModal,idSongAlbumMo
                         handlePause={handlePauseClick}
                         handlePlay={handlePlayClick}
                     />
-    </div>*/}
+                    </div>
+                )}
                 <img src={song?.path_imagen} alt="song_img" />
+            </div>
+                
             </div>
             <div className="mt-4 flex flex-col">
                 <p className="font-semibold text-lg text-white truncate">

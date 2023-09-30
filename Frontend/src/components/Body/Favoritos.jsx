@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { BsPlayFill } from "react-icons/bs";
 import { ToastContainer, toast } from 'react-toastify';
 import Service from '../../Service/Service';
+import { usePlayer } from "../../context_Player/playerContext";
 import Header_name from "./Header_name";
 import Songs_Playlist from "./Songs_Playlist";
 
@@ -26,6 +27,7 @@ function Favoritos() {
     const [playlist_seleccionada, setPlaylist_seleccionada] = useState('');
     const [canciones_playlist, setCanciones_playlist] = useState([]);
     const [fullCanciones, setFullCanciones] = useState([]);
+    const { cancionActual, setCancionActual, canc, setCanc, reproduciendose, setReproduciendose } = usePlayer();
 
     useEffect(() => {
         setColor(shuffle(colors).pop());
@@ -49,6 +51,26 @@ function Favoritos() {
             })
         })
     }, []);
+
+    const playFavoritos = async (e) => {
+        e.preventDefault();
+        console.log(canciones);
+        try {
+          setCanc(canciones);
+          setCancionActual(canciones[0]);
+      
+          let values = {
+            id_cancion: canciones[0].id_cancion,
+            id_album: canciones[0].id_album,
+            id_usuario: usuario.id
+          }
+          let res2 = await Service.postReproduccion(values);
+          console.log(res2.data);
+          setReproduciendose(true);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
 
     const openModal = () => {
         setIsModal(true);
@@ -166,7 +188,7 @@ function Favoritos() {
                     <h1 className="text-2xl md:text-3xl xl:text-5xl font-bold">Mis Favoritos</h1>
                     <p>{name_user + " " + apellido_user}</p>
                 </div>
-                <button className="bg-purple hover:bg-purple-700 text-white rounded-full p-3 absolute top-1/2 right-4 transform -translate-y-1/2 shadow-lg">
+                <button className="bg-purple hover:bg-purple-700 text-white rounded-full p-3 absolute top-1/2 right-4 transform -translate-y-1/2 shadow-lg" onClick={(e) => playFavoritos(e)}>
                     <BsPlayFill className="h-12 w-12" />
                 </button>
             </section>
