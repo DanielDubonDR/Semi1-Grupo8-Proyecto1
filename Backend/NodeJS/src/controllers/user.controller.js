@@ -131,14 +131,10 @@ const compararPassword = async (password, passwordCifrado) => {
 export const setHistory = async (req, res) => {
 
     try{
-        const { id_cancion, id_album, id_usuario } = req.body;
+        const { id_cancion, id_album, id_usuario, fecha } = req.body;
         let status = false;
-
-        const currentDatetime = new Date();
-        const formattedDatetime = currentDatetime.toISOString().slice(0, 19).replace('T', ' ');
-
         
-        const query = await pool.query("INSERT INTO historico (id_cancion, id_album, id_usuario, fecha) VALUES (?, ?, ?, ?)", [id_cancion, id_album, id_usuario, formattedDatetime]);
+        const query = await pool.query("INSERT INTO historico (id_cancion, id_album, id_usuario, fecha) VALUES (?, ?, ?, ?)", [id_cancion, id_album, id_usuario, fecha]);
         status = query[0].affectedRows > 0;
 
         return res.send({ "status": status });
