@@ -7,6 +7,9 @@ BlueprintAlbum = Blueprint('album', __name__)
 
 @BlueprintAlbum.route('/album/crear', methods=['POST'])
 def crearAlbum():
+    #Conexion a la base de datos
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         #variables que se reciben del front en un formulario
         nombre = request.form['nombre']
@@ -21,9 +24,7 @@ def crearAlbum():
 
         status = False
 
-        #Conexion a la base de datos
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
+        
 
         #Guardar la imagen
         nombre_imagen = guardarObjeto(BytesIO(data), extension,"Fotos/")
@@ -39,14 +40,16 @@ def crearAlbum():
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintAlbum.route('/album/listar', methods=['GET'])
 def listarAlbum():
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT * FROM album;") #id_album, id_artista, nombre, descripcion, id_imagen, path_imagen
         album = cursor.fetchall()
         #Pasar a un json
@@ -63,14 +66,16 @@ def listarAlbum():
         conexion.close()
         return jsonify(album)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([])
 
 @BlueprintAlbum.route('/album/ver/album/<id_album>', methods=['GET'])
 def verAlbumId(id_album):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT * FROM album WHERE id_album = %s;", (id_album,))
         album = cursor.fetchone()
         #Pasar a un json
@@ -86,14 +91,16 @@ def verAlbumId(id_album):
         conexion.close()
         return jsonify(album)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({})
 
 @BlueprintAlbum.route('/album/ver/<id_artista>', methods=['GET'])
 def verAlbum(id_artista):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT * FROM album WHERE id_artista = %s;", (id_artista,))
         album = cursor.fetchall()
         cursor.close()
@@ -110,14 +117,16 @@ def verAlbum(id_artista):
             }
         return jsonify(album)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([])
 
 @BlueprintAlbum.route('/album/ver/canciones/<id_album>', methods=['GET'])
 def verCancionesAlbum(id_album):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT cancion.*, id_album FROM cancion INNER JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion WHERE cancion_album.id_album = %s;", (id_album,))
         album = cursor.fetchall()
         #Pasar a un json
@@ -136,19 +145,21 @@ def verCancionesAlbum(id_album):
         conexion.close()
         return jsonify(album)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([])
 
 @BlueprintAlbum.route('/album/modificar/info/<id_album>', methods=['PATCH'])
 def modificarAlbum(id_album):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         #variables que se reciben del front en un json
         nombre = request.json['nombre']
         descripcion = request.json['descripcion']
         id_artista = request.json['id_artista']
 
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("UPDATE album SET nombre = %s, descripcion = %s, id_artista = %s WHERE id_album = %s;", (nombre, descripcion, id_artista, id_album))
         
         status = cursor.rowcount > 0
@@ -159,11 +170,15 @@ def modificarAlbum(id_album):
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintAlbum.route('/album/modificar/imagen/<id_album>', methods=['PATCH'])
 def modificarImagenAlbum(id_album):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         #variables que se reciben del front en un formulario
         imagen = request.files['imagen']
@@ -175,9 +190,6 @@ def modificarImagenAlbum(id_album):
 
         status = False
 
-        #Conexion a la base de datos
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         #Eliminar la imagen anterior y guardar la nueva
         cursor.execute("SELECT id_imagen FROM album WHERE id_album = %s;", (id_album,))
 
@@ -198,18 +210,19 @@ def modificarImagenAlbum(id_album):
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 #Falta probar hasta que se creen canciones
 @BlueprintAlbum.route('/album/add/song', methods=['POST'])
 def addSong():
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         id_album = request.json['id_album']
         id_cancion = request.json['id_cancion']
-
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
 
         cursor.execute("INSERT INTO cancion_album (id_album, id_cancion) VALUES (%s, %s);", (id_album, id_cancion))
 
@@ -221,11 +234,15 @@ def addSong():
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintAlbum.route('/album/eliminar/', methods=['DELETE'], strict_slashes=False)
 def eliminarAlbum():
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         data = request.get_json()
         idAlbum = data['idAlbum']
@@ -233,8 +250,6 @@ def eliminarAlbum():
         password = data['password']
         status = False
 
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT * FROM usuario WHERE id_usuario = %s;", (idUser,))
         result = cursor.fetchone()
 
@@ -267,19 +282,22 @@ def eliminarAlbum():
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintAlbum.route('/album/eliminar/song', methods=['DELETE'])
 def deleteSongAlbum():
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         data = request.get_json()
         id_album = data['id_album']
         id_cancion = data['id_cancion']
         status = False
         try:
-            conexion = obtenerConexion()
-            cursor = conexion.cursor()
+            
             cursor.execute("DELETE FROM cancion_album WHERE id_album = %s AND id_cancion = %s;", (id_album, id_cancion))
             status = cursor.rowcount > 0
             conexion.commit()
@@ -287,8 +305,12 @@ def deleteSongAlbum():
             cursor.close()
             conexion.close()
         except:
+            cursor.close()
+            conexion.close()
             status = False
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})

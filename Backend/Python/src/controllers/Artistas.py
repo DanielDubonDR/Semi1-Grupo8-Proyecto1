@@ -7,6 +7,9 @@ BlueprintArtistas = Blueprint('artistas', __name__)
 
 @BlueprintArtistas.route('/artista/crear', methods=['POST'])
 def crearArtista():
+    #Conexion a la base de datos
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         #variables que se reciben del front en un formulario
         nombres = request.form['nombres']
@@ -21,9 +24,7 @@ def crearArtista():
 
         status = False
 
-        #Conexion a la base de datos
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
+        
         #Guardar la imagen
         nombre_imagen = guardarObjeto(BytesIO(data), extension,"Fotos/")
         id_foto = nombre_imagen['Key']
@@ -37,14 +38,17 @@ def crearArtista():
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintArtistas.route('/artista/listar', methods=['GET'])
 def listarArtistas():
+    #Conexion a la base de datos
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT * FROM artista;") #id_artista, nombres, apellidos, fecha_nac, path_fotografia, id_fotografia
         data = cursor.fetchall()
         #Pasar a un json
@@ -62,14 +66,16 @@ def listarArtistas():
         conexion.close()
         return jsonify(data)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([])
 
 @BlueprintArtistas.route('/artista/ver/<id>', methods=['GET'])
 def verArtista(id):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT * FROM artista WHERE id_artista = %s;", (id,))
         data = cursor.fetchone()
         #Pasar a un json
@@ -88,14 +94,16 @@ def verArtista(id):
         return jsonify(data)
     except Exception as e:
         print(e)
+        cursor.close()
         conexion.close()
         return jsonify([])
 
 @BlueprintArtistas.route('/artista/ver/canciones/<id>', methods=['GET'])
 def verCancionesArtista(id):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
+        
         query='''
         SELECT
             cancion.nombre AS songName,
@@ -131,11 +139,15 @@ def verCancionesArtista(id):
         conexion.close()
         return jsonify(data)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([])
 
-@BlueprintArtistas.route('/artista/modificar/info/<id>', methods=['PATCH'])
+@BlueprintArtistas.route('/artista/modificar/info/<id>', methods=['PATCH'], strict_slashes=False)
 def modificarInfoArtista(id):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         #JSON que se recibe del front
         data = request.get_json()
@@ -145,8 +157,7 @@ def modificarInfoArtista(id):
 
         status = False
 
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
+        
         cursor.execute("UPDATE artista SET nombres = %s, apellidos = %s, fecha_nac = %s WHERE id_artista = %s;", (nombres, apellidos, fecha_nac, id))
 
         status = cursor.rowcount > 0
@@ -157,11 +168,15 @@ def modificarInfoArtista(id):
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintArtistas.route('/artista/modificar/image/<id>', methods=['PATCH'])
 def modificarImagenArtista(id):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         #variables que se reciben del front en un formulario
         imagen = request.files['imagen']
@@ -172,10 +187,7 @@ def modificarImagenArtista(id):
             data = imagen.read()
 
         status = False
-
-        #Conexion a la base de datos
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
+        
         #Eliminar la imagen anterior y guardar la nueva
         cursor.execute("SELECT id_fotografia FROM artista WHERE id_artista = %s;", (id,))
 
@@ -196,11 +208,15 @@ def modificarImagenArtista(id):
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintArtistas.route('/artista/eliminar/', methods=['DELETE'], strict_slashes=False)
 def eliminarArtista():
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         data = request.get_json()
         id = data['idArtist']
@@ -208,12 +224,9 @@ def eliminarArtista():
         password = data['password']
         status = False
 
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT * FROM usuario WHERE id_usuario = %s;", (idUser,))
 
         result = cursor.fetchone()
-        print(result[6])
 
         if len(result) > 0:
             if result[6] != 1:
@@ -223,14 +236,12 @@ def eliminarArtista():
                 return jsonify({'status': status})
             contraseniaCifrada = result[4]
             status = compararPassword(password, contraseniaCifrada)
-            print(status)
             if status == False:
                 cursor.close()
                 conexion.close()
                 return jsonify({'status': status})
             cursor.execute("SELECT * FROM artista WHERE id_artista = %s;", (id,))
             result = cursor.fetchone()
-            print(result)
             if len(result) > 0:
                 try:
                     cursor.execute("SELECT * FROM album WHERE id_artista = %s;", (id,))
@@ -261,6 +272,7 @@ def eliminarArtista():
                     cursor.execute("DELETE FROM cancion WHERE id_artista = %s;", (id,))
                     conexion.commit()
                     status = cursor.rowcount > 0
+                    cursor.close()
                     conexion.close() #Cerrar conexion, este faltaba
                     return jsonify({'status': status})
                 except Exception as e:
@@ -281,5 +293,6 @@ def eliminarArtista():
         
     except Exception as e:
         print(e)
+        cursor.close()
         conexion.close()
         return jsonify({'status': False})

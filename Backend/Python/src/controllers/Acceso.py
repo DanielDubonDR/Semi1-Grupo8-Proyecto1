@@ -9,14 +9,14 @@ BlueprintAcceso = Blueprint('acceso', __name__)
 
 @BlueprintAcceso.route('/login', methods=['POST'])
 def login():
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         #variables de correo y contraseña que se reciben del front en un json
         data = request.get_json()
         correo = data['correo']
         password = data['password']
         #se hace la consulta a la base de datos
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT * FROM usuario WHERE correo = %s;", (correo,)) # id_usuario, correo, nombres, apellidos, fecha_nac, rol, id_foto, path_foto
         query = cursor.fetchall()
         status = False
@@ -48,11 +48,15 @@ def login():
         conexion.close()
         return jsonify({'status': status, 'rol': rol, 'datosUusario': usuario})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintAcceso.route('/registrar', methods=['POST'])
 def registrar():
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         #variables que se reciben del front en un formulario
         nombres = request.form['nombres']
@@ -72,8 +76,6 @@ def registrar():
         status = False
 
         #Conexion a la base de datos
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT * FROM usuario WHERE correo = %s;", (correo,))
         query = cursor.fetchall()
         if query is None or len(query) == 0:
@@ -101,6 +103,8 @@ def registrar():
             status = True
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
  

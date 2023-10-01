@@ -48,6 +48,9 @@ def subirCancion():
 
 @BlueprintCancion.route('/cancion/crear', methods=['POST'])
 def crearCancion():
+    #Conexion a la base de datos
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         #variables que se reciben del front en un json
         data = request.get_json()
@@ -61,9 +64,7 @@ def crearCancion():
         print(path_cancion)
         status = False
 
-        #Conexion a la base de datos
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
+        
 
         cursor.execute("INSERT INTO cancion (nombre, duracion, id_imagen, path_imagen, id_obj_cancion, path_cancion, id_artista) VALUES (%s, %s, %s, %s, %s, %s, %s);", (nombre, duracion, id_imagen, path_imagen, id_cancion, path_cancion, id_artista))
 
@@ -75,14 +76,17 @@ def crearCancion():
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintCancion.route('/cancion/listar', methods=['GET'])
 def listarCancion():
+    #Conexion a la base de datos
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT c.*, CONCAT(a.nombres, ' ', COALESCE(a.apellidos, '')) AS nombre_artista FROM cancion c, artista a WHERE c.id_artista=a.id_artista;") # id_cancion, nombre, duracion, id_imagen, path_imagen, path_cancion, id_obj_cancion
         cancion = cursor.fetchall()
         #Pasar a un json
@@ -101,14 +105,17 @@ def listarCancion():
         conexion.close()
         return jsonify(cancion)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([])
 
 @BlueprintCancion.route('/cancion/album/listar', methods=['GET'])
 def listarCancionAlbum():
+    #Conexion a la base de datos
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT cancion.*, cancion_album.id_album FROM cancion LEFT JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion;")
         cancion = cursor.fetchall()
         #Pasar a un json
@@ -128,14 +135,17 @@ def listarCancionAlbum():
         conexion.close()
         return jsonify(cancion)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([])
 
 @BlueprintCancion.route('/cancion/ver/<id_cancion>', methods=['GET'])
 def verCancionId(id_cancion):
+    #Conexion a la base de datos
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT c.*, CONCAT(a.nombres, ' ', COALESCE(a.apellidos, '')) AS nombre_artista FROM cancion c, artista a WHERE c.id_artista=a.id_artista AND c.id_cancion = %s;", (id_cancion,))
         cancion = cursor.fetchone()
         #Pasar a un json
@@ -154,14 +164,17 @@ def verCancionId(id_cancion):
         conexion.close()
         return jsonify(cancion)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([])
 
 @BlueprintCancion.route('/cancion/album/ver/<id_album>', methods=['GET'])
 def verCancionAlbum(id_album):
+    #Conexion a la base de datos
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT cancion.*, cancion_album.id_album FROM cancion LEFT JOIN cancion_album ON cancion.id_cancion = cancion_album.id_cancion WHERE cancion.id_cancion = %s;", (id_album,))
         cancion = cursor.fetchall()
         #Pasar a un json
@@ -181,11 +194,16 @@ def verCancionAlbum(id_album):
         conexion.close()
         return jsonify(cancion)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([])
 
 @BlueprintCancion.route('/cancion/modificar/info/<id_cancion>', methods=['PATCH'])
 def modificarCancion(id_cancion):
+    #Conexion a la base de datos
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         data = request.get_json()
         nombre = data['nombre']
@@ -196,8 +214,6 @@ def modificarCancion(id_cancion):
 
         status = False
 
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
 
         cursor.execute("UPDATE cancion SET nombre = %s, duracion = %s, id_artista = %s WHERE id_cancion = %s;", (nombre, duracion, id_artista, id_cancion))
 
@@ -210,20 +226,22 @@ def modificarCancion(id_cancion):
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintCancion.route('/cancion/modificar/image/<id_cancion>', methods=['PATCH'])
 def modificarImagenCancion(id_cancion):
+    #Conexion a la base de datos
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         data = request.get_json()
         id_imagen = data['id_imagen']
         path_imagen = data['path_imagen']
 
         status = False
-
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
 
         cursor.execute("UPDATE cancion SET id_imagen = %s, path_imagen = %s WHERE id_cancion = %s;", (id_imagen, path_imagen, id_cancion))
 
@@ -236,20 +254,22 @@ def modificarImagenCancion(id_cancion):
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintCancion.route('/cancion/modificar/cancion/<id_cancion>', methods=['PATCH'])
 def modificarCancionCancion(id_cancion):
+    #Conexion a la base de datos
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         data = request.get_json()
         id_obj_cancion = data['id_cancion']
         path_cancion = data['path_cancion']
 
         status = False
-
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
 
         cursor.execute("UPDATE cancion SET id_obj_cancion = %s, path_cancion = %s WHERE id_cancion = %s;", (id_obj_cancion, path_cancion, id_cancion))
 
@@ -262,11 +282,16 @@ def modificarCancionCancion(id_cancion):
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintCancion.route('/cancion/eliminar/', methods=['DELETE'], strict_slashes=False)
 def eliminarCancion():
+    #Conexion a la base de datos
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         status = False
 
@@ -275,8 +300,6 @@ def eliminarCancion():
         password = data['password']
         idSong = data['idSong']
 
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT * FROM usuario WHERE id_usuario = %s;", (idUser,))
         result = cursor.fetchone()
 
@@ -319,14 +342,17 @@ def eliminarCancion():
             conexion.close()
             return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintCancion.route('/cancion/album/get/null/artist/<id_artista>', methods=['GET'])
 def getSongAlbumNullByArtist(id_artista):
+    
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT * FROM cancion WHERE id_artista = %s AND id_cancion NOT IN (SELECT id_cancion FROM cancion_album);", (id_artista,))
         cancion = cursor.fetchall()
         #Pasar a un json
@@ -346,5 +372,6 @@ def getSongAlbumNullByArtist(id_artista):
         return jsonify(cancion)
     except Exception as e:
         print(e)
+        cursor.close()
         conexion.close()
         return jsonify({'status': False})

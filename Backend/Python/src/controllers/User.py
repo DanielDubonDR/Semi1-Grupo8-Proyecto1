@@ -3,15 +3,16 @@ from config.imageHandler import guardarObjeto, eliminarObjeto, compararPassword
 from db import  obtenerConexion
 from datetime import datetime
 from io import BytesIO
+from datetime import datetime
 
 
 BlueprintUser = Blueprint('usuario', __name__)
 
 @BlueprintUser.route('/usuario/ver/<id_usuario>', methods=['GET'])
 def verUsuario(id_usuario):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT correo, nombres, apellidos, fecha_nac, path_foto FROM usuario WHERE id_usuario = %s;", (id_usuario,))
         usuario = cursor.fetchone()
         #Pasar la lista a un diccionario
@@ -26,11 +27,15 @@ def verUsuario(id_usuario):
         conexion.close()
         return jsonify(usuario)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({})
 
 @BlueprintUser.route('/usuario/modificar/info/<id_usuario>', methods=['PATCH'])
 def modificarInfoUsuario(id_usuario):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         data = request.get_json()
         nombres = data['nombres']
@@ -63,11 +68,15 @@ def modificarInfoUsuario(id_usuario):
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintUser.route('/usuario/modificar/imagen/', methods=['PATCH'])
 def modificarImagenUsuario():
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         imagen = request.files['imagen']
         idUser = request.form['idUser']
@@ -107,11 +116,15 @@ def modificarImagenUsuario():
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintUser.route('/usuario/eliminar/<id_usuario>', methods=['DELETE'])
 def eliminarUsuario(id_usuario):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         status = False
 
@@ -133,19 +146,22 @@ def eliminarUsuario(id_usuario):
 
         return jsonify({'status': status})
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify({'status': False})
 
 @BlueprintUser.route('/usuario/add/history', methods=['POST'])
 def addHistory():
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
         data = request.get_json()
         id_cancion = data['id_cancion']
         id_usuario = data['id_usuario']
         id_album = data['id_album']
+        fecha = data['fecha']
 
-        current_date = datetime.now()
-        fecha = current_date.strftime("%Y-%m-%d %H:%M:%S")
 
         conexion = obtenerConexion()
         cursor = conexion.cursor()
@@ -160,13 +176,16 @@ def addHistory():
 
         return jsonify({'status': status}), 200
     except Exception as e:
+        print(e)
+        cursor.close()
+        conexion.close()
         return jsonify({'status': False}), 500
 
 @BlueprintUser.route('/usuario/ver/top5/songs/<id_usuario>', methods=['GET'])
 def verTop5Songs(id_usuario):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
         cursor.execute("SELECT id_cancion, COUNT(id_cancion) AS reproducciones FROM historico WHERE id_usuario = %s GROUP BY id_cancion ORDER BY reproducciones DESC LIMIT 5;", (id_usuario,))
         query1_result = cursor.fetchall()
 
@@ -174,7 +193,6 @@ def verTop5Songs(id_usuario):
             return jsonify([])
 
         cancion_ids = [row[0] for row in query1_result]
-
         cursor.execute("SELECT id_cancion, nombre, duracion, path_cancion, path_imagen FROM cancion WHERE id_cancion IN ({});".format(','.join(map(str, cancion_ids))))
         query2_result = cursor.fetchall()
 
@@ -193,14 +211,16 @@ def verTop5Songs(id_usuario):
         conexion.close()
         return jsonify(combined_results)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([]), 500
 
 @BlueprintUser.route('/usuario/ver/top3/artistas/<id_usuario>', methods=['GET'])
 def verTop3Artistas(id_usuario):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
 
         cursor.execute("SELECT a.id_artista, CONCAT(a.nombres, ' ', a.apellidos) AS nombre_artista, a.path_fotografia , COUNT(*) AS reproducciones FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN artista a ON al.id_artista = a.id_artista JOIN usuario u ON h.id_usuario = u.id_usuario WHERE u.id_usuario = %s GROUP BY a.id_artista, nombre_artista ORDER BY reproducciones DESC LIMIT 3;", (id_usuario,))
 
@@ -220,20 +240,24 @@ def verTop3Artistas(id_usuario):
 
         return jsonify(query_result)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([]), 500
 
 @BlueprintUser.route('/usuario/ver/top5/albumes/<id_usuario>', methods=['GET'])
 def verTop5Albumes(id_usuario):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
-
+        
         cursor.execute("SELECT id_album, COUNT(id_album) AS reproducciones FROM historico WHERE id_usuario = %s GROUP BY id_album ORDER BY reproducciones DESC LIMIT 5;", (id_usuario,))
         query1_result = cursor.fetchall()
 
+        if len(query1_result) == 0:
+            return jsonify([])
         album_ids = [row[0] for row in query1_result]
-
+        
         cursor.execute("SELECT id_album, nombre, path_imagen FROM album WHERE id_album IN ({});".format(','.join(map(str, album_ids))))
 
         query2_result = cursor.fetchall()
@@ -254,27 +278,31 @@ def verTop5Albumes(id_usuario):
 
         return jsonify(combined_results)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([]), 500
 
 @BlueprintUser.route('/usuario/ver/historico/<id_usuario>', methods=['GET'])
 def verHistorico(id_usuario):
+    conexion = obtenerConexion()
+    cursor = conexion.cursor()
     try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
 
-        cursor.execute("SELECT h.fecha, c.nombre AS nombre_cancion, c.duracion AS duracion_cancion, a.nombres AS nombre_artista, al.nombre AS nombre_album FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN artista a ON al.id_artista = a.id_artista WHERE h.id_usuario = %s ORDER BY h.fecha DESC;", (id_usuario,))
+        cursor.execute("SELECT h.fecha, c.nombre AS nombre_cancion, c.duracion AS duracion_cancion, a.nombres AS nombre_artista, al.nombre AS nombre_album,c.path_imagen AS path_imagen FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN artista a ON al.id_artista = a.id_artista WHERE h.id_usuario = %s ORDER BY h.fecha DESC;", (id_usuario,))
         query_result = cursor.fetchall()
         
         #Pasar a un json
+
         for i in range(len(query_result)):
-            fecha_iso = query_result[i][0].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            fecha_iso = query_result[i][0].isoformat()[:-3] + 'Z'
             query_result[i] = {
-                'fecha': fecha_iso,
+                'fecha': query_result[i][0],
                 'nombre_cancion': query_result[i][1],
                 'duracion_cancion': query_result[i][2],
                 'nombre_artista': query_result[i][3],
-                'nombre_album': query_result[i][4]
+                'nombre_album': query_result[i][4],
+                'path_imagen': query_result[i][5]
             }
 
         cursor.close()
@@ -282,5 +310,7 @@ def verHistorico(id_usuario):
 
         return jsonify(query_result)
     except Exception as e:
+        cursor.close()
+        conexion.close()
         print(e)
         return jsonify([]), 500
