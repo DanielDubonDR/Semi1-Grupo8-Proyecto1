@@ -4,6 +4,7 @@ import { BsPlayFill } from "react-icons/bs";
 import { ToastContainer, toast } from 'react-toastify';
 import Service from '../../Service/Service';
 import { usePlayer } from "../../context_Player/playerContext";
+import convertirFechaParaSQL from '../../utils/utils';
 import Header_name from "./Header_name";
 import Songs_Playlist from "./Songs_Playlist";
 
@@ -58,11 +59,12 @@ function Favoritos() {
         try {
           setCanc(canciones);
           setCancionActual(canciones[0]);
-      
+          const hoy = new Date();
           let values = {
             id_cancion: canciones[0].id_cancion,
             id_album: canciones[0].id_album,
-            id_usuario: usuario.id
+            id_usuario: usuario.id,
+            fecha: convertirFechaParaSQL(hoy)
           }
           let res2 = await Service.postReproduccion(values);
           console.log(res2.data);

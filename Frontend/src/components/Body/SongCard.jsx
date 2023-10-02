@@ -4,6 +4,7 @@ import { BsPlusCircle } from "react-icons/bs";
 import { toast } from 'react-toastify';
 import Service from "../../Service/Service";
 import { usePlayer } from "../../context_Player/playerContext";
+import convertirFechaParaSQL from "../../utils/utils";
 import PlayPause from "./PlayPause";
 
 const SongCard = ({song, isPlaying, activeSong, opcion,idSongModal,idSongAlbumModal, i}) => {
@@ -128,10 +129,12 @@ const SongCard = ({song, isPlaying, activeSong, opcion,idSongModal,idSongAlbumMo
         try {
         setCancionActual(cancion);
         setCanc([cancion])
+        const hoy = new Date();
           let values = {
             id_cancion: cancion.id_cancion,
             id_album: cancion.id_album,
-            id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+            id_usuario: JSON.parse(localStorage.getItem('data_user')).id,
+            fecha: convertirFechaParaSQL(hoy)
           }
           console.log(values);
           let res = await Service.postReproduccion(values);

@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import Service from "../../Service/Service";
 import { useUserContext } from '../../context/UserContext';
 import { usePlayer } from "../../context_Player/playerContext";
+import convertirFechaParaSQL from "../../utils/utils";
 function Song_Album({order, track, artist, name_album, opcion,idSongModal,idSongAlbumModal}){
     const [isLiked, setIsLiked] = useState(false);
     const {logueado, setLogueado} = useUserContext();
@@ -127,10 +128,12 @@ function Song_Album({order, track, artist, name_album, opcion,idSongModal,idSong
         try {
         setCancionActual(cancion);
         setCanc([cancion])
+        const hoy = new Date();
           let values = {
             id_cancion: cancion.id_cancion,
             id_album: cancion.id_album,
-            id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+            id_usuario: JSON.parse(localStorage.getItem('data_user')).id,
+            fecha: convertirFechaParaSQL(hoy)
           }
           console.log(values);
           let res = await Service.postReproduccion(values);

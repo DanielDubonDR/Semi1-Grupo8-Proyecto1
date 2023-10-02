@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { BsPlay, BsPlusCircle } from "react-icons/bs";
-import Service from "../../Service/Service";
 import { toast } from 'react-toastify';
+import Service from "../../Service/Service";
 import { usePlayer } from "../../context_Player/playerContext";
+import convertirFechaParaSQL from "../../utils/utils";
 function Song_Album2({order, track, artist, name_album, opcion,idSongModal,idSongAlbumModal}){
     const [isLiked, setIsLiked] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
@@ -104,10 +105,12 @@ function Song_Album2({order, track, artist, name_album, opcion,idSongModal,idSon
         try {
         setCancionActual(cancion);
         setCanc([cancion])
+        const hoy = new Date();
           let values = {
             id_cancion: cancion.id_cancion,
             id_album: cancion.id_album,
-            id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+            id_usuario: JSON.parse(localStorage.getItem('data_user')).id,
+            fecha: convertirFechaParaSQL(hoy)
           }
           console.log(values);
           let res = await Service.postReproduccion(values);

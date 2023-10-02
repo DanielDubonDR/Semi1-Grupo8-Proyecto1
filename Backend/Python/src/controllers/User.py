@@ -1,10 +1,9 @@
-from flask import Blueprint, request, jsonify
-from config.imageHandler import guardarObjeto, eliminarObjeto, compararPassword
-from db import  obtenerConexion
 from datetime import datetime
 from io import BytesIO
-from datetime import datetime
 
+from config.imageHandler import compararPassword, eliminarObjeto, guardarObjeto
+from db import obtenerConexion
+from flask import Blueprint, jsonify, request
 
 BlueprintUser = Blueprint('usuario', __name__)
 
@@ -295,9 +294,9 @@ def verHistorico(id_usuario):
         #Pasar a un json
 
         for i in range(len(query_result)):
-            fecha_iso = query_result[i][0].isoformat()[:-3] + 'Z'
+            fecha_iso = query_result[i][0].isoformat()
             query_result[i] = {
-                'fecha': query_result[i][0],
+                'fecha': fecha_iso,
                 'nombre_cancion': query_result[i][1],
                 'duracion_cancion': query_result[i][2],
                 'nombre_artista': query_result[i][3],

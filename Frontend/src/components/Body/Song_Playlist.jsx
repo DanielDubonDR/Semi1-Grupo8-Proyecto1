@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import Service from "../../Service/Service";
 import { usePlayer } from "../../context_Player/playerContext";
+import convertirFechaParaSQL from "../../utils/utils";
 import ContextMenu from "../contextmenu/contextmenu";
 function Song_Playlist({order, track, id_playlist, opcion,idSongModal,idSongAlbumModal}){
     const [isLiked, setIsLiked] = useState(false);
@@ -104,10 +105,12 @@ function Song_Playlist({order, track, id_playlist, opcion,idSongModal,idSongAlbu
         try {
         setCancionActual(cancion);
         setCanc([cancion])
+        const hoy = new Date();
           let values = {
             id_cancion: cancion.id_cancion,
             id_album: cancion.id_album,
-            id_usuario: JSON.parse(localStorage.getItem('data_user')).id
+            id_usuario: JSON.parse(localStorage.getItem('data_user')).id,
+            fecha: convertirFechaParaSQL(hoy)
           }
           console.log(values);
           let res = await Service.postReproduccion(values);
