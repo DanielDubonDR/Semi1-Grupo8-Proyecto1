@@ -196,16 +196,18 @@ def verTop5Songs(id_usuario):
         query2_result = cursor.fetchall()
 
         combined_results = []
-        for i in range(len(query1_result)):
-            combined_data = {
-                'id_cancion': query1_result[i][0],
-                'reproducciones': query1_result[i][1],
-                'nombre': query2_result[i][1],
-                'duracion': query2_result[i][2],
-                'path_cancion': query2_result[i][3],
-                'path_imagen': query2_result[i][4]
-            }
-            combined_results.append(combined_data)
+        for cancion in query1_result:
+            datos = next((item for item in query2_result if item[0] == cancion[0]), None)
+            if datos:
+                combined_results.append({
+                    'id_cancion': cancion[0],
+                    'reproducciones': cancion[1],
+                    'nombre': datos[1],
+                    'duracion': datos[2],
+                    'path_cancion': datos[3],
+                    'path_imagen': datos[4]
+                })
+
         cursor.close()
         conexion.close()
         return jsonify(combined_results)
@@ -262,14 +264,15 @@ def verTop5Albumes(id_usuario):
         query2_result = cursor.fetchall()
 
         combined_results = []
-        for i in range(len(query1_result)):
-            combined_data = {
-                'id_album': query1_result[i][0],
-                'reproducciones': query1_result[i][1],
-                'nombre': query2_result[i][1],
-                'path_imagen': query2_result[i][2]
-            }
-            combined_results.append(combined_data)
+        for album in query1_result:
+            datos = next((item for item in query2_result if item[0] == album[0]), None)
+            if datos:
+                combined_results.append({
+                    'id_album': album[0],
+                    'reproducciones': album[1],
+                    'nombre': datos[1],
+                    'path_imagen': datos[2]
+                })
 
         
         cursor.close()
