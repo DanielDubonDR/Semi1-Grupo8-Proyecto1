@@ -37,7 +37,6 @@ Brindar al desarrollador una guía para la comprensión del código y la arquite
 2. Comprender la estructura del código.
 3. Comprender los servicios de AWS utilizados.
 4. Comprender como adaptar el proyecto a servicios en la nube.
-5. Hacer de conocimiento a los distintos programadores que quieran comprender el proyecto.
 
 ## Arquitectura del proyecto
 
@@ -393,4 +392,10 @@ Se crearon los siguientes usuarios con los números de carnet de los desarrollad
 
 ## Conclusiones
 
-Descripción
+1.  La comprensión de la arquitectura del proyecto es esencial para el éxito en su implementación y mantenimiento.El tener una arquitectura definida proporciona una base sólida para trabajar efectivamente en el proyecto. Sabiendo como se organiza el proyecto, nos permite identificar áreas de mejora y aplicar buenas prácticas de programación. Esto se traduce en un código más limpio, menos propenso a errores y más fácil de mantener.
+
+2. La estructura del código es fundamental para la legibilidad, la colaboración y el mantenimiento eficiente. 
+
+3.  La utilización de servicios en la nube, específicamente los proporcionados por AWS, ha demostrado ser una estrategia efectiva para aprovechar los beneficios que la capa gratuita nos provee, igualmente nos permitió aprender sobre nuevas tecnologías y servicios que nos ayudarán en el futuro.
+
+4.  Se concluye que el uso de los servicios en la nube puede aportar ventajas significativas en términos de rendimiento y disponibilidad. Sin embargo, es importante tener en cuenta que la implementación de una aplicación en la nube requiere un conocimiento profundo de la arquitectura de la aplicación y de los servicios en la nube.
