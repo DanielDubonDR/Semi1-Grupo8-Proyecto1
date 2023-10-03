@@ -134,30 +134,31 @@ Amazon Elastic Compute Cloud (Amazon EC2) fue utilizado en nuestro proyecto para
 ##### 1. _Instancias_
 Para comenzar con la configuración de las instancias, primeramente se accedió a la cuenta - lo que llevó a la página de inicio de la Consola:
 <br>
-<div align="center"><img src="img/Login_IAM.jpeg" width="300"/></div>
+<div align="center"><img src="img/Login_IAM.jpeg" width="500"/></div>
 
 Una vez accedido, se ingresó al servicio de EC2:
+
 ![ec2](img/lb/ec2.png)
 
 Se busca en el Panel de Navegación de la izquierda la opción de `Instancias` y se selecciona la opción de `Lanzar Instancia`:
-<div align="center"><img src="img/EC2/Lanzar.jpeg" width="500"/></div>
+<div align="center"><img src="img/EC2/Lanzar.jpeg" width="600"/></div>
 
 ###### Se configuraron las instancias de la siguiente manera:
 
 Se ingresa el nombre de la instancia:
-<div align="center"><img src="img/EC2/Nombre.jpeg" width="500"/></div>
+<div align="center"><img src="img/EC2/Nombre.jpeg" width="600"/></div>
 
 Se selecciona la imagen de la máquina en este caso Ubuntu y se selecciona la versión 22.04 LTS, se selecciona la arquitectura de la máquina en este caso x86 (Free Tier):
-<div align="center"><img src="img/EC2/SO.jpeg" width="400"/></div>
+<div align="center"><img src="img/EC2/SO.jpeg" width="500"/></div>
 
 Se selecciona el tipo de instancia, en este caso se seleccionó `t2.micro` y se crean claves SSH para poder acceder a la instancia:
-<div align="center"><img src="img/EC2/Claves.jpeg" width="400"/></div>
+<div align="center"><img src="img/EC2/Claves.jpeg" width="500"/></div>
 
 Elegimos el número de instancias que queremos crear, en este caso se creó 2 instancias y se revisa la configuración de las instancias:
-<div align="center"><img src="img/EC2/Resumen.jpeg" width="200"/></div>
+<div align="center"><img src="img/EC2/Resumen.jpeg" width="300"/></div>
 
 Luego de esto se crea el grupo de seguridad para poder acceder a las instancias y se le asignó el puerto 4000 para poder acceder a las instancias:
-<div align="center"><img src="img/EC2/ReglaEntrada.jpeg" width="500"/></div>
+<div align="center"><img src="img/EC2/ReglaEntrada.jpeg" width="600"/></div>
 
 
 
