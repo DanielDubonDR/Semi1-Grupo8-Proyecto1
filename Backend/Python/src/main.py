@@ -30,5 +30,9 @@ app.register_blueprint(BlueprintHome)
 def index():
     return 'Hello World'
 
+@app.route('/ping', methods=['GET'])
+def ping():
+    return 'pong desde python'
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=4000)
