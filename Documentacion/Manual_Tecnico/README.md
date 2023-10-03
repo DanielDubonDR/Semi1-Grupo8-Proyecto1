@@ -280,7 +280,7 @@ Una vez seleccionado, se especificaron los detalles del grupo de la siguiente ma
 
 <br>
 
-![bal_carga](img/LB/bal_carga7.png)
+![bal_carga](img/LB/bal_Carga7.png)
 
 <br>
 
