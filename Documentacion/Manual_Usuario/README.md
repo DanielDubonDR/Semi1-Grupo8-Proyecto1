@@ -1,5 +1,7 @@
 # 🎶 SoundStream
 
+<div align="center"><img src="./../../Images/6mHNsRq.png" width="300"/></div>
+
 # Manual de Usuario
 
 ## ÍNDICE:
