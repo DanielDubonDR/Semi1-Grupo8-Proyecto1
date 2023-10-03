@@ -118,6 +118,12 @@ Descripción xd
 
 - `sound-stream-semi1-g8`: Bucket en donde se encuentra alojado el proyecto de ReactJS y donde estará expuesto el link a todo publico.
 
+    ![buckets](./img/S3bucket1.png)
+
+
+    ![pagina](./img/S3ss.png)
+
+
 ### EC2
 <div align="center"><img src="https://www.logicata.com/wp-content/uploads/2020/08/Amazon-EC2@4x-e1593195270371.png" width="100"/></div>
 
@@ -344,7 +350,7 @@ Se crearon los siguientes usuarios con los números de carnet de los desarrollad
 - `202004745`
 - `202010918`
 
-<div align="center"><img src="http://imgfz.com/i/8BkF64S.png" width="200"/></div>
+![users](http://imgfz.com/i/8BkF64S.png)
 
 #### Grupos de Usuarios
 
@@ -353,7 +359,7 @@ Se crearon los siguientes usuarios con los números de carnet de los desarrollad
     Cuenta con los siguientes permisos:
     - AdministratorAccess
 
-    <div align="center"><img src="http://imgfz.com/i/jgdCQ6b.png" width="100"/></div>
+    ![admin](http://imgfz.com/i/jgdCQ6b.png)
 
     Los usuarios que cuentan con este permiso son los siguientes:
     - `201900042`
@@ -369,7 +375,7 @@ Se crearon los siguientes usuarios con los números de carnet de los desarrollad
     - IAMFullAccess
     - ElasticLoadBalancingFullAccess
 
-    <div align="center"><img src="http://imgfz.com/i/j5q7xLJ.png" width="100"/></div>
+    ![back](http://imgfz.com/i/j5q7xLJ.png)
 
     Los usuarios que cuentan con este permiso son los siguientes:
     - `201901772`
@@ -383,7 +389,7 @@ Se crearon los siguientes usuarios con los números de carnet de los desarrollad
     - AmazonS3FullAccess
     - IAMFullAccess
 
-    <div align="center"><img src="http://imgfz.com/i/5Z3ZQ8u.png" width="100"/></div>
+    ![front](http://imgfz.com/i/5Z3ZQ8u.png)
 
     Los usuarios que cuentan con este permiso son los siguientes:
     - `201900042`
