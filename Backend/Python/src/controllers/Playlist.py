@@ -262,24 +262,20 @@ def setLikedPlaylist():
 
         status = False
 
-        try:
-            cursor.execute("SELECT pu.id_playlist FROM playlist_usuario pu INNER JOIN playlist ON playlist.id_playlist = pu.id_playlist WHERE playlist.nombre = 'Me gusta' AND pu.id_usuario = %s;", (data['id_usuario'],))
-            result = cursor.fetchone()
+        cursor.execute("SELECT pu.id_playlist FROM playlist_usuario pu INNER JOIN playlist ON playlist.id_playlist = pu.id_playlist WHERE playlist.nombre = 'Me gusta' AND pu.id_usuario = %s;", (data['id_usuario'],))
+        result = cursor.fetchone()
 
-            id_playlist = result[0]
+        id_playlist = result[0]
 
-            cursor.execute("INSERT INTO canciones_playlist (id_playlist, id_cancion, id_album) VALUES (%s, %s, %s);", (id_playlist, id_cancion, id_album))
+        cursor.execute("INSERT INTO canciones_playlist (id_playlist, id_cancion, id_album) VALUES (%s, %s, %s);", (id_playlist, id_cancion, id_album))
 
-            status = cursor.rowcount > 0
+        status = cursor.rowcount > 0
 
-            conexion.commit()
+        conexion.commit()
 
-            cursor.close()
-            conexion.close()
-        except:
-            cursor.close()
-            conexion.close()
-            status = False
+        cursor.close()
+        conexion.close()
+
 
         return jsonify({'status': status})
     except Exception as e:
@@ -299,23 +295,19 @@ def deleteLikedPlaylist():
 
         status = False
 
-        try:
-            cursor.execute("SELECT pu.id_playlist FROM playlist_usuario pu INNER JOIN playlist ON playlist.id_playlist = pu.id_playlist WHERE playlist.nombre = 'Me gusta' AND pu.id_usuario = %s;", (id_usuario,))
-            result = cursor.fetchone()
+        cursor.execute("SELECT pu.id_playlist FROM playlist_usuario pu INNER JOIN playlist ON playlist.id_playlist = pu.id_playlist WHERE playlist.nombre = 'Me gusta' AND pu.id_usuario = %s;", (id_usuario,))
+        result = cursor.fetchone()
 
-            id_playlist = result[0]
+        id_playlist = result[0]
 
-            cursor.execute("DELETE FROM canciones_playlist WHERE id_cancion = %s AND id_playlist = %s;", (id_cancion, id_playlist))
+        cursor.execute("DELETE FROM canciones_playlist WHERE id_cancion = %s AND id_playlist = %s;", (id_cancion, id_playlist))
 
-            status = cursor.rowcount > 0
+        status = cursor.rowcount > 0
 
-            conexion.commit()
-            cursor.close()
-            conexion.close()
-        except:
-            cursor.close()
-            conexion.close()
-            status = False
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+
 
         return jsonify({'status': status})
     except Exception as e:
@@ -347,7 +339,7 @@ def getPlaylistByID(id_playlist):
             })
 
         cursor.close()
-        cursor = conexion.cursor()
+        conexion.close()
 
         return jsonify(arr)
     except Exception as e:

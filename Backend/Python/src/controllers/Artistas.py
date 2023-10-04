@@ -261,44 +261,37 @@ def eliminarArtista():
             cursor.execute("SELECT * FROM artista WHERE id_artista = %s;", (id,))
             result = cursor.fetchone()
             if len(result) > 0:
-                try:
-                    cursor.execute("SELECT * FROM album WHERE id_artista = %s;", (id,))
-                    result = cursor.fetchall()
+                cursor.execute("SELECT * FROM album WHERE id_artista = %s;", (id,))
+                result = cursor.fetchall()
 
-                    if len(result) > 0:
-                        for i in range(len(result)):
-                            id_imagen = result[i][4]
-                            eliminarObjeto(id_imagen)
-                    
-                    cursor.execute("SELECT * FROM cancion WHERE id_artista = %s;", (id,))
-                    result = cursor.fetchall()
+                if len(result) > 0:
+                    for i in range(len(result)):
+                        id_imagen = result[i][4]
+                        eliminarObjeto(id_imagen)
+                
+                cursor.execute("SELECT * FROM cancion WHERE id_artista = %s;", (id,))
+                result = cursor.fetchall()
 
-                    if len(result) > 0:
-                        for i in range(len(result)):
-                            id_imagen = result[i][3]
-                            eliminarObjeto(id_imagen)
-                            id_obj_cancion = result[i][6]
-                            eliminarObjeto(id_obj_cancion)
-                    
-                    cursor.execute("SELECT * FROM artista WHERE id_artista = %s;", (id,))
-                    result = cursor.fetchone()
-                    id_imagen = result[5]
-                    eliminarObjeto(id_imagen)
-                    cursor.execute("DELETE FROM artista WHERE id_artista = %s;", (id,))
-                    conexion.commit()
-                    status = cursor.rowcount > 0
-                    cursor.execute("DELETE FROM cancion WHERE id_artista = %s;", (id,))
-                    conexion.commit()
-                    status = cursor.rowcount > 0
-                    cursor.close()
-                    conexion.close() #Cerrar conexion, este faltaba
-                    return jsonify({'status': status})
-                except Exception as e:
-                    print(e)
-                    cursor.close()
-                    conexion.close()
-                    status = False
-                    return jsonify({'status': status})
+                if len(result) > 0:
+                    for i in range(len(result)):
+                        id_imagen = result[i][3]
+                        eliminarObjeto(id_imagen)
+                        id_obj_cancion = result[i][6]
+                        eliminarObjeto(id_obj_cancion)
+                
+                cursor.execute("SELECT * FROM artista WHERE id_artista = %s;", (id,))
+                result = cursor.fetchone()
+                id_imagen = result[5]
+                eliminarObjeto(id_imagen)
+                cursor.execute("DELETE FROM artista WHERE id_artista = %s;", (id,))
+                conexion.commit()
+                status = cursor.rowcount > 0
+                cursor.execute("DELETE FROM cancion WHERE id_artista = %s;", (id,))
+                conexion.commit()
+                status = cursor.rowcount > 0
+                cursor.close()
+                conexion.close() #Cerrar conexion, este faltaba
+                return jsonify({'status': status})
             else:
                 cursor.close()
                 conexion.close()
@@ -308,7 +301,6 @@ def eliminarArtista():
             cursor.close()
             conexion.close()
             return jsonify({'status': False})
-        
     except Exception as e:
         print(e)
         cursor.close()
