@@ -7,14 +7,12 @@ const TiempoTranscurrido = ({ fecha }) => {
   const offsetUTC = -6; // UTC-6
 
 // Aplicar el desplazamiento horario
-const fechaUTCmenos6 = new Date(new Date(fecha).getTime() + (offsetUTC * 60 * 60 * 1000));
-    console.log(fechaUTCmenos6)
 // Formatear la fecha y hora
-const formattedDate = fechaUTCmenos6.toISOString().slice(0, 19).replace('T', ' ');
+const formattedDate = new Date(fecha.toLocaleString(undefined, { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }));
     console.log(formattedDate)
-  const fechaFormateada = format(new Date(fechaUTCmenos6), 'dd/MM/yyyy HH:mm:ss'); // Formatea la fecha
+  const fechaFormateada = format(new Date(formattedDate), 'dd/MM/yyyy HH:mm:ss'); // Formatea la fecha
 
-  const tiempoTranscurrido = formatDistanceToNow(new Date(fechaUTCmenos6), { addSuffix: true, locale: es, includeSeconds: true }); // Configura el idioma y habilita segundos
+  const tiempoTranscurrido = formatDistanceToNow(new Date(formattedDate), { addSuffix: true, locale: es, includeSeconds: true }); // Configura el idioma y habilita segundos
 
   const textoFormateado = tiempoTranscurrido.replace('en alrededor de', 'hace'); // Cambia el texto
 
