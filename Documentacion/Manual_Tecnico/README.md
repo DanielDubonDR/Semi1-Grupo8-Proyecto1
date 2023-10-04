@@ -389,7 +389,7 @@ Se crearon los siguientes usuarios con los números de carnet de los desarrollad
     - AmazonS3FullAccess
     - IAMFullAccess
 
-    ![front](http://imgfz.com/i/5Z3ZQ8u.png)
+    ![front](http://imgfz.com/i/RqMm2AL.png)
 
     Los usuarios que cuentan con este permiso son los siguientes:
     - `201900042`
