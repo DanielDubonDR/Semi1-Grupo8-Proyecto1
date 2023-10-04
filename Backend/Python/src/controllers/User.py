@@ -189,6 +189,8 @@ def verTop5Songs(id_usuario):
         query1_result = cursor.fetchall()
 
         if len(query1_result) == 0:
+            cursor.close()
+            conexion.close()
             return jsonify([])
 
         cancion_ids = [row[0] for row in query1_result]
@@ -256,6 +258,8 @@ def verTop5Albumes(id_usuario):
         query1_result = cursor.fetchall()
 
         if len(query1_result) == 0:
+            cursor.close()
+            conexion.close()
             return jsonify([])
         album_ids = [row[0] for row in query1_result]
         

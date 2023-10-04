@@ -296,18 +296,12 @@ def deleteSongAlbum():
         id_album = data['id_album']
         id_cancion = data['id_cancion']
         status = False
-        try:
-            
-            cursor.execute("DELETE FROM cancion_album WHERE id_album = %s AND id_cancion = %s;", (id_album, id_cancion))
-            status = cursor.rowcount > 0
-            conexion.commit()
+        cursor.execute("DELETE FROM cancion_album WHERE id_album = %s AND id_cancion = %s;", (id_album, id_cancion))
+        status = cursor.rowcount > 0
+        conexion.commit()
 
-            cursor.close()
-            conexion.close()
-        except:
-            cursor.close()
-            conexion.close()
-            status = False
+        cursor.close()
+        conexion.close()
         return jsonify({'status': status})
     except Exception as e:
         cursor.close()

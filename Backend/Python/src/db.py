@@ -6,11 +6,13 @@ blueprint = Blueprint('db', __name__)
 
 # Conexion a la base de datos
 pool = mysql.connector.pooling.MySQLConnectionPool(
+    pool_name=dbConfig['pool_name'],
     host=dbConfig['host'],
     user=dbConfig['user'],
     password=dbConfig['password'],
     database=dbConfig['database'],
-    port=dbConfig['port']
+    port=dbConfig['port'],
+    pool_size=1000,
 )
 
 # Funcion para conectarse a la base de datos

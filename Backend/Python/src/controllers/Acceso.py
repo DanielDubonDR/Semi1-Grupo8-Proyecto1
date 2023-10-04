@@ -98,9 +98,9 @@ def registrar():
             cursor.execute("INSERT INTO playlist_usuario (id_playlist, id_usuario) VALUES (%s,%s);", (playlistId, usuarioId))
             conexion.commit()
             
-            cursor.close()
-            conexion.close()
             status = True
+        cursor.close()
+        conexion.close()
         return jsonify({'status': status})
     except Exception as e:
         cursor.close()
