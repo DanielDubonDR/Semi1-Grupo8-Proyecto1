@@ -184,8 +184,8 @@ const handleSetSong = async (cancion) => {
   const hoy = new Date();
 
       let values = {
-        id_cancion: cancionActual.id_cancion,
-        id_album: cancionActual.id_album,
+        id_cancion: cancion.id_cancion,
+        id_album: cancion.id_album,
         id_usuario: usuario.id,
         fecha: convertirFechaParaSQL(hoy)
       };
