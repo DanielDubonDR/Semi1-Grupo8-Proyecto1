@@ -4,6 +4,7 @@ import Service from "../../Service/Service";
 import { useUserContext } from "../../context/UserContext";
 import { usePlayer } from "../../context_Player/playerContext";
 import { canciones } from "../datos_test/canciones";
+import convertirFechaParaSQL from "../../utils/utils";
 import Barra from "./Barra";
 import "./Reproductor.css";
 import Vol from "./Volumen";
@@ -53,11 +54,15 @@ function Reproductor() {
 
   const fetchData = async () => {
     try {
+      
+      const hoy = new Date();
+      setReproduciendose(true);
       console.log(cancionActual);
       let values = {
         id_cancion: cancionActual.id_cancion,
         id_album: cancionActual.id_album,
         id_usuario: usuario.id,
+        fecha: convertirFechaParaSQL(hoy)
       };
       let res = await Service.postReproduccion(values);
       console.log(res.data);
@@ -95,19 +100,27 @@ function Reproductor() {
       );
       let back;
       if (index == 0) {
-        back = canc[0];
+        let x = canc.length - 1;
+        back = canc[x];
       } else {
         back = canc[index - 1];
       }
 
       setCancionActual(back);
 
+      const hoy = new Date();
       let values = {
         id_cancion: back.id_cancion,
         id_album: back.id_album,
         id_usuario: usuario.id,
+        fecha: convertirFechaParaSQL(hoy)
       };
-      let res = await Service.postReproduccion(values);
+      try {
+        let res = await Service.postReproduccion(values);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+
       setReproduciendose(true);
       audioElem.current.currentTime = 0;
     } catch (error) {
@@ -128,13 +141,18 @@ function Reproductor() {
       }
 
       setCancionActual(siguiente);
+      console.log(cancionActual);
+      const hoy = new Date();
 
       let values = {
         id_cancion: siguiente.id_cancion,
         id_album: siguiente.id_album,
         id_usuario: usuario.id,
+        fecha: convertirFechaParaSQL(hoy)
       };
+      console.log(cancionActual);
       let res = await Service.postReproduccion(values);
+      console.log(res.data);
       setReproduciendose(true);
       audioElem.current.currentTime = 0;
     } catch (error) {

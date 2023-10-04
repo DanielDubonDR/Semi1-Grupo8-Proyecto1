@@ -14,9 +14,17 @@ export const createArtist = async (req, res) => {
         const { buffer, originalname } = req.file;
         const fileExtension = originalname.split('.').pop();
         let status = false
-    
+        let fecha_aux = null;
+        console.log(fecha_aux);
+        if (fecha_nac !== "" || fecha_nac !== null){
+            fecha_aux = fecha_nac;
+        }
+        if (fecha_aux.length > 0){
+            fecha_aux = null;
+        }
+        console.log(fecha_aux);
         const { Key, Location } = await saveObj(buffer, fileExtension, tipoObjeto.IMG);
-        const query = await pool.query("INSERT INTO artista (nombres, apellidos, fecha_nac, path_fotografia, id_fotografia) VALUES (?,?,?,?,?)", [nombres, apellidos, fecha_nac, Location, Key]);
+        const query = await pool.query("INSERT INTO artista (nombres, apellidos, fecha_nac, path_fotografia, id_fotografia) VALUES (?,?,?,?,?)", [nombres, apellidos, fecha_aux, Location, Key]);
         status = query[0].affectedRows > 0;
     
         return res.send({ "status": status });
@@ -80,8 +88,16 @@ export const updateInfoArtistById = async (req, res) => {
 
     try {
         const id = req.params.id;
-        const { nombres, apellidos, fecha_nac } = req.body;
+        let { nombres, apellidos, fecha_nac } = req.body;
         let status = false;
+
+        if (fecha_nac.length > 0){
+            fecha_nac = null;
+        }
+        if (fecha_nac == "" || fecha_nac == null){
+            fecha_nac = null;
+        }
+
     
         const query = await pool.query("UPDATE artista SET nombres = ?, apellidos = ?, fecha_nac = ? WHERE id_artista = ?", [nombres, apellidos, fecha_nac, id]);
     

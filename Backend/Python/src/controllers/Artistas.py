@@ -24,7 +24,10 @@ def crearArtista():
 
         status = False
 
-        
+        #Si no se recibe fecha de nacimiento, se pone null
+        if fecha_nac == '' or fecha_nac == None or fecha_nac == 'null':
+            fecha_nac = None 
+
         #Guardar la imagen
         nombre_imagen = guardarObjeto(BytesIO(data), extension,"Fotos/")
         id_foto = nombre_imagen['Key']
@@ -43,6 +46,7 @@ def crearArtista():
         print(e)
         return jsonify({'status': False})
 
+
 @BlueprintArtistas.route('/artista/listar', methods=['GET'])
 def listarArtistas():
     #Conexion a la base de datos
@@ -53,12 +57,16 @@ def listarArtistas():
         data = cursor.fetchall()
         #Pasar a un json
         for i in range(len(data)):
-            fecha_iso = data[i][3].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            if data[i][3] != None:
+                #Pasar a iso
+                fecha_aux = data[i][3].isoformat()
+            if data[i][3] == None or data[i][3] == 'null' or data[i][3] == '':
+                fecha_aux = None
             data[i] = {
                 'id_artista': data[i][0],
                 'nombres': data[i][1],
                 'apellidos': data[i][2],
-                'fecha_nac': fecha_iso,
+                'fecha_nac': fecha_aux,
                 'path_fotografia': data[i][4],
                 'id_fotografia': data[i][5]
             }
@@ -79,11 +87,16 @@ def verArtista(id):
         cursor.execute("SELECT * FROM artista WHERE id_artista = %s;", (id,))
         data = cursor.fetchone()
         #Pasar a un json
+        if data[3] != None:
+            #Pasar a iso
+            fecha_aux = data[3].isoformat()
+        if data[3] == None or data[3] == 'null' or data[3] == '':
+            fecha_aux = None
         data = {
             'id_artista': data[0],
             'nombres': data[1],
             'apellidos': data[2],
-            'fecha_nac': data[3].strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+            'fecha_nac': fecha_aux,
             'path_fotografia': data[4],
             'id_fotografia': data[5]
         }
@@ -155,6 +168,11 @@ def modificarInfoArtista(id):
         apellidos = data['apellidos']
         fecha_nac = data['fecha_nac']
 
+        #Si no se recibe fecha de nacimiento, se pone null
+        if fecha_nac == '' or fecha_nac == None or fecha_nac == 'null':
+            fecha_nac = None
+
+        print(fecha_nac)
         status = False
 
         

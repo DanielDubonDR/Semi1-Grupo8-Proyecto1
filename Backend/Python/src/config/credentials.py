@@ -5,13 +5,13 @@ import os
 load_dotenv()
 
 dbConfig = {
+    'pool_name': "pool_sound_stream",
     'host': os.environ.get('DB_HOST'),
     'user': os.environ.get('DB_USER'),
     'password': os.environ.get('DB_PASSWORD'),
     'database': os.environ.get('DATABASE'),
     'port': os.environ.get('DB_PORT')
 }
-
 #Configuracion del bucket
 bucketConfig = {
     'name': os.environ.get('NAME_BUCKET'),

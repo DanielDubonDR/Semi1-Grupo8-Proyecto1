@@ -6,6 +6,7 @@ export default function CRUD_album() {
   const usuario = JSON.parse(localStorage.getItem("data_user"));
   const [albumes, setAlbumes] = useState([]);
   const [artistasDisponibles, setArtistasDisponibles] = useState([]);
+  const [response, setResponse] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,30 +34,21 @@ export default function CRUD_album() {
     };
 
     fetchData();
-  }, []);
+
+    setResponse("");
+  }, [response]);
   return (
     <div
       id="profile"
       class="h-screen w-screen overflow-y-auto bg-gradient-to-t from-darkPurple scrollbar-hide mb-[100px]"
     >
-      {Item_CRUD_album(albumes, artistasDisponibles)}
+      {Item_CRUD_album(albumes, artistasDisponibles, setResponse, response)}
     </div>
   );
 }
 
-function Item_CRUD_album(data, artistasDisponibles) {
+function Item_CRUD_album(data, artistasDisponibles, setResponse, response) {
   const usuario = JSON.parse(localStorage.getItem("data_user"));
-  const showToastMessageError = () => {
-    toast.error("Ha ocurrido un error - el álbum no ha sido eliminado.", {
-      position: toast.POSITION.TOP_RIGHT,
-    });
-  };
-
-  const showToastMessageSuccess = () => {
-    toast.success("El álbum ha sido eliminado correctamente.", {
-      position: toast.POSITION.TOP_RIGHT,
-    });
-  };
 
   const [showModal, setShowModal] = useState(false);
   const [showSongs, setShowSongs] = useState(false);
@@ -121,7 +113,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
         toast.success("La canción ha sido agregada correctamente.", {
           position: toast.POSITION.TOP_RIGHT,
         });
-        window.location.reload();
+        setResponse("ok");
       } else {
       }
     } catch (error) {
@@ -130,7 +122,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
-    //setAddSong(false);
+    setAddSong(false);
   };
 
 
@@ -158,7 +150,13 @@ function Item_CRUD_album(data, artistasDisponibles) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
-    window.location.reload();
+    setResponse("Add");
+    setFData({
+      nombre: "",
+      id_artista: "",
+      descripcion: "",
+      imagen: ""
+    });
     setAddAlbum(false);
   };
 
@@ -166,9 +164,6 @@ function Item_CRUD_album(data, artistasDisponibles) {
 
   const obtDatos = async () => {
     setAlbum(data);
-
-    /*const respose = await fetch(URL);
-    setAlbum(await respose.data);*/
   };
   const getRowValue = (e) => {
     console.log("HOLIWIS KIWIIIIIIIIS", e);
@@ -176,9 +171,10 @@ function Item_CRUD_album(data, artistasDisponibles) {
 
   const obtCancionesAlbum = async (id_album) => {
     try {
-      let res = await Service.listarCancionesAlbum(id_album);
+      let res = await Service.listarCancionesAlbum(id_album,usuario.id);
       if (res.status === 200) {
-        setCancionesAlbum(res.data);
+        console.log("ESTAS SON LAS CANCIONES DEL ALBUM", res.data);
+        setCancionesAlbum(res.data["songsWithLike"]);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -222,7 +218,9 @@ function Item_CRUD_album(data, artistasDisponibles) {
         toast.success("La canción ha sido eliminada correctamente del álbum.", {
           position: toast.POSITION.TOP_RIGHT,
         });
-        window.location.reload();
+        
+        setResponse("Eliminado")
+        set
 
       } else {
         toast.error("Ha ocurrido un error - la canción no ha sido eliminada.", {
@@ -236,6 +234,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
+
   }
 
   const handleActualizacion = async (e) => {
@@ -254,7 +253,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
           position: toast.POSITION.TOP_RIGHT,
         });
 
-         window.location.reload();
+        setResponse("Actualizado")
       } else {
       }
     } catch (error) {
@@ -288,7 +287,7 @@ function Item_CRUD_album(data, artistasDisponibles) {
         toast.success("La imagen ha sido actualizada correctamente.", {
           position: toast.POSITION.TOP_RIGHT,
         });
-        window.location.reload();
+        setResponse("Update")
       } else {
       }
     } catch (error) {
@@ -316,7 +315,8 @@ function Item_CRUD_album(data, artistasDisponibles) {
           position: toast.POSITION.TOP_RIGHT,
 
         });
-         window.location.reload();
+        setResponse("Delete")
+        setDeleteAlbum(false);
       } else {
       }
     } catch (error) {

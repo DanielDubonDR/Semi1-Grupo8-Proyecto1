@@ -5,6 +5,7 @@ import { useUserContext } from "../../context/UserContext";
 import { usePlayer } from "../../context_Player/playerContext";
 import { ToastContainer, toast } from 'react-toastify';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import convertirFechaParaSQL from "../../utils/utils";
 import { BsPlay, BsPlusCircle } from "react-icons/bs";
 import { set } from "lodash";
 
@@ -22,6 +23,7 @@ export default function Navbar({ fixed }) {
   const [canciones_playlist, setCanciones_playlist] = useState([]);
   const [idSongModal, setIdSongModal] = useState('');
   const [idSongAlbumModal, setIdSongAlbumModal] = useState('');
+  const [response, setResponse] = useState('');
   const usuario = JSON.parse(localStorage.getItem('data_user'));
   const handleSelectChange = (e) => {
     console.log("QUIERO REVISAR: ", e.target.value)
@@ -156,7 +158,9 @@ const handleAddSongtoPlaylist = (e) => {
 
 
     fetchData();
-  }, []);
+
+    setResponse("");
+  }, [response]);
 
   const filteredCanciones = cancionesB.filter((cancion) =>
   cancion.nombre.toLowerCase().includes(searchText.toLowerCase()) || cancion.nombre_artista.toLowerCase().includes(searchText.toLowerCase())
@@ -176,11 +180,15 @@ const handleSetSong = async (cancion) => {
   try {
   setCancionActual(cancion);
   setCanc([cancion])
-    let values = {
-      id_cancion: cancion.id_cancion,
-      id_album: cancion.id_album,
-      id_usuario: usuario.id
-    }
+
+  const hoy = new Date();
+
+      let values = {
+        id_cancion: cancionActual.id_cancion,
+        id_album: cancionActual.id_album,
+        id_usuario: usuario.id,
+        fecha: convertirFechaParaSQL(hoy)
+      };
     console.log(values);
     let res = await Service.postReproduccion(values);
     console.log(res.data);
@@ -197,15 +205,18 @@ const playAlbum = async (album) => {
     console.log(res.data);
     setCanc(res.data);
     setCancionActual(res.data[0]);
+    const hoy = new Date();
 
-    let values = {
-      id_cancion: res.data[0].id_cancion,
-      id_album: res.data[0].id_album,
-      id_usuario: usuario.id
-    }
+      let values = {
+        id_cancion: cancionActual.id_cancion,
+        id_album: cancionActual.id_album,
+        id_usuario: usuario.id,
+        fecha: convertirFechaParaSQL(hoy)
+      };
+    console.log(values);
     let res2 = await Service.postReproduccion(values);
-    console.log(res2.data);
     setReproduciendose(true);
+    console.log(res.data);
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -242,9 +253,7 @@ const toggleLike = (cancion) => {
                   theme: "dark",
                   });
                   cancion.isLiked = true;
-              setTimeout(() => {
-                  window.location.reload();
-              },500)
+                  setResponse("cambio");
           }else{
               toast.error('Ocurrio un Error!', {
                   position: "top-right",

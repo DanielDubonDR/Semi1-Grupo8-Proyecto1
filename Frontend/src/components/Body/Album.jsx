@@ -36,6 +36,9 @@ function Album() {
     const [idSongAlbumModal, setIdSongAlbumModal] = useState('');
     const [playlist_seleccionada, setPlaylist_seleccionada] = useState('');
     const [canciones_playlist, setCanciones_playlist] = useState([]);
+    const usuario = JSON.parse(localStorage.getItem('data_user'));
+
+    
     const { cancionActual, setCancionActual, canc, setCanc, reproduciendose, setReproduciendose } = usePlayer();
     useEffect(() => {
         setColor(shuffle(colors).pop());
@@ -79,7 +82,7 @@ function Album() {
           }
           let res2 = await Service.postReproduccion(values);
           console.log(res2.data);
-          setReproduciendose(true);
+            setReproduciendose(true);
         } catch (error) {
           console.error("Error fetching data:", error);
         }

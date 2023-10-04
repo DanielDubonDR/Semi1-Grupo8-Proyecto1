@@ -7,12 +7,19 @@ import { useUserContext } from "../../context/UserContext";
 export default function CRUD_artistas() {
   const [data, setData] = useState({});
   const usuario = JSON.parse(localStorage.getItem("data_user"));
+  const [response, setResponse] = useState("");
 
   const [artistas, setArtistas] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
         let res = await Service.listarArtistas();
+        
+        for (let i = 0; i < res.data.length; i++) {
+          if (res.data[i].fecha_nac == null) {
+            res.data[i].fecha_nac = null;
+          }
+        }
 
         if (res.status == 200) {
           setArtistas(res.data);
@@ -23,7 +30,9 @@ export default function CRUD_artistas() {
     };
 
     fetchData();
-  }, []);
+
+    setResponse("");
+  }, [response]);
 
   const { logueado, setLogueado } = useUserContext();
   const navigate = useNavigate();
@@ -38,14 +47,12 @@ export default function CRUD_artistas() {
       id="profile"
       class="flex h-screen w-screen overflow-y-auto bg-gradient-to-t from-lightPurple/50 scrollbar-hide mb-[100px]"
     >
-      {Item_CRUD_artistas(artistas)}
+      {Item_CRUD_artistas(artistas, setResponse, response )}
     </div>
   );
 }
 
-
-
-function Item_CRUD_artistas(data) {
+function Item_CRUD_artistas(data, setResponse, response) {
   const usuario = JSON.parse(localStorage.getItem("data_user"));
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
@@ -55,7 +62,7 @@ function Item_CRUD_artistas(data) {
 
   const handleImageUpdate = async (e) => {
     const file = e.target.files[0];
-    
+
     const formData = new FormData();
     formData.append("imagen", file);
 
@@ -73,10 +80,7 @@ function Item_CRUD_artistas(data) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
-    
-    
-  }
-
+  };
 
   const showToastMessageError = () => {
     toast.error("Ha ocurrido un error - la canción no ha sido eliminada.", {
@@ -95,7 +99,7 @@ function Item_CRUD_artistas(data) {
   const [addSong, setAddSong] = useState(false);
   const [deleteAlbum, setDeleteAlbum] = useState(false);
   const [addAlbum, setAddAlbum] = useState(false);
-
+  
   const [album, setAlbum] = useState([]);
   //atributos:
   const [name, setName] = useState("");
@@ -108,6 +112,7 @@ function Item_CRUD_artistas(data) {
   const [title, setTitle] = useState("");
   const [id_artist, setId_artist] = useState(-1);
   const [passw, setPassw] = useState("");
+
 
   useEffect(() => {
     obtDatos();
@@ -129,21 +134,24 @@ function Item_CRUD_artistas(data) {
     setDescription(event.target.value);
   };
 
-
   const DeleteArtist = async (id, e) => {
     e.preventDefault();
     try {
       let datos = {
-        idArtist : id,
-        idUser : usuario.id,
-        password : passw
-      }
+        idArtist: id,
+        idUser: usuario.id,
+        password: passw,
+      };
       const res = await Service.eliminarArtista(datos);
 
       if (res.status == 200) {
         toast.success("El artista ha sido eliminado correctamente.", {
           position: toast.POSITION.TOP_RIGHT,
         });
+
+        setTimeout(() => {
+          setResponse("cambio eliminado");
+        }, 500);
       } else {
       }
     } catch (error) {
@@ -152,10 +160,10 @@ function Item_CRUD_artistas(data) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
-    window.location.reload();
+    setDeleteAlbum(false);
   };
 
-  const handleActualizacion = async (e) => { 
+  const handleActualizacion = async (e) => {
     e.preventDefault();
     let datos_Enviar = {
       nombres: name,
@@ -168,10 +176,13 @@ function Item_CRUD_artistas(data) {
       if (res.status == 200) {
         toast.success("El artista ha sido actualizado correctamente.", {
           position: toast.POSITION.TOP_RIGHT,
-        });
+        });        
+        setTimeout(() => {
+          setResponse("cambio de estado");
+        }, 500);
 
-        window.location.reload();
         setShowSongs(false);
+
       } else {
       }
     } catch (error) {
@@ -180,7 +191,8 @@ function Item_CRUD_artistas(data) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
-
+    setShowModal(false);
+    setShowSongs(false);
   };
 
   function formatDate(inputDate) {
@@ -188,7 +200,7 @@ function Item_CRUD_artistas(data) {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear().toString();
-  
+
     return `${day}-${month}-${year}`;
   }
 
@@ -197,10 +209,9 @@ function Item_CRUD_artistas(data) {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear().toString();
-  
+
     return `${year}-${month}-${day}`;
   };
-
 
   const obtDatos = async () => {
     setAlbum(data);
@@ -236,7 +247,17 @@ function Item_CRUD_artistas(data) {
     formData.append("nombres", fData.nombres);
     formData.append("apellidos", fData.apellidos);
     formData.append("imagen", selectedImage);
-    formData.append("fecha_nac", fData.fecha_nac);
+
+    if (fData.fecha_nac == ""){
+      console.log("fecha nac es null");
+      fData.fecha_nac = null
+      formData.append("fecha_nac", fData.fecha_nac);
+    }
+    else{
+      formData.append("fecha_nac", fData.fecha_nac);
+    }
+
+    console.log("formData: ", fData.fecha_nac);
 
     try {
       const res = await Service.crearArtista(formData);
@@ -244,6 +265,10 @@ function Item_CRUD_artistas(data) {
         toast.success("El artista ha sido creado correctamente.", {
           position: toast.POSITION.TOP_RIGHT,
         });
+
+        setTimeout(() => {
+          setResponse("cambio agregado");
+        }, 500);
       } else {
       }
     } catch (error) {
@@ -260,7 +285,8 @@ function Item_CRUD_artistas(data) {
       id_imagen: "",
       fecha_nac: "",
     });
-    window.location.reload();
+
+
 
     setAddAlbum(false);
   };
@@ -342,10 +368,7 @@ function Item_CRUD_artistas(data) {
                     Search
                   </label>
                   <div class="relative w-full">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-
-                    </div>
-
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"></div>
                   </div>
                   <div class="w-full md:w-auto  space-y-2 md:space-y-0  flex-shrink-0">
                     <button
@@ -381,7 +404,7 @@ function Item_CRUD_artistas(data) {
                   <th scope="col" class="px-6 py-3">
                     Nombre
                   </th>
-                  
+
                   <th scope="col" class="px-6 py-3">
                     Fecha de Nacimiento
                   </th>
@@ -414,7 +437,11 @@ function Item_CRUD_artistas(data) {
                     <td class="px-6 py-4">
                       {value.nombres + " " + value.apellidos}
                     </td>
+                    {value.fecha_nac == null ? (
+                      <td class="px-6 py-4">{""}</td>
+                    ) : (
                     <td class="px-6 py-4">{formatDate(value.fecha_nac)}</td>
+                    )}
                     <td class=" text-center">
                       <button
                         class="bg-yellow-400 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded "
@@ -570,7 +597,10 @@ function Item_CRUD_artistas(data) {
                     {!showSongs ? (
                       <div className="relative p-6 flex-auto">
                         <div class="w-full ">
-                          <form class="w-full " onSubmit={(e) => handleActualizacion(e)}>
+                          <form
+                            class="w-full "
+                            onSubmit={(e) => handleActualizacion(e)}
+                          >
                             <div class="grid grid-cols-2 gap-2">
                               <div class="md:flex md:items-center mb-6">
                                 <div class="">
@@ -786,7 +816,10 @@ function Item_CRUD_artistas(data) {
                             Confirme su contraseña:
                           </label>
                         </div>
-                        <form className="justify-center flex" onSubmit={(e) => DeleteArtist(id_artist, e)}>
+                        <form
+                          className="justify-center flex"
+                          onSubmit={(e) => DeleteArtist(id_artist, e)}
+                        >
                           <div class="w-full flex">
                             <input
                               class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
@@ -795,10 +828,8 @@ function Item_CRUD_artistas(data) {
                               onChange={handlePasswChange}
                               autoComplete="on"
                             ></input>
-
-                            
                           </div>
-                          
+
                           <div class="flex">
                             <button
                               type="submit"
@@ -922,7 +953,6 @@ function Item_CRUD_artistas(data) {
                                 id="inline-full-name"
                                 type="text"
                                 name="apellidos"
-                                
                                 defaultValue={fData.apellidos}
                                 onChange={handleInputChange}
                               ></input>

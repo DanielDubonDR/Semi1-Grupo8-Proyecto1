@@ -9,6 +9,7 @@ export default function CRUD_cancion() {
   const usuario = JSON.parse(localStorage.getItem("data_user"));
   const [artista, setArtista] = useState([]);
   const [canciones, setCanciones] = useState([]);
+  const [response, setResponse] = useState("");
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -36,7 +37,8 @@ export default function CRUD_cancion() {
     };
 
     fetchData();
-  }, []);
+    setResponse("");
+  }, [response]);
 
   const { logueado, setLogueado } = useUserContext();
   const navigate = useNavigate();
@@ -51,12 +53,12 @@ export default function CRUD_cancion() {
       id="profile"
       class="flex h-screen w-full overflow-y-auto bg-gradient-to-t from-silver/40 mb-[100px] scrollbar-hide"
     >
-      {Item_CRUD_cancion(canciones, artista)}
+      {Item_CRUD_cancion(canciones, artista, response, setResponse)}
     </div>
   );
 }
 
-function Item_CRUD_cancion(data, data2) {
+function Item_CRUD_cancion(data, data2, response, setResponse) {
   const usuario = JSON.parse(localStorage.getItem("data_user"));
   const [canci, setCanci] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -203,7 +205,7 @@ function Item_CRUD_cancion(data, data2) {
       if (res.status === 200 || res.status === 204) {
         toast.success("Canción eliminada con éxito");
         setDeleteAlbum(false);
-        window.location.reload();
+        setResponse("ok Delete");
       } else {
         toast.error("Error al eliminar la canción");
       }
@@ -275,7 +277,7 @@ function Item_CRUD_cancion(data, data2) {
       toast.success("Canción actualizada con éxito");
       setShowModal(false)
       setShowSongs(false);
-      window.location.reload();
+      setResponse("ok Act");
     } else {
       toast.error("Error al actualizar la canción");
     }
@@ -411,11 +413,11 @@ function Item_CRUD_cancion(data, data2) {
     console.log("res de la creación: ", res.data);
     if (res.status === 200) {
       toast.success("Canción creada con éxito");
-      window.location.reload();
+      setResponse("ok Add");
     } else {
       toast.error("Error al crear la canción");
     }
-
+    
     setAddAlbum(false);
   };
 
