@@ -586,9 +586,16 @@ const closeModal = () => {
 
                     <td class="px-6 py-4">{value.nombres + " " + value.apellidos}</td>
                     <td class="px-6 py-4">
-                      <td class="px-6 py-4 text-right">
+
+                    {
+                        value.fecha_nac === null ? <td class="px-6 py-4 text-right">
+                        
+                      </td> :  <td class="px-6 py-4 text-right">
                         {formatDate(value.fecha_nac)}
                       </td>
+                    }
+
+                     
                     </td>
                   </tr>
                 ))}
