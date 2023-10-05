@@ -12,7 +12,7 @@ pool = mysql.connector.pooling.MySQLConnectionPool(
     password=dbConfig['password'],
     database=dbConfig['database'],
     port=dbConfig['port'],
-    pool_size=1000,
+    pool_size=25,
 )
 
 # Funcion para conectarse a la base de datos
