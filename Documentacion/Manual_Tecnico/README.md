@@ -6,25 +6,38 @@
 
 ## ÍNDICE:
 
-1. [Objetivos](#objetivos)
-2. [Arquitectura del proyecto](#arquitectura-del-proyecto)
-3. [Estructura del código](#estructura-del-código)
+- [🎶 SoundStream](#-soundstream)
+- [Manual Técnico](#manual-técnico)
+  - [ÍNDICE:](#índice)
+  - [Objetivos](#objetivos)
+    - [General](#general)
+    - [Específicos](#específicos)
+  - [Arquitectura del proyecto](#arquitectura-del-proyecto)
+  - [Estructura del código](#estructura-del-código)
     - [Backend](#backend)
-        - [Python](#python)
-        - [NodeJS](#nodejs)
+      - [Python](#python)
+      - [NodeJS](#nodejs)
+    - [API](#api)
     - [Frontend](#frontend)
-4. [Descripción de los servicios de AWS](#descripción-de-los-servicios-de-aws)
+      - [Reactjs](#reactjs)
+  - [Descripción de los servicios de AWS](#descripción-de-los-servicios-de-aws)
     - [S3](#s3)
+      - [Buckets](#buckets)
     - [EC2](#ec2)
+      - [Instancias](#instancias)
+      - [Creación de Instancias](#creación-de-instancias)
+        - [1. _Instancias_](#1-instancias)
+          - [Se configuraron las instancias de la siguiente manera:](#se-configuraron-las-instancias-de-la-siguiente-manera)
     - [Load Balancer](#load-balancer)
-        - [Creación del Load Balancer](#creación-del-load-balancer)
-            - [1. _Target Groups_](#1-target-groups)
-            - [2. _Balanceador de Carga_](#2-balanceador-de-carga)
+      - [Creación del Load Balancer](#creación-del-load-balancer)
+      - [1. _Target Groups_](#1-target-groups)
+        - [2. _Balanceador de Carga_](#2-balanceador-de-carga)
     - [RDS](#rds)
-        - [Diagrama Entidad Relación](#diagrama-entidad-relación)
+      - [Diagrama Entidad Relación](#diagrama-entidad-relación)
     - [IAM](#iam)
-        - [Roles](#roles)
-5. [Conclusiones](#conclusiones)
+      - [Usuarios](#usuarios)
+      - [Grupos de Usuarios](#grupos-de-usuarios)
+  - [Conclusiones](#conclusiones)
 
 ## Objetivos
 
@@ -72,7 +85,58 @@ Este proyecto se encuentra corriendo en un servidor EC2 en la zona de disponibil
 #### NodeJS
 <div align="center"><img src="https://seeklogo.com/images/N/nodejs-logo-FBE122E377-seeklogo.com.png" width="100"/></div>
 
-Descripcion xd
+<!-- {
+  "name": "api",
+  "version": "1.0.0",
+  "description": "API con coneccion a base de datos sql",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "author": "Daniel Dubon",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1446.0",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.6.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.0",
+    "nodemon": "^3.0.1"
+  }
+} -->
+
+Para la realización de la API desarrollada en NodeJS se utilizó el framework de Express, el cual es un framework de NodeJS que permite la creación de API's de forma sencilla.
+
+Tambien se utilizó la librería de Multer para poder subir archivos a S3, asi mismo tambien se utilizó la librería de Bcrypt para poder encriptar las contraseñas de los usuarios, la librería de UUID para poder generar los id's de los usuarios y la librería de Morgan para poder ver las peticiones que se realizan a la API, asi mismo tambien se utilizó la librería de Cors para poder realizar peticiones desde el cliente.
+
+Para poder conectarse a la base de datos se utilizó la librería de mysql2, y para poder conectarse a S3 se utilizó la librería de aws-sdk.
+
+Para poder ejecutar el proyecto se utilizó el siguiente comando:
+
+```
+npm run dev
+```
+
+Para esto se necesita haber instlado con npm los requerimientos que se encuentran en el archivo [`package.json`](../../Backend/NodeJS/package.json).
+
+El codigo de la API se encuentra en la carpeta [`NodeJS`](./../../Backend/NodeJS) en donde se encuentra la carpeta [`src`](./../../Backend/NodeJS/src) en donde se encuentra el código de la API.
+
+Este proyecto se encuentra corriendo en un servidor EC2 en la zona de disponibilidad `us-east-1a` en el puerto `4000`.
+
+### API
+
+Aca se encuentra la documentación de los endpoints de la API desarrollada en Python y NodeJS.
+
+- [ENPOINTS](https://documenter.getpostman.com/view/15418354/2s9YJey1DJ)
+
 
 ### Frontend
 
@@ -330,11 +394,61 @@ Una vez seleccionado, se especificaron los detalles del grupo de la siguiente ma
 ### RDS
 <div align="center"><img src="https://brandslogos.com/wp-content/uploads/images/large/aws-rds-logo.png" width="100"/></div>
 
-Descripción
+Creación de la base de datos en RDS
+
+Para comenzar con la configuración de la base de datos, primeramente se accedió a la cuenta - lo que llevó a la página de inicio de la Consola:
+
+<div align="center"><img src="./img/RDS/Screenshot 2023-10-02 211308.png" width="800"/></div>
+
+Una vez accedido, se ingresó al servicio de RDS:
+
+<div align="center"><img src="./img/RDS/Screenshot 2023-10-02 211357.png" width="800"/></div>
+
+Se busca en el Panel de Navegación de la izquierda la opción de `Bases de datos` y se selecciona la opción de `Crear base de datos`, en elegir un metodo de creación se selecciona `Creación estándar`:
+
+<div align="center"><img src="./img/RDS/Screenshot 2023-10-02 212708.png"/></div>
+
+Se selecciona el motor de base de datos, en este caso se seleccionó `MySQL`:
+
+<div align="center"><img src="./img/RDS/Screenshot 2023-10-02 212731.png"/></div>
+
+Se selecciona la versión del motor de base de datos, en este caso se seleccionó `MySQL 8.0.33`:
+
+<div align="center"><img src="./img/RDS/Screenshot 2023-10-02 212744.png"/></div>
+
+En las opciones de plantilla se selecciona `Capa Gratuita`:
+
+<div align="center"><img src="./img/RDS/Screenshot 2023-10-02 212801.png"/></div>
+
+Le indicamos el identificador de la base de datos
+
+<div align="center"><img src="./img/RDS/Screenshot 2023-10-02 212813.png"/></div>
+
+Se le asigna un nombre de usuario y una contraseña para poder acceder a la base de datos:
+
+<div align="center"><img src="./img/RDS/Screenshot 2023-10-02 212825.png"/></div>
+
+Se selecciona el tamaño de la instancia, en este caso se seleccionó `db.t3.micro`:
+
+<div align="center"><img src="./img/RDS/Screenshot 2023-10-02 212834.png"/></div>
+
+Se selecciona la zona de disponibilidad, en este caso se seleccionó `us-east-1d`
+
+Le damos acceso al publico y se selecciona el grupo de seguridad que se creó anteriormente `vpc-mysql-semi` la cual tiene el puerto 3306 abierto tanto para el acceso publico como para el acceso privado:
+
+<div align="center"><img src="./img/RDS/Screenshot 2023-10-02 215231.png"/></div>
+
+Para la auteuticacion de la base de datos se selecciona `Autenticación con contraseña`:
+
+<div align="center"><img src="./img/RDS/Screenshot 2023-10-02 215242.png"/></div>
+
+Se crea la base de datos:
+
+<div align="center"><img src="./img/RDS/Screenshot 2023-10-02 215748.png"/></div>
 
 #### Diagrama Entidad Relación
 
-Descripción
+<div align="center"><img src="./img/RDS/DB.png"/></div>
 
 ### IAM
 <div align="center"><img src="https://logowiki.net/uploads/logo/a/aws-iam.svg" width="80"/></div>
