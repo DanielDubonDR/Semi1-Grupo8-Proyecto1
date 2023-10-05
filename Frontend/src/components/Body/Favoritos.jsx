@@ -182,7 +182,7 @@ function Favoritos() {
         }
     }
     return (
-        <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide bg-black">
+        <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide bg-black ml-[16rem]">
             <Header_name/>
             <section className={`flex items-end space-x-7 bg-gradient-to-b to-black ${color} h-80 text-white p-8 relative`}>
                 <img className="h-44 w-44 shadow-2xl" src="https://i.postimg.cc/RC7PRnrf/Black-Red-Minimal-Beat-Music-Logo-1000-1000-px.jpg" alt="" />

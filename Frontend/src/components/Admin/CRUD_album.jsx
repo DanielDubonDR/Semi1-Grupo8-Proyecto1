@@ -122,6 +122,14 @@ function Item_CRUD_album(data, artistasDisponibles, setResponse, response) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
+
+    setFData({
+      nombre: "",
+      id_artista: "",
+      descripcion: "",
+      imagen: ""
+    });
+
     setAddSong(false);
   };
 

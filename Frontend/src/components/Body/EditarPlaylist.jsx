@@ -132,7 +132,7 @@ const EditarPlaylist = () => {
 
     const squareRef = useRef();
     return(
-        <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide">
+        <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide ml-[16rem]">
         <div className=" mb-24">
             <Header_name />
             <ToastContainer

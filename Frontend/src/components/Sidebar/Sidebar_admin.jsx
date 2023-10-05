@@ -64,7 +64,7 @@ function Sidebar_admin() {
     return(
         
         <div className='flex'>
-        <div className='bg-black text-gray-500 p-5 text-xs lg:text-sm border-r border-gray-900 overflow-y-scroll scrollbar-hide h-screen sm: max-w-[12rem] lg:max-w-[16rem] hidden md:inline-flex'>
+        <div className='bg-black text-gray-500 p-5 text-xs lg:text-sm border-r border-gray-900 overflow-y-scroll scrollbar-hide h-screen sm:max-w-[12rem] lg:max-w-[16rem] hidden md:inline-flex fixed'>
             <div className='space-y-4'>
                 <div className="flex items-center justify-center space-x-2">
                     <img className='h-20 w-20 align-middle' src="http://imgfz.com/i/pxcvWfe.png" alt="" />

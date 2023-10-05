@@ -150,7 +150,7 @@ const ArtistDetails = () => {
     }
     const activeSong = {};
     return (
-        <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide ">
+        <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide ml-[16rem]">
             <Header_name/>
             <div className="flex flex-col">
                 <DetailsHeader 

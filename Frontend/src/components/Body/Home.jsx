@@ -175,7 +175,7 @@ function Home(){
     console.log(songs);
     const activeSong = {};
     return(
-        <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide bg-gradient-to-b from-purple to-black">
+        <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide bg-gradient-to-b from-purple to-black ml-[16rem]">
             <Header_name/>
         <div className="flex flex-col ml-8 mb-32">
             <div className="w-full flex flex-wrap justify-between items-center sm:flex-row flex-col mt-4">

@@ -19,7 +19,7 @@ const MyPlaylists = () => {
   }, []);
 
   return (
-    <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide " >
+    <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide ml-[16rem]" >
       <Header_name />
       <div className="relative w-full flex flex-col bg-gradient-to-b from-purple to-black">
         <div className="w-full h-40 bg-gradient-to-1 from-transparent to-black sm:h-48"></div>

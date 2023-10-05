@@ -417,6 +417,15 @@ function Item_CRUD_cancion(data, data2, response, setResponse) {
     } else {
       toast.error("Error al crear la canción");
     }
+
+    setFData({
+      nombres: "",
+      apellidos: "",
+      path_imagen: "",
+      id_imagen: "",
+      fecha_nac: "",
+    });
+
     
     setAddAlbum(false);
   };

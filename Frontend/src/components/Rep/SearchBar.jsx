@@ -306,7 +306,7 @@ const toggleLike = (cancion) => {
 };
 
 const filteredAlbums = albums.filter((album) =>
-  album.nombre.toLowerCase().includes(searchText.toLowerCase()) //|| album.artista.toLowerCase().includes(searchText.toLowerCase())
+  album.nombre.toLowerCase().includes(searchText.toLowerCase()) || album.nombre_artista.toLowerCase().includes(searchText.toLowerCase())
 );
 
 const filteredArtistas = artista.filter((artista) =>
@@ -353,7 +353,7 @@ const closeModal = () => {
 
   return (
     <>
-      <div className="w-full bg-black2  mb-[100px] overflow-y-auto scrollbar-hide">
+      <div className="w-full bg-black2  mb-[100px] overflow-y-auto scrollbar-hide ml-[16rem]">
         <nav class="sticky top-0 bg-gradient-to-r from-lightPurple via-purple to-lightPurple dark:bg-gray-900 z-30 w-full px-2 py-4 shadow-[0_30px_30px_-15px_rgba(0,0,0,0.8)]">
           <div class="grid gap-6 md:grid-cols-3 ">
             <div>

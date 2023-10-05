@@ -199,7 +199,7 @@ function Radio() {
     }
 
     return (
-        <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide mb-[100px]">
+        <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide ml-[16rem] mb-[100px]">
             <Header_name/>
             <section 
             className={`flex items-end space-x-7 bg-gradient-to-b to-black ${color} h-80 text-white p-8 relative`}
