@@ -15,11 +15,14 @@ def verUsuario(id_usuario):
         cursor.execute("SELECT correo, nombres, apellidos, fecha_nac, path_foto FROM usuario WHERE id_usuario = %s;", (id_usuario,))
         usuario = cursor.fetchone()
         #Pasar la lista a un diccionario
+        fecha_aux = usuario[3]
+        fecha_aux = fecha_aux + datetime.timedelta(days=1)
+        fecha_aux = fecha_aux.isoformat()
         usuario = {
             'correo': usuario[0],
             'nombres': usuario[1],
             'apellidos': usuario[2],
-            'fecha_nac': usuario[3].strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+            'fecha_nac': fecha_aux,
             'path_foto': usuario[4]
         }
         cursor.close()

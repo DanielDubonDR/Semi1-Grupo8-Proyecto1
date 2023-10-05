@@ -61,7 +61,7 @@ def listarArtistas():
             if data[i][3] != None:
                 #Pasar a iso
                 fecha_aux = data[i][3]
-                fecha_aux = fecha_aux + datetime.timedelta(hours=6)
+                fecha_aux = fecha_aux + datetime.timedelta(days=1)
                 fecha_aux = fecha_aux.isoformat()
             if data[i][3] == None or data[i][3] == 'null' or data[i][3] == '':
                 fecha_aux = None
@@ -93,7 +93,7 @@ def verArtista(id):
         if data[3] != None:
             #Pasar a iso
             fecha_aux = data[3]
-            fecha_aux = fecha_aux + datetime.timedelta(hours=6)
+            fecha_aux = fecha_aux + datetime.timedelta(days=1)
             fecha_aux = fecha_aux.isoformat()
         if data[3] == None or data[3] == 'null' or data[3] == '':
             fecha_aux = None
