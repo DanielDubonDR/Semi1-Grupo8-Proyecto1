@@ -1,6 +1,5 @@
-from datetime import datetime
+import datetime
 from io import BytesIO
-
 from config.imageHandler import compararPassword, eliminarObjeto, guardarObjeto
 from db import obtenerConexion
 from flask import Blueprint, jsonify, request
