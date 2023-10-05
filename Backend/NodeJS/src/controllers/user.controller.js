@@ -219,6 +219,10 @@ export const getHistory = async (req, res) => {
         // SELECT h.fecha, c.nombre AS nombre_cancion, c.duracion AS duracion_cancion, a.nombres AS nombre_artista, al.nombre AS nombre_album FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN artista a ON al.id_artista = a.id_artista WHERE h.id_usuario = 2 ORDER BY h.fecha DESC;
         const id_usuario = req.params.id;
         const query = await pool.query("SELECT h.fecha, c.nombre AS nombre_cancion, c.duracion AS duracion_cancion, a.nombres AS nombre_artista, al.nombre AS nombre_album,c.path_imagen AS path_imagen FROM historico h JOIN cancion_album ca ON h.id_album = ca.id_album AND h.id_cancion = ca.id_cancion JOIN cancion c ON ca.id_cancion = c.id_cancion JOIN album al ON ca.id_album = al.id_album JOIN artista a ON al.id_artista = a.id_artista WHERE h.id_usuario = ? ORDER BY h.fecha DESC", [id_usuario]);
+
+        query[0].forEach( item => {
+            item.fecha = new Date( item.fecha.getTime() + 6 * 60 * 60 * 1000 );
+        });
     
         return res.send(query[0]);
 
