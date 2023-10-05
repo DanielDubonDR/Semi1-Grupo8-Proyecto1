@@ -54,7 +54,7 @@ function Album() {
             })
         })
 
-        Service.listarCancionesAlbum(id, JSON.parse(localStorage.getItem('data_user')).id)
+        Service.listarCancionesAlbum(id, usuario.id)
         .then(response => {
             setCanciones(response.data.songsWithLike);
         })
