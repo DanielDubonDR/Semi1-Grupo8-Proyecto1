@@ -19,6 +19,7 @@ function Profile(){
     const [name_user, setName_user] = useState('');
     const [apellido_user, setApellido_user] = useState('');
     const [correo_user, setCorreo_user] = useState('');
+    const [fecha_nacimiento_user, setFecha_nacimiento_user] = useState('');
 
     useEffect(() => {
       if(!logueado){
@@ -33,6 +34,12 @@ function Profile(){
           setName_user(response.data.nombres)
           setApellido_user(response.data.apellidos)
           setCorreo_user(response.data.correo)
+          const fechaFormateada = new Date(response.data.fecha_nac).toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          });
+          setFecha_nacimiento_user(fechaFormateada)
           console.log(image_user)
           console.log(name_user)
       })
@@ -75,6 +82,15 @@ function Profile(){
           Correo Electrónico
         </label>
         <h2 className="text-white text-2xl">{correo_user}</h2>
+      </div>
+      <div className="mb-5">
+        <label
+          htmlFor="date"
+          className="mb-3 block text-base font-medium text-lightPurple"
+        >
+          Fecha de Nacimiento
+        </label>
+        <h2 className="text-white text-2xl">{fecha_nacimiento_user}</h2>
       </div>
       <div>
         <button

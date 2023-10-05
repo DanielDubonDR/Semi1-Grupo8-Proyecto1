@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import Service from "../../Service/Service";
@@ -7,13 +7,23 @@ const EditarPlaylist = () => {
     const [isDragging, setIsDragging] = useState(false);
     const [infoImage, setInfoImage] = useState('Arrastra aquí');
     const [previewImage, setPreviewImage] = useState(null);
-    const [oldImage, setOldImage] = useState('https://i.pinimg.com/236x/bc/3e/3d/bc3e3de9ca839288c7779965afb5c17c.jpg');
+    const [oldImage, setOldImage] = useState('');
     const [oldName, setOldName] = useState('');
     const [image, setImage] = useState(null);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const navigate = useNavigate();
     const { id } = useParams();
+
+    useEffect(() => {
+        Service.getPlaylist(id)
+        .then(response => {
+            setOldImage(response.data[0].path_portada);
+            setOldName(response.data[0].nombre);
+            setName(response.data[0].nombre);
+            setDescription(response.data[0].descripcion);
+        })
+    }, [])
 
     const handleDragStart = (e) => {
         e.preventDefault();

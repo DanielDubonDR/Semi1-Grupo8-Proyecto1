@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'http://load-balancer-g8-1287959962.us-east-1.elb.amazonaws.com:4000/'
+    baseURL: 'http://localhost:4000/'
 });
 
 //-----------------------USUARIOS-----------------------

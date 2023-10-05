@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Service from "../../Service/Service";
 import { useUserContext } from "../../context/UserContext";
 import { usePlayer } from "../../context_Player/playerContext";
-import { canciones } from "../datos_test/canciones";
 import convertirFechaParaSQL from "../../utils/utils";
+import { canciones } from "../datos_test/canciones";
 import Barra from "./Barra";
 import "./Reproductor.css";
 import Vol from "./Volumen";
@@ -161,7 +161,7 @@ function Reproductor() {
   };
 
   return (
-    <div className="fixed bottom-0 bg-black text-white p-2 z-50 w-screen grid grid-cols-4 gap-2 flex-auto">
+    <div className="fixed bottom-0 bg-black text-white p-2 z-50 w-screen grid grid-cols-4 gap-2 flex-auto ml-[16rem]">
       <div className="relative md:flex md:items-center">
         <img className="h-20 w-20" src={cancionActual.path_imagen} alt="" />
         <div>
