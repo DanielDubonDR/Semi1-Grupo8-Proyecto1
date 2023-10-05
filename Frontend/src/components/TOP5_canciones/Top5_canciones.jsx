@@ -35,7 +35,7 @@ export default function Top5_Canciones() {
 
     return (
         <>
-            <div className="TOP5_Canciones h-full w-full" >
+            <div className="TOP5_Canciones h-full w-full mb-[150px]" >
                 { canciones ? <Puestos canciones={canciones} /> : 
                 <>
                 <div class="flex h-screen-full w-screen-full bg-black">

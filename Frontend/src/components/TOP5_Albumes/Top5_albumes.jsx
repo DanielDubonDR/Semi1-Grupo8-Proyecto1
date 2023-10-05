@@ -33,7 +33,7 @@ export default function Top5_Albumes() {
 
   return (
     <>
-      <div className="TOP5_Canciones h-full w-full bg-black">
+      <div className="TOP5_Canciones h-full w-full bg-black  mb-[150px]">
         {albumes ? (
           <PuestosA albumes={albumes} />
         ) : (
