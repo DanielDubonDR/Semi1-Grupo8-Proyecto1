@@ -1,3 +1,4 @@
+import datetime
 from flask import Blueprint, request, jsonify
 from config.imageHandler import guardarObjeto, eliminarObjeto, compararPassword
 from db import  obtenerConexion
@@ -59,7 +60,9 @@ def listarArtistas():
         for i in range(len(data)):
             if data[i][3] != None:
                 #Pasar a iso
-                fecha_aux = data[i][3].isoformat()
+                fecha_aux = data[i][3]
+                fecha_aux = fecha_aux + datetime.timedelta(hours=6)
+                fecha_aux = fecha_aux.isoformat()
             if data[i][3] == None or data[i][3] == 'null' or data[i][3] == '':
                 fecha_aux = None
             data[i] = {
@@ -89,7 +92,9 @@ def verArtista(id):
         #Pasar a un json
         if data[3] != None:
             #Pasar a iso
-            fecha_aux = data[3].isoformat()
+            fecha_aux = data[3]
+            fecha_aux = fecha_aux + datetime.timedelta(hours=6)
+            fecha_aux = fecha_aux.isoformat()
         if data[3] == None or data[3] == 'null' or data[3] == '':
             fecha_aux = None
         data = {
@@ -172,7 +177,7 @@ def modificarInfoArtista(id):
         if fecha_nac == '' or fecha_nac == None or fecha_nac == 'null':
             fecha_nac = None
 
-        print(fecha_nac)
+
         status = False
 
         
