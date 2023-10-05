@@ -50,7 +50,7 @@ def listarAlbum():
     conexion = obtenerConexion()
     cursor = conexion.cursor()
     try:
-        cursor.execute("SELECT * FROM album;") #id_album, id_artista, nombre, descripcion, id_imagen, path_imagen
+        cursor.execute("SELECT album.*, CONCAT(artista.nombres, ' ', COALESCE(artista.apellidos, '')) AS nombre_artista FROM album LEFT JOIN artista ON album.id_artista = artista.id_artista") #id_album, id_artista, nombre, descripcion, id_imagen, path_imagen
         album = cursor.fetchall()
         #Pasar a un json
         for i in range(len(album)):
@@ -60,7 +60,8 @@ def listarAlbum():
                 'nombre': album[i][2],
                 'descripcion': album[i][3],
                 'id_imagen': album[i][4],
-                'path_imagen': album[i][5]
+                'path_imagen': album[i][5],
+                'nombre_artista': album[i][6]
             }
         cursor.close()
         conexion.close()
