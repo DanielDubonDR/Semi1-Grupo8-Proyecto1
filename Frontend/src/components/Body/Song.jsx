@@ -26,8 +26,9 @@ function Song({order, track, artist, opcion,idSongModal,idSongAlbumModa}){
         .then(response => {
             setSong(response.data);
             setDuracion(response.data.duracion);
+            setNombres(response.data.nombre_artista);
         })
-        setNombres(artist.nombres +" "+ artist.apellidos);
+        //setNombres(artist.nombres +" "+ artist.apellidos);
         setIsLiked(track.isLiked)
     }, [])
     const handleMouseEnter = () => {
