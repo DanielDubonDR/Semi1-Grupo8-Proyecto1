@@ -33,7 +33,7 @@ export const createAlbum = async (req, res) => {
 export const getAlbums = async (req, res) => {
 
     try {
-        const query = await pool.query("SELECT * FROM album");
+        const query = await pool.query("SELECT album.*, CONCAT(artista.nombres, ' ', COALESCE(artista.apellidos, '')) AS nombre_artista FROM album LEFT JOIN artista ON album.id_artista = artista.id_artista");
     
         res.status(200).send(query[0]);
 
